@@ -20,6 +20,13 @@ intellij {
     plugins.set(listOf(/* Plugin Dependencies */))
 }
 
+dependencies {
+    implementation("io.etcd:jetcd-core:0.7.3") {
+        exclude(group="org.slf4j", module = "slf4j-api")
+    }
+    compileOnly("org.projectlombok:lombok:1.18.24")
+}
+
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
@@ -39,6 +46,10 @@ tasks {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
         privateKey.set(System.getenv("PRIVATE_KEY"))
         password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+    }
+
+    runIde {
+        autoReloadPlugins.set(true)
     }
 
     publishPlugin {

@@ -8,7 +8,7 @@
     <name>Etcdhelper</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="tsonglew@github.com" url="https://tsonglew.github.io">Tsonglew</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
@@ -25,6 +25,11 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-
+        <toolWindow
+                factoryClass="com.github.tsonglew.etcdhelper.window.MainToolWindowFactory"
+                id="EtcdMainWindow"
+                icon="/icons/etcd.png"
+                anchor="right"
+        />
     </extensions>
 </idea-plugin>
