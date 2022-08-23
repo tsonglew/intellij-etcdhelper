@@ -2,6 +2,7 @@ package com.github.tsonglew.etcdhelper.window
 
 import com.github.tsonglew.etcdhelper.action.EtcdAddConnectionAction
 import com.github.tsonglew.etcdhelper.action.EtcdRefreshConnectionAction
+import com.github.tsonglew.etcdhelper.common.EtcdClientManager
 import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -19,7 +20,9 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.event.TreeSelectionEvent
 import javax.swing.event.TreeSelectionListener
+import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.MutableTreeNode
 import javax.swing.tree.TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION
 
 class MainToolWindow(
@@ -44,7 +47,7 @@ class MainToolWindow(
                 BorderLayout.CENTER
             )
         }
-        rootPanel
+        EtcdClientManager.mainToolWindow = this
     }
 
     companion object {
@@ -99,6 +102,12 @@ class MainToolWindow(
                 JBScrollPane(treeStruct).apply{ border = JBUI.Borders.customLine(Color.BLACK) },
                 BorderLayout.CENTER
             )
+        }
+    }
+
+    fun addTreeNode() {
+        (treeModel.root as MutableTreeNode).apply {
+            treeModel.insertNodeInto(DefaultMutableTreeNode(), this, 0)
         }
     }
 }

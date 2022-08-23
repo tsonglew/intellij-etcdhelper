@@ -1,5 +1,7 @@
 package com.github.tsonglew.etcdhelper.action
 
+import com.github.tsonglew.etcdhelper.common.EtcdClientManager
+import com.github.tsonglew.etcdhelper.data.ConnectionManager
 import com.github.tsonglew.etcdhelper.dialog.EtcdAddConnectionDialog
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
@@ -16,6 +18,7 @@ class EtcdAddConnectionAction : AnAction(
           EtcdAddConnectionDialog(p).also {
               if (it.showAndGet()) {
                   println("show and get")
+                  EtcdClientManager.mainToolWindow.addTreeNode()
               }
           }
         }

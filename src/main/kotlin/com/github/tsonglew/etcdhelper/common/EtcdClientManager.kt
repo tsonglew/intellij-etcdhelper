@@ -1,5 +1,6 @@
 package com.github.tsonglew.etcdhelper.common
 
+import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -20,6 +21,5 @@ object EtcdClientManager {
         return CONN_MAP[endpoints]
     }
 
-    val conn: EtcdClient
-        get() = CONN_MAP.entries.stream().findAny().get().value
+    lateinit var mainToolWindow: MainToolWindow
 }
