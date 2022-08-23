@@ -12,8 +12,12 @@ class EtcdAddConnectionAction : AnAction(
 ) {
     override fun actionPerformed(e: AnActionEvent) {
         println("etcd add action performed")
-        e.project?.also {
-          EtcdAddConnectionDialog(it).show()
+        e.project?.also {p ->
+          EtcdAddConnectionDialog(p).also {
+              if (it.showAndGet()) {
+                  println("show and get")
+              }
+          }
         }
     }
 }

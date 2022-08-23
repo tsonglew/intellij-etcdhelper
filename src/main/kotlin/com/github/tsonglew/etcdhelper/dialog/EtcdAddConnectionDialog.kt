@@ -1,10 +1,15 @@
 package com.github.tsonglew.etcdhelper.dialog
 
+import com.google.api.Endpoint
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.DialogPanel
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.layout.jbTextField
+import kotlinx.coroutines.newFixedThreadPoolContext
+import java.awt.TextField
 import javax.swing.JComponent
 import javax.swing.JPanel
 
@@ -13,23 +18,35 @@ class EtcdAddConnectionDialog(
 ) : DialogWrapper(project){
 
     private lateinit var panel: JPanel
+    private val endpointsTextField =  JBTextField("endpoints", 20)
+    private val usernameTextField=  JBTextField("username", 20)
+    private val passwordTextField=  JBTextField("password", 20)
 
     init {
         super.init()
         title = "add connection"
     }
 
-    override fun createCenterPanel(): JComponent? {
-        return panel{
+    override fun createCenterPanel(): JComponent {
+       panel= panel{
             row("endpoints: ") {
-                textField()
+                cell(endpointsTextField)
             }
             row("username: ") {
-                textField()
+                cell(usernameTextField)
             }
             row("password: ") {
-                textField()
+                cell(passwordTextField)
             }
         }
+        return panel
+    }
+
+    override fun doOKAction() {
+        println("doOKAction")
+        println("endpoints ${endpointsTextField.text}")
+        println("username ${usernameTextField.text}")
+        println("password ${passwordTextField.text}")
+        super.doOKAction()
     }
 }
