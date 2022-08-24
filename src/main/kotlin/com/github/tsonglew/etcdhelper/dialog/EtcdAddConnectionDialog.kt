@@ -1,5 +1,6 @@
 package com.github.tsonglew.etcdhelper.dialog
 
+import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
 import com.google.api.Endpoint
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
@@ -49,4 +50,10 @@ class EtcdAddConnectionDialog(
         println("password ${passwordTextField.text}")
         super.doOKAction()
     }
+
+    fun toEtcdConfiguration() = EtcdConfiguration(
+        endpointsTextField.text,
+        usernameTextField.text,
+        passwordTextField.text
+    )
 }

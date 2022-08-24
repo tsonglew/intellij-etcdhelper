@@ -25,6 +25,7 @@ dependencies {
         exclude(group="org.slf4j", module = "slf4j-api")
     }
     compileOnly("org.projectlombok:lombok:1.18.24")
+    testImplementation ("org.jetbrains.kotlin:kotlin-test")
 }
 
 tasks {

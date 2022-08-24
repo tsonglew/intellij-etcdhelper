@@ -3,6 +3,7 @@ package com.github.tsonglew.etcdhelper.window
 import com.github.tsonglew.etcdhelper.action.EtcdAddConnectionAction
 import com.github.tsonglew.etcdhelper.action.EtcdRefreshConnectionAction
 import com.github.tsonglew.etcdhelper.common.EtcdClientManager
+import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
 import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -42,7 +43,7 @@ class MainToolWindow(
             add(
                 OnePixelSplitter(true, 1f).apply {
                     firstComponent = createTreePanel()
-                    secondComponent = JPanel()// createTreePanel()
+                    secondComponent = JPanel()
                 },
                 BorderLayout.CENTER
             )
@@ -105,9 +106,13 @@ class MainToolWindow(
         }
     }
 
-    fun addTreeNode() {
+    fun addTreeNode(etcdConfiguration: EtcdConfiguration) {
         (treeModel.root as MutableTreeNode).apply {
-            treeModel.insertNodeInto(DefaultMutableTreeNode(), this, 0)
+            treeModel.insertNodeInto(
+                EtcdConnectionTreeNode(etcdConfiguration),
+                this,
+                0
+            )
         }
     }
 }
