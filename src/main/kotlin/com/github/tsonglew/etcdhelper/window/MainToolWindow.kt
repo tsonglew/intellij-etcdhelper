@@ -4,10 +4,23 @@ import com.github.tsonglew.etcdhelper.action.EtcdAddConnectionAction
 import com.github.tsonglew.etcdhelper.action.EtcdRefreshConnectionAction
 import com.github.tsonglew.etcdhelper.common.EtcdClientManager
 import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
+import com.github.tsonglew.etcdhelper.tab.EtcdDataVirtualFile
 import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
+import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.FileEditor
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.newvfs.NewVirtualFile
+import com.intellij.openapi.vfs.newvfs.impl.FakeVirtualFile
+import com.intellij.openapi.vfs.newvfs.impl.StubVirtualFile
+import com.intellij.psi.PsiFileFactory
+import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.DoubleClickListener
 import com.intellij.ui.OnePixelSplitter
 import com.intellij.ui.components.JBScrollPane
@@ -43,7 +56,7 @@ class MainToolWindow(
             add(
                 OnePixelSplitter(true, 1f).apply {
                     firstComponent = createTreePanel()
-                    secondComponent = JPanel()
+                    secondComponent = createTablePanel()
                 },
                 BorderLayout.CENTER
             )
@@ -72,6 +85,18 @@ class MainToolWindow(
         }
     }
 
+    private fun createTablePanel() : JComponent{
+        return JPanel(BorderLayout()).apply {
+            add(
+                ActionManager.getInstance()
+                    .createActionToolbar("table", DefaultActionGroup(), true)
+                    .also { it.targetComponent = this }
+                    .component,
+                BorderLayout.CENTER
+            )
+        }
+    }
+
     private fun initTreeStructure(): Tree {
         treeStruct = Tree(treeModel)
         treeStruct.isEditable = false
@@ -88,6 +113,12 @@ class MainToolWindow(
         object : DoubleClickListener() {
             override fun onDoubleClick(event: MouseEvent): Boolean {
                 println("double click tree")
+
+//                val node = treeStruct.selectionPath?.lastPathComponent as EtcdConnectionTreeNode
+                FileEditorManager.getInstance(project).openFile(
+                    LightVirtualFile("test11", "content111"),
+                    true
+                )
                 return true;
             }
         }.installOn(treeStruct)
