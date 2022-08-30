@@ -4,7 +4,7 @@ import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
 import javax.swing.tree.DefaultMutableTreeNode
 
 class EtcdConnectionTreeNode(
-    val etcdConfiguration: EtcdConfiguration?
+    private val etcdConfiguration: EtcdConfiguration?
 ): DefaultMutableTreeNode(etcdConfiguration) {
 
     constructor(): this(null)
