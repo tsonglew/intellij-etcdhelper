@@ -129,6 +129,7 @@ class MainToolWindow(
     private fun createTreePanel(): JComponent {
         treeModel = DefaultTreeModel(EtcdConnectionTreeNode())
         treeStruct = initTreeStructure()
+        treeStruct.isRootVisible = false
         return JPanel(BorderLayout()).apply {
             add(
                 JBScrollPane(treeStruct).apply{ border = JBUI.Borders.customLine(Color.BLACK) },
