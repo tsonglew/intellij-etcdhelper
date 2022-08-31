@@ -4,6 +4,7 @@ import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.JBSplitter
+import gnu.trove.TIntHashSet
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import javax.swing.JPanel
@@ -41,6 +42,6 @@ class EtcdKeyValueDisplayTab(
     }
 
     private fun initKeyTreePanel() {
-        keyTreePanel = KeyTreeDisplayPanel()
+        keyTreePanel = KeyTreeDisplayPanel(project, this, EtcdConfiguration())
     }
 }
