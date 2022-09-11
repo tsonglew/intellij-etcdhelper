@@ -1,10 +1,9 @@
 package com.github.tsonglew.etcdhelper.tab
 
 import com.github.tsonglew.etcdhelper.common.EtcdClient
-import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
-import com.github.tsonglew.etcdhelper.render.KeyTreeCellRenderer
+import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.view.render.ConnectionTreeCellRenderer
 import com.intellij.openapi.project.Project
-import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.treeStructure.Tree
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
@@ -13,19 +12,19 @@ import javax.swing.JPanel
 class KeyTreeDisplayPanel(
     private val project: Project,
     private val keyValueDisplayTab: EtcdKeyValueDisplayTab,
-    private val etcdConfiguration: EtcdConfiguration
+    private val etcdConnectionInfo: EtcdConnectionInfo
 ): JPanel() {
     init {
         val etcdClient = EtcdClient().apply {
             init(
-                etcdConfiguration.endpoints.split(",").toTypedArray(),
-                etcdConfiguration.username,
-                etcdConfiguration.password
+                etcdConnectionInfo.endpoints.split(",").toTypedArray(),
+                etcdConnectionInfo.username,
+                etcdConnectionInfo.password
             )
         }
         val keys = etcdClient.getByPrefix("/", null);
         val keyTree = Tree().apply {
-            cellRenderer = KeyTreeCellRenderer()
+            cellRenderer = ConnectionTreeCellRenderer()
             addMouseListener(object : MouseListener{
                 override fun mouseClicked(e: MouseEvent?) {
                     println("mouse clicked")
