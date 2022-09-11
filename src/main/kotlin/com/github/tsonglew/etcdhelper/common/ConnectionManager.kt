@@ -12,12 +12,18 @@ class ConnectionManager(
 ): Disposable {
     private val connectionTreeRoot= DefaultMutableTreeNode()
     private val connectionTreeModel = DefaultTreeModel(connectionTreeRoot)
+
+    /**
+     * map of endpoints to {@link EtcdClient}
+     */
     private val connectionMap = hashMapOf<String, EtcdClient>()
 
     companion object {
         fun getInstance(project: Project, propertyUtil: PropertyUtil) =
             project.getService(ConnectionManager::class.java) ?: ConnectionManager(project, propertyUtil)
     }
+
+    fun getClient(etcdConnectionInfo: EtcdConnectionInfo) = connectionMap[etcdConnectionInfo.endpoints]
 
     /**
      * init saved connections

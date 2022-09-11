@@ -2,38 +2,31 @@ package com.github.tsonglew.etcdhelper.window
 
 import com.github.tsonglew.etcdhelper.action.AddAction
 import com.github.tsonglew.etcdhelper.action.DeleteAction
-import com.github.tsonglew.etcdhelper.action.RefreshAction
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
-import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
+import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
+import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFile
+import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFileSystem
 import com.github.tsonglew.etcdhelper.view.render.ConnectionTreeCellRenderer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.openapi.wm.ToolWindow
-import com.intellij.testFramework.LightVirtualFile
-import com.intellij.ui.DoubleClickListener
 import com.intellij.ui.OnePixelSplitter
 import com.intellij.ui.TreeSpeedSearch
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
-import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Component
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.event.TreeSelectionListener
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.MutableTreeNode
-import javax.swing.tree.TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION
 
 class MainToolWindow(
     private val project: Project,
@@ -86,7 +79,29 @@ class MainToolWindow(
             alignmentX =Component.LEFT_ALIGNMENT
             addMouseListener(object: MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
-                    super.mouseClicked(e)
+                    if (e?.clickCount == 2 && !e.isMetaDown) {
+                        connectionTreeLoadingDecorator.startLoading(false)
+                        try {
+                            ReadAction.nonBlocking<Any?> {
+
+                                val connectionNode = connectionTree.selectionPath?.path?.get(1) as DefaultMutableTreeNode
+                                val connectionInfo = connectionNode.userObject as EtcdConnectionInfo
+                                val f = EtcdKeyValueDisplayVirtualFile(
+                                    project,
+                                    connectionInfo.endpoints,
+                                    connectionInfo,
+                                    connectionManager
+                                )
+                                ApplicationManager.getApplication().invokeLater {
+                                    EtcdKeyValueDisplayVirtualFileSystem.getInstance(project).openEditor(f)
+                                    // TODO: addEditorToMap
+                                }
+
+                            }.submit(ThreadPoolManager.executor)
+                        } finally {
+                            connectionTreeLoadingDecorator.stopLoading()
+                        }
+                    }
                     println("clicked connection tree")
                 }
             })

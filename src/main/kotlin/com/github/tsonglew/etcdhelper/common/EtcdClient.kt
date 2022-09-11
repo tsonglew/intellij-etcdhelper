@@ -31,7 +31,7 @@ class EtcdClient {
         endpoints = etcdUrls
         try {
             val clientBuilder = Client.builder().endpoints(*etcdUrls)
-            if (user != null && password != null) {
+            if (user != null && password != null && user.isNotEmpty() && password.isNotEmpty()) {
                 clientBuilder.user(bytesOf(user)).password(bytesOf(password))
             }
             client = clientBuilder.build()
@@ -109,7 +109,7 @@ class EtcdClient {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return Collections.emptyList();
+        return listOf();
     }
 
     companion object {

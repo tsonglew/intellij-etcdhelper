@@ -27,9 +27,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow
                 factoryClass="com.github.tsonglew.etcdhelper.window.MainToolWindowFactory"
-                id="EtcdMainWindow"
+                id="EtcdHelper"
                 icon="/icons/etcd.png"
                 anchor="right"
         />
+        <fileEditorProvider implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
     </extensions>
 </idea-plugin>

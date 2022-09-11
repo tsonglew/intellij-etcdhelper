@@ -18,13 +18,13 @@ class EtcdConnectionSettingsDialog(
 ) : DialogWrapper(project){
 
     private lateinit var panel: JPanel
-    private val endpointsTextField =  JBTextField("endpoints", 20)
-    private val usernameTextField=  JBTextField("username", 20)
-    private val passwordTextField=  JBTextField("password", 20)
+    private val endpointsTextField =  JBTextField("http://localhost:2379", 20)
+    private val usernameTextField=  JBTextField("", 20)
+    private val passwordTextField=  JBTextField("", 20)
 
     init {
         super.init()
-        title = "add connection"
+        title = "Add Connection"
     }
 
     override fun createCenterPanel(): JComponent {
@@ -54,7 +54,7 @@ class EtcdConnectionSettingsDialog(
         close(OK_EXIT_CODE)
     }
 
-    fun toEtcdConfiguration() = EtcdConnectionInfo(
+    private fun toEtcdConfiguration() = EtcdConnectionInfo(
         endpointsTextField.text,
         usernameTextField.text,
         passwordTextField.text
