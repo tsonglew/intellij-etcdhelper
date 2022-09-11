@@ -16,7 +16,7 @@ class MainToolWindowFactory : ToolWindowFactory {
                     .getService(ContentFactory::class.java)
                     .createContent(
                         MainToolWindow(project, toolWindow).content,
-                        "EtcdMainToolWindow",
+                        "",
                         false
                     )
             )
