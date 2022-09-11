@@ -1,6 +1,7 @@
 package com.github.tsonglew.etcdhelper.common
 
 import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
+import com.intellij.util.containers.toArray
 import io.etcd.jetcd.*
 import io.etcd.jetcd.auth.Permission
 import io.etcd.jetcd.options.GetOption
@@ -18,16 +19,28 @@ class EtcdClient {
     private var leaseClient: Lease? = null
     private lateinit var endpoints: Array<String>
 
+    fun init(etcdConnectionInfo: EtcdConnectionInfo) {
+        init(
+            etcdConnectionInfo.endpoints.split(",").toTypedArray(),
+            etcdConnectionInfo.username,
+            etcdConnectionInfo.password
+        )
+    }
+
     fun init(etcdUrls: Array<String>, user: String?, password: String?) {
         endpoints = etcdUrls
-        val clientBuilder = Client.builder().endpoints(*etcdUrls)
-        if (user != null && password != null) {
-            clientBuilder.user(bytesOf(user)).password(bytesOf(password))
+        try {
+            val clientBuilder = Client.builder().endpoints(*etcdUrls)
+            if (user != null && password != null) {
+                clientBuilder.user(bytesOf(user)).password(bytesOf(password))
+            }
+            client = clientBuilder.build()
+            kvClient = client!!.kvClient
+            authClient = client!!.authClient
+            leaseClient = client!!.leaseClient
+        } catch (e: Exception ) {
+            println("invalid connection info")
         }
-        client = clientBuilder.build()
-        kvClient = client!!.kvClient
-        authClient = client!!.authClient
-        leaseClient = client!!.leaseClient
     }
 
     fun close() {

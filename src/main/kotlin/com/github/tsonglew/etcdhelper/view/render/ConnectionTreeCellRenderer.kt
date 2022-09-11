@@ -1,13 +1,12 @@
-package com.github.tsonglew.etcdhelper.render
+package com.github.tsonglew.etcdhelper.view.render
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.util.Iconable.IconFlags
 import com.intellij.ui.ColoredTreeCellRenderer
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.xml.crypto.dsig.keyinfo.KeyInfo
 
-class KeyTreeCellRenderer: ColoredTreeCellRenderer() {
+class ConnectionTreeCellRenderer: ColoredTreeCellRenderer() {
     override fun customizeCellRenderer(
         tree: JTree,
         value: Any?,

@@ -1,7 +1,6 @@
 package com.github.tsonglew.etcdhelper.tab
 
-import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
-import com.intellij.openapi.vfs.NonPhysicalFileSystem
+import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.VirtualFileSystem
@@ -9,13 +8,13 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class EtcdDataVirtualFile(
-    private val etcdConfiguration: EtcdConfiguration
+    private val etcdConnectionInfo: EtcdConnectionInfo
 ): VirtualFile() {
     companion object{
         val virtualFileSystem: VirtualFileSystem = VirtualFileManager.getInstance().getFileSystem("etcd")
     }
 
-    override fun getName(): String = etcdConfiguration.toString()
+    override fun getName(): String = etcdConnectionInfo.toString()
 
     override fun getFileSystem(): VirtualFileSystem = virtualFileSystem
     override fun getPath(): String {

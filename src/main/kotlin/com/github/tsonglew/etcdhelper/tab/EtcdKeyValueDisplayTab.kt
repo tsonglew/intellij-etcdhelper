@@ -1,20 +1,19 @@
 package com.github.tsonglew.etcdhelper.tab
 
-import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
+import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.JBSplitter
-import gnu.trove.TIntHashSet
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import javax.swing.JPanel
 
 class EtcdKeyValueDisplayTab(
     private val project: Project,
-    private val configuration: EtcdConfiguration,
+    private val configuration: EtcdConnectionInfo,
     private var keyTreePanel: KeyTreeDisplayPanel? = null,
     private var toolbarPanel: JPanel? = null,
-            private var formPanel: JPanel? = null
+    private var formPanel: JPanel? = null
 ): JPanel() {
 
     init {
@@ -42,6 +41,6 @@ class EtcdKeyValueDisplayTab(
     }
 
     private fun initKeyTreePanel() {
-        keyTreePanel = KeyTreeDisplayPanel(project, this, EtcdConfiguration())
+        keyTreePanel = KeyTreeDisplayPanel(project, this, EtcdConnectionInfo())
     }
 }

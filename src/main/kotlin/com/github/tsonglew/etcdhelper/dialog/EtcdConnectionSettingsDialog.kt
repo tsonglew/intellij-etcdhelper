@@ -1,21 +1,20 @@
 package com.github.tsonglew.etcdhelper.dialog
 
-import com.github.tsonglew.etcdhelper.common.EtcdConfiguration
-import com.google.api.Endpoint
+import com.github.tsonglew.etcdhelper.common.ConnectionManager
+import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.components.DialogPanel
-import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.layout.jbTextField
-import kotlinx.coroutines.newFixedThreadPoolContext
-import java.awt.TextField
+import com.intellij.ui.treeStructure.Tree
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.xml.transform.OutputKeys
 
-class EtcdAddConnectionDialog(
-    project: Project
+class EtcdConnectionSettingsDialog(
+    private val project: Project,
+    private val connectionTree: Tree,
+    private val connectionManager: ConnectionManager
 ) : DialogWrapper(project){
 
     private lateinit var panel: JPanel
@@ -48,10 +47,14 @@ class EtcdAddConnectionDialog(
         println("endpoints ${endpointsTextField.text}")
         println("username ${usernameTextField.text}")
         println("password ${passwordTextField.text}")
-        super.doOKAction()
+
+        // TODO: persist connection
+
+        connectionManager.addConnectionToList(toEtcdConfiguration())
+        close(OK_EXIT_CODE)
     }
 
-    fun toEtcdConfiguration() = EtcdConfiguration(
+    fun toEtcdConfiguration() = EtcdConnectionInfo(
         endpointsTextField.text,
         usernameTextField.text,
         passwordTextField.text
