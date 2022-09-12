@@ -38,7 +38,7 @@ class EtcdKeyTreeDisplayPanel(
     private val splitterContainer: JBSplitter,
     private val etcdConnectionInfo: EtcdConnectionInfo,
     private val connectionManager: ConnectionManager,
-    private val doubleClickKeyAction: Consumer<KeyValue>
+    private val doubleClickKeyAction: Consumer<String>
 ): JPanel() {
     private var pageIndex = 1
     private var pageSize = 100
@@ -55,10 +55,10 @@ class EtcdKeyTreeDisplayPanel(
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 super.mouseClicked(e)
-                if (e?.clickCount == 2 && selectionPath?.pathCount!! > 1) {
+                if (selectionPath?.pathCount!! > 1) {
                     val lastNode = selectionPath?.lastPathComponent as DefaultMutableTreeNode
                     if (lastNode.isLeaf) {
-                        doubleClickKeyAction.accept(lastNode.userObject as KeyValue)
+                        doubleClickKeyAction.accept(lastNode.userObject as String)
                     }
                 }
                 println("click etcd key tree display panel tree")
@@ -104,7 +104,7 @@ class EtcdKeyTreeDisplayPanel(
             try {
                 flatRootNode = DefaultMutableTreeNode(etcdConnectionInfo)
                 allKeys.forEach {
-                    flatRootNode!!.add(DefaultMutableTreeNode(it.key))
+                    flatRootNode!!.add(DefaultMutableTreeNode(it.key.toString()))
                 }
                 updateKeyTree(etcdKeyValueDisplayPanel.groupSymbol)
                 keyDisplayPanel.updateUI()
