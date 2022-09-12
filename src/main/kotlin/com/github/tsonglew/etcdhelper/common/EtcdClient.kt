@@ -112,6 +112,15 @@ class EtcdClient {
         return listOf();
     }
 
+    fun get(key: String): List<KeyValue>{
+        try {
+            return kvClient!![bytesOf(key)].get().kvs
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return listOf()
+    }
+
     companion object {
         private val NO_PREFIX_END = byteArrayOf(0)
         private const val INIT = false
