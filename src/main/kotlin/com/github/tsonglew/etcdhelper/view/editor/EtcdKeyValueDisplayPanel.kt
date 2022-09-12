@@ -5,9 +5,11 @@ import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.SearchTextField
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.JBUI
 import io.etcd.jetcd.KeyValue
@@ -18,6 +20,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.ScrollPaneConstants
 
 class EtcdKeyValueDisplayPanel(
     private val project: Project,
@@ -135,7 +138,24 @@ class EtcdKeyValueDisplayPanel(
         })
     }
 
-    private fun renderValueDisplayPanel(keyValue: KeyValue) {
-        valueDisplayPanel = EtcdValueDisplayPanel.getInstance()
+    /**
+     * render value display panel when key tree is clicked
+     */
+    private fun renderValueDisplayPanel(key: String) {
+        val valueDisplayScrollPanel = JBScrollPane(valueDisplayPanel).apply {
+        horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+        verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
+        }
+        val loadingDecorator = LoadingDecorator(valueDisplayScrollPanel, this, 0)
+        splitterContainer.secondComponent = loadingDecorator.component
+        valueDisplayPanel = EtcdValueDisplayPanel(
+            BorderLayout(),
+            project,
+            this,
+            key,
+            connectionInfo,
+            connectionManager,
+            loadingDecorator
+        )
     }
 }
