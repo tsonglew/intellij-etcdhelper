@@ -1,7 +1,8 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.6.20"
     id("org.jetbrains.intellij") version "1.6.0"
+    kotlin("jvm") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 group = "com.github.tsonglew"
@@ -24,6 +25,7 @@ dependencies {
     implementation("io.etcd:jetcd-core:0.7.3") {
         exclude(group="org.slf4j", module = "slf4j-api")
     }
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     compileOnly("org.projectlombok:lombok:1.18.24")
     testImplementation ("org.jetbrains.kotlin:kotlin-test")
 }

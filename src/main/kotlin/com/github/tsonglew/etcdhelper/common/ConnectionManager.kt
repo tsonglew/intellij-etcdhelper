@@ -1,17 +1,18 @@
 package com.github.tsonglew.etcdhelper.common
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.MutableTreeNode
 
 class ConnectionManager(
     private val project: Project,
-    private val propertyUtil: PropertyUtil
+    private val propertyUtil: PropertyUtil,
+    private val connectionTree: Tree
 ): Disposable {
-    private val connectionTreeRoot= DefaultMutableTreeNode()
-    private val connectionTreeModel = DefaultTreeModel(connectionTreeRoot)
 
     /**
      * map of endpoints to {@link EtcdClient}
@@ -19,8 +20,13 @@ class ConnectionManager(
     private val connectionMap = hashMapOf<String, EtcdClient>()
 
     companion object {
-        fun getInstance(project: Project, propertyUtil: PropertyUtil) =
-            project.getService(ConnectionManager::class.java) ?: ConnectionManager(project, propertyUtil)
+        @JvmStatic
+        fun getInstance(
+            project: Project,
+            propertyUtil: PropertyUtil,
+            connectionTree: Tree
+        ) = project.getService(ConnectionManager::class.java)
+            ?: ConnectionManager(project, propertyUtil, connectionTree)
     }
 
     fun getClient(etcdConnectionInfo: EtcdConnectionInfo) = connectionMap[etcdConnectionInfo.endpoints]
@@ -29,24 +35,37 @@ class ConnectionManager(
      * init saved connections
      */
     fun initConnections(connectionTree: Tree) {
+        connectionTree.isRootVisible = false
         propertyUtil.getConnections().forEach {
             addConnectionToList(it)
         }
-        connectionTree.model = connectionTreeModel
-        connectionTree.isRootVisible = false
     }
 
     /**
      * add a new etcd connection to model
      */
     fun addConnectionToList( etcdConnectionInfo: EtcdConnectionInfo) {
-        connectionTreeModel.apply {
+        (connectionTree.model as DefaultTreeModel).apply {
             (root as DefaultMutableTreeNode).apply {
                 add(DefaultMutableTreeNode(etcdConnectionInfo))
                 connectionMap[etcdConnectionInfo.endpoints] = EtcdClient().apply { init(etcdConnectionInfo) }
             }
             reload()
         }
+    }
+
+    /**
+     * remove the selected connection on connection tree
+     */
+    fun removeSelectedConnection() {
+        val connectionTreeModel = connectionTree.model as DefaultTreeModel
+        val root = connectionTreeModel.root as DefaultMutableTreeNode
+        connectionTree.selectionPaths?.forEach {
+            thisLogger().info("remove tree node: ${it.path}")
+            root.remove(it.lastPathComponent as MutableTreeNode)
+            // FIXME: remove from property util
+        }
+        connectionTreeModel.reload()
     }
 
     override fun dispose() {

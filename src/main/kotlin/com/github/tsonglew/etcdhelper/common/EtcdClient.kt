@@ -55,15 +55,15 @@ class EtcdClient {
      *
      * @param key           key
      * @param value         value
-     * @param timeoutMillis 写入的操作的 timeout
+     * @param ttlSecs  ttl(secs)
      * @return 是否写入成功
      */
-    fun put(key: String, value: String, timeoutMillis: Int, ttlSecs: Int): Boolean {
+    fun put(key: String, value: String, ttlSecs: Int): Boolean {
         if (ttlSecs > 0) {
-            return putWithTtl(key, value, timeoutMillis, ttlSecs)
+            return putWithTtl(key, value, ttlSecs)
         }
         try {
-            kvClient!!.put(bytesOf(key), bytesOf(value))[timeoutMillis.toLong(), TimeUnit.MILLISECONDS]
+            kvClient!!.put(bytesOf(key), bytesOf(value))[10000L, TimeUnit.MILLISECONDS]
             return true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -71,14 +71,14 @@ class EtcdClient {
         return false
     }
 
-    private fun putWithTtl(key: String, value: String, timeoutMillis: Int, ttlSecs: Int): Boolean {
+    private fun putWithTtl(key: String, value: String, ttlSecs: Int): Boolean {
         try {
             val leaseId = leaseClient!!.grant(ttlSecs.toLong()).get().id
             kvClient!!.put(
                 bytesOf(key),
                 bytesOf(value),
                 PutOption.newBuilder().withLeaseId(leaseId).build()
-            )[timeoutMillis.toLong(), TimeUnit.MILLISECONDS]
+            )[10000L, TimeUnit.MILLISECONDS]
             return true
         } catch (e: Exception) {
             e.printStackTrace()

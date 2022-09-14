@@ -2,8 +2,11 @@ package com.github.tsonglew.etcdhelper.dialog
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.ui.PasswordFieldPanel
+import com.intellij.ui.components.JBPasswordField
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.treeStructure.Tree
@@ -20,7 +23,7 @@ class EtcdConnectionSettingsDialog(
     private lateinit var panel: JPanel
     private val endpointsTextField =  JBTextField("http://localhost:2379", 20)
     private val usernameTextField=  JBTextField("", 20)
-    private val passwordTextField=  JBTextField("", 20)
+    private val passwordTextField=  JBPasswordField()
 
     init {
         super.init()
@@ -29,26 +32,15 @@ class EtcdConnectionSettingsDialog(
 
     override fun createCenterPanel(): JComponent {
        panel= panel{
-            row("endpoints: ") {
-                cell(endpointsTextField)
-            }
-            row("username: ") {
-                cell(usernameTextField)
-            }
-            row("password: ") {
-                cell(passwordTextField)
-            }
+            row("endpoints: ") { cell(endpointsTextField) }
+            row("username: ") { cell(usernameTextField) }
+            row("password: ") { cell(passwordTextField) }
         }
         return panel
     }
 
     override fun doOKAction() {
-        println("doOKAction")
-        println("endpoints ${endpointsTextField.text}")
-        println("username ${usernameTextField.text}")
-        println("password ${passwordTextField.text}")
-
-        // TODO: persist connection
+        PropertyUtil(project).saveConnection(toEtcdConfiguration())
 
         connectionManager.addConnectionToList(toEtcdConfiguration())
         close(OK_EXIT_CODE)
@@ -57,6 +49,6 @@ class EtcdConnectionSettingsDialog(
     private fun toEtcdConfiguration() = EtcdConnectionInfo(
         endpointsTextField.text,
         usernameTextField.text,
-        passwordTextField.text
+        passwordTextField.password.toString()
     )
 }
