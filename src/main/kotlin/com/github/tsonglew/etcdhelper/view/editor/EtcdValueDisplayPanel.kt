@@ -3,25 +3,22 @@ package com.github.tsonglew.etcdhelper.view.editor
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
-import com.intellij.ide.AutoScrollToSourceOptionProvider
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
-import com.intellij.ui.EditorSettingsProvider
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
 import io.etcd.jetcd.KeyValue
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
+import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.table.DefaultTableModel
 
 class EtcdValueDisplayPanel(
     private val layoutManager: LayoutManager,
@@ -32,6 +29,8 @@ class EtcdValueDisplayPanel(
     private val connectionManager: ConnectionManager,
     private val loadingDecorator: LoadingDecorator
 ): JPanel(BorderLayout()) {
+
+    private lateinit var valueTextArea: LanguageTextField
 
     init {
         loadingDecorator.startLoading(false)
@@ -81,16 +80,19 @@ class EtcdValueDisplayPanel(
         val valuePreviewToolbarPanel = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
             add(JLabel("key: "))
             add(keyTextField)
+            add(JButton("Save").apply {
+                addActionListener {
+                    val value = valueTextArea.text
+                    thisLogger().info("save key $key value $value")
+                    connectionManager.getClient(etcdConnectionInfo)?.put(key, value, 0)
+                }
+            })
         }
         add(valuePreviewToolbarPanel, BorderLayout.NORTH)
     }
 
     private fun initValuePreviewPanel() {
-        val fieldTextArea = JBTextArea().apply {
-            lineWrap = true
-            autoscrolls = true
-        }
-        val valueTextArea = LanguageTextField(
+        valueTextArea = LanguageTextField(
             PlainTextLanguage.INSTANCE,
             project,
             keyValue?.value?.toString() ?: ""
@@ -98,7 +100,6 @@ class EtcdValueDisplayPanel(
             autoscrolls = true
             setOneLineMode(false)
             minimumSize = Dimension(100, 100)
-            background = Color.BLACK.darker()
             addSettingsProvider { editor ->
                 editor?.settings?.apply {
                     isUseSoftWraps = true
