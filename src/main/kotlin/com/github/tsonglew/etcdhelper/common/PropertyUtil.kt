@@ -9,12 +9,9 @@ class PropertyUtil(
 
     private val connectionService =  GlobalConnectionService.getInstance()
 
-    fun saveConnection(etcdConnectionInfo: EtcdConnectionInfo) {
-        connectionService.addConnection(etcdConnectionInfo)
-    }
-
     fun getConnections() = connectionService.connections
 
-    fun removeConnection(etcdConnectionInfo: EtcdConnectionInfo) {
-    }
+    fun saveConnection(etcdConnectionInfo: EtcdConnectionInfo) = connectionService.addConnection(etcdConnectionInfo)
+
+    fun removeConnection(etcdConnectionInfo: EtcdConnectionInfo) = connectionService.removeConnection(etcdConnectionInfo)
 }

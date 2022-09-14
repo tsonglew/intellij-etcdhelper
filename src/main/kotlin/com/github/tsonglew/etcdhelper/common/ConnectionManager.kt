@@ -63,7 +63,7 @@ class ConnectionManager(
         connectionTree.selectionPaths?.forEach {
             thisLogger().info("remove tree node: ${it.path}")
             root.remove(it.lastPathComponent as MutableTreeNode)
-            // FIXME: remove from property util
+            propertyUtil.removeConnection((it.lastPathComponent as DefaultMutableTreeNode).userObject as EtcdConnectionInfo)
         }
         connectionTreeModel.reload()
     }
