@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.diagnostic.thisLogger
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -42,11 +43,13 @@ class GlobalConnectionService: PersistentStateComponent<GlobalConnectionService.
         val connections = myState.connections
         connections.add(connectionInfo)
         myState.connections = connections
+        thisLogger().info("connections after add: $connections")
     }
 
     fun removeConnection(connectionInfo: EtcdConnectionInfo) {
         val connections = myState.connections
         connections.remove(connectionInfo)
         myState.connections = connections
+        thisLogger().info("connections after remove: $connections")
     }
 }
