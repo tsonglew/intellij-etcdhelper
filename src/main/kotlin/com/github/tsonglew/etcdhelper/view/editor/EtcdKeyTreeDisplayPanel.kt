@@ -1,6 +1,7 @@
 package com.github.tsonglew.etcdhelper.view.editor
 
-import com.github.tsonglew.etcdhelper.action.AddAction
+import com.github.tsonglew.etcdhelper.action.KeyCreateAction
+import com.github.tsonglew.etcdhelper.action.KeyDeleteAction
 import com.github.tsonglew.etcdhelper.action.RefreshAction
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
@@ -11,7 +12,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.application.readAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.ui.JBSplitter
@@ -24,13 +24,10 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.util.*
 import java.util.function.Consumer
 import javax.swing.JPanel
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.DefaultTreeCellEditor.DefaultTextField
 import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.TreeModel
 
 class EtcdKeyTreeDisplayPanel(
     private val project: Project,
@@ -46,10 +43,7 @@ class EtcdKeyTreeDisplayPanel(
     private var flatRootNode: DefaultMutableTreeNode? = null
     private var treeModel: DefaultTreeModel? = null
 
-    private var allKeys: List<KeyValue> = connectionManager
-        .getClient(etcdConnectionInfo)
-        ?.getByPrefix("/", 0)
-        ?: listOf()
+    private var allKeys: List<KeyValue> = arrayListOf()
     private val keyTree = Tree().apply {
         cellRenderer = KeyTreeCellRenderer()
         addMouseListener(object : MouseAdapter() {
@@ -70,8 +64,8 @@ class EtcdKeyTreeDisplayPanel(
     private val actionManager = CommonActionsManager.getInstance()
     private val actions = DefaultActionGroup().apply{
         add(createRefreshAction())
-        // TODO: add(createAddAction())
-        // TODO: add(createDeleteAction())
+        add(createKeyCreateAction())
+        add(createDeleteAction())
         addSeparator()
     }
     private val actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true)
@@ -99,6 +93,10 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     fun renderKeyTree(searchSymbol: String, groupSymbol: String) {
+        allKeys = connectionManager
+            .getClient(etcdConnectionInfo)
+            ?.getByPrefix("/", 0)
+            ?: listOf()
         keyDisplayLoadingDecorator.startLoading(false)
         ReadAction.nonBlocking {
             try {
@@ -119,14 +117,26 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     private fun createPagingPanel(parent: EtcdKeyValueDisplayPanel) = JPanel(BorderLayout()).apply {
-        add(JBLabel("Page Size: " + currentPageKeys.size).apply { border=JBUI.Borders.empty() }, BorderLayout.NORTH)
+        add(JBLabel("Page Size: " + currentPageKeys.size).apply { border = JBUI.Borders.empty() }, BorderLayout.NORTH)
         add(JBLabel("Page $pageIndex of $pageCount"))
         // TODO: page navigation
     }
 
 
-    private fun createAddAction(): AddAction = TODO()
-    private fun createDeleteAction(): AddAction = TODO()
+    private fun createKeyCreateAction(): KeyCreateAction = KeyCreateAction.create(
+        project,
+        connectionManager,
+        etcdConnectionInfo,
+        this
+    )
+
+    private fun createDeleteAction(): KeyDeleteAction = KeyDeleteAction.create(
+        project,
+        connectionManager,
+        etcdConnectionInfo,
+        this,
+        keyTree
+    )
 
     private fun updateKeyTree(groupSymbol: String) {
         if (flatRootNode == null) {
