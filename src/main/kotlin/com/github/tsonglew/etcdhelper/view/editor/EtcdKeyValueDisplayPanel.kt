@@ -119,7 +119,7 @@ class EtcdKeyValueDisplayPanel(
     private fun createGroupByPanel() = JPanel().apply {
         border = JBUI.Borders.empty()
         add(JLabel("Group by: "))
-        add(JBTextField("test group").apply {
+        add(JBTextField("").apply {
             groupTextField = this
             addKeyListener(object : KeyListener {
                 override fun keyTyped(e: KeyEvent?) {

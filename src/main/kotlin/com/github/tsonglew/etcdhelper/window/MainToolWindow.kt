@@ -27,19 +27,27 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JPanel
 import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.TreeNode
 
 class MainToolWindow(
     private val project: Project,
     private val toolWindow: ToolWindow
 ): Disposable{
-    private val connectionTree = Tree()
+    private val connectionTree = Tree().apply {
+        model = DefaultTreeModel(DefaultMutableTreeNode())
+    }
     private val connectionTreeLoadingDecorator = LoadingDecorator(JBScrollPane(connectionTree), this, 0)
     private val connectionPanel = JPanel().apply {
         layout=BorderLayout()
     }
 
     private val propertyUtil = PropertyUtil(project)
-    private val connectionManager = ConnectionManager.getInstance(project, propertyUtil).apply {
+    private val connectionManager = ConnectionManager.getInstance(
+        project,
+        propertyUtil,
+        connectionTree
+    ).apply {
         initConnections(connectionTree)
     }
     private val connectionActionToolbar = ActionManager
@@ -48,7 +56,7 @@ class MainToolWindow(
             "ToolWindowToolbar",
             DefaultActionGroup().apply {
                 add(AddAction.create(project, connectionTree, connectionManager))
-                add(DeleteAction.create(project, connectionTree, connectionManager))
+                add(DeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
                 addSeparator()
                 // TODO: create expander
             },
@@ -60,6 +68,7 @@ class MainToolWindow(
     private val connectionTreeSpeedSearch = TreeSpeedSearch(connectionTree) {
         (it.lastPathComponent as DefaultMutableTreeNode).userObject.toString()
     }
+
     val content = JPanel(BorderLayout()).apply {
         add(connectionActionToolbar.targetComponent!!, BorderLayout.NORTH)
         add(OnePixelSplitter(true, 1f).apply {
@@ -76,10 +85,11 @@ class MainToolWindow(
         connectionPanel.add(connectionTreeLoadingDecorator.component, BorderLayout.CENTER)
         connectionTree.apply {
             cellRenderer = ConnectionTreeCellRenderer()
-            alignmentX =Component.LEFT_ALIGNMENT
+            alignmentX = Component.LEFT_ALIGNMENT
             addMouseListener(object: MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
-                    if (e?.clickCount == 2 && !e.isMetaDown) {
+                    if (e?.clickCount == 2) {
+                        println("path count: ${connectionTree.selectionPath?.pathCount}")
                         connectionTreeLoadingDecorator.startLoading(false)
                         try {
                             ReadAction.nonBlocking<Any?> {
@@ -102,11 +112,11 @@ class MainToolWindow(
                             connectionTreeLoadingDecorator.stopLoading()
                         }
                     }
-                    println("clicked connection tree")
                 }
             })
         }
     }
+
 
     override fun dispose() {
         connectionManager.dispose()

@@ -29,5 +29,6 @@
                 anchor="right"
         />
         <fileEditorProvider implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
+        <applicationService serviceImplementation="com.github.tsonglew.etcdhelper.service.GlobalConnectionService"/>
     </extensions>
 </idea-plugin>
