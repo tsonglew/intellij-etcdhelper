@@ -13,7 +13,20 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-    <description>a simple etcd plugin</description>
+    <description><![CDATA[
+        <div>a simple intellij-based etcd plugin</div>
+        <div style="white-space:normal; word-break:break-all; width:100%">
+            <ul>
+                <li>Convenient management of etcd connections</li>
+                <li>Display of keys</li>
+                <li>Support adding, modifying and deleting keys and value</li>
+            </ul>
+        </div>
+        <br>
+        If you have any suggestions, questions or bugs about this plugin,
+        please issue them on <a href="https://github.com/tsonglew/intellij-etcdhelper">Github</a>
+        ]]>]
+    </description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
