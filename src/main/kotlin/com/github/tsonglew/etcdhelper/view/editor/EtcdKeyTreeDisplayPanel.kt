@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.ui.JBSplitter
@@ -31,7 +32,7 @@ import javax.swing.tree.DefaultTreeModel
 
 class EtcdKeyTreeDisplayPanel(
     private val project: Project,
-    private val etcdKeyValueDisplayPanel: EtcdKeyValueDisplayPanel,
+    private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
     private val splitterContainer: JBSplitter,
     private val etcdConnectionInfo: EtcdConnectionInfo,
     private val connectionManager: ConnectionManager,
@@ -49,18 +50,22 @@ class EtcdKeyTreeDisplayPanel(
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 super.mouseClicked(e)
-                if (selectionPath?.pathCount!! > 1) {
-                    val lastNode = selectionPath?.lastPathComponent as DefaultMutableTreeNode
-                    if (lastNode.isLeaf) {
-                        doubleClickKeyAction.accept(lastNode.userObject as String)
-                    }
+                if ((selectionPath?.pathCount ?: 0) > 1
+                    && (selectionPath?.lastPathComponent as DefaultMutableTreeNode).isLeaf
+                ) {
+                    selectionPath?.path?.let { p ->
+                        p.copyOfRange(1, p.size)
+                            .joinToString(keyValueDisplayPanel.groupSymbol) {
+                                (it as DefaultMutableTreeNode).userObject as String
+                            }
+                    }.also { doubleClickKeyAction.accept(it ?: "") }
                 }
-                println("click etcd key tree display panel tree")
+                thisLogger().info("click etcd key tree display panel tree")
             }
         })
     }
     private val keyTreeScrollPane = JBScrollPane(keyTree)
-    private val keyDisplayLoadingDecorator =  LoadingDecorator(keyTreeScrollPane, etcdKeyValueDisplayPanel, 0)
+    private val keyDisplayLoadingDecorator = LoadingDecorator(keyTreeScrollPane, keyValueDisplayPanel, 0)
     private val actionManager = CommonActionsManager.getInstance()
     private val actions = DefaultActionGroup().apply{
         add(createRefreshAction())
@@ -73,7 +78,7 @@ class EtcdKeyTreeDisplayPanel(
         minimumSize = Dimension(255, 100)
         add(actionToolbar.component, BorderLayout.NORTH)
         add(keyDisplayLoadingDecorator.component, BorderLayout.CENTER)
-        add(createPagingPanel(etcdKeyValueDisplayPanel), BorderLayout.SOUTH)
+        add(createPagingPanel(keyValueDisplayPanel), BorderLayout.SOUTH)
     }
 
     private val pageCount: Int
@@ -92,19 +97,19 @@ class EtcdKeyTreeDisplayPanel(
         pageIndex = 1
     }
 
-    fun renderKeyTree(searchSymbol: String, groupSymbol: String) {
+    fun renderKeyTree(searchSymbol: String = "/", groupSymbol: String = "/") {
         allKeys = connectionManager
             .getClient(etcdConnectionInfo)
-            ?.getByPrefix("/", 0)
+            ?.getByPrefix(searchSymbol, 0)
+            ?.apply { sortedBy { it.key.toString() } }
             ?: listOf()
         keyDisplayLoadingDecorator.startLoading(false)
         ReadAction.nonBlocking {
             try {
-                flatRootNode = DefaultMutableTreeNode(etcdConnectionInfo)
-                allKeys.forEach {
-                    flatRootNode!!.add(DefaultMutableTreeNode(it.key.toString()))
+                flatRootNode = DefaultMutableTreeNode(etcdConnectionInfo).apply {
+                    isVisible = false
                 }
-                updateKeyTree(etcdKeyValueDisplayPanel.groupSymbol)
+                groupKeyTree(keyValueDisplayPanel.groupSymbol)
                 keyDisplayPanel.updateUI()
             } finally {
                 keyDisplayLoadingDecorator.stopLoading()
@@ -113,7 +118,7 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     private fun createRefreshAction() = RefreshAction().apply {
-        action = { renderKeyTree(etcdKeyValueDisplayPanel.searchSymbol, etcdKeyValueDisplayPanel.groupSymbol) }
+        action = { renderKeyTree(keyValueDisplayPanel.searchSymbol, keyValueDisplayPanel.groupSymbol) }
     }
 
     private fun createPagingPanel(parent: EtcdKeyValueDisplayPanel) = JPanel(BorderLayout()).apply {
@@ -127,7 +132,8 @@ class EtcdKeyTreeDisplayPanel(
         project,
         connectionManager,
         etcdConnectionInfo,
-        this
+        this,
+        keyValueDisplayPanel
     )
 
     private fun createDeleteAction(): KeyDeleteAction = KeyDeleteAction.create(
@@ -138,14 +144,41 @@ class EtcdKeyTreeDisplayPanel(
         keyTree
     )
 
-    private fun updateKeyTree(groupSymbol: String) {
+    private fun groupKeyTree(groupSymbol: String) {
         if (flatRootNode == null) {
             return
         }
-
-        // TODO: group by group symbol
+        groupRootNode(
+            flatRootNode!!,
+            arrayListOf<String>().apply { addAll(allKeys.map { it.key.toString() }) },
+            groupSymbol
+        )
         treeModel = DefaultTreeModel(flatRootNode)
         keyTree.model = treeModel
         treeModel!!.reload()
+    }
+
+    private fun groupRootNode(node: DefaultMutableTreeNode, keys: List<String>, groupSymbol: String) {
+        val keyNodeMap = hashMapOf<String, DefaultMutableTreeNode>()
+        val nodeChildrenMap = hashMapOf<DefaultMutableTreeNode, ArrayList<String>>()
+        keys.forEach {
+            val idx = it.indexOf(groupSymbol)
+            if (idx < 0) {
+                node.add(DefaultMutableTreeNode(it))
+            } else {
+                val newKey = it.substring(0, idx)
+                if (!keyNodeMap.containsKey(newKey)) {
+                    DefaultMutableTreeNode(newKey).also { n ->
+                        keyNodeMap[newKey] = n
+                        nodeChildrenMap[n] = arrayListOf()
+                        node.add(n)
+                    }
+                }
+                nodeChildrenMap[keyNodeMap[newKey]]!!.add(it.substring(idx + 1))
+            }
+        }
+        nodeChildrenMap.forEach {
+            groupRootNode(it.key, it.value, groupSymbol)
+        }
     }
 }

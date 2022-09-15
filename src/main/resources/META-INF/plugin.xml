@@ -38,7 +38,7 @@
         <toolWindow
                 factoryClass="com.github.tsonglew.etcdhelper.window.MainToolWindowFactory"
                 id="EtcdHelper"
-                icon="/icons/etcd.png"
+                icon="/icons/icon.svg"
                 anchor="right"
         />
         <fileEditorProvider implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
