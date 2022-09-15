@@ -103,8 +103,7 @@ class MainToolWindow(
                                     connectionManager
                                 )
                                 ApplicationManager.getApplication().invokeLater {
-
-                                EtcdKeyValueDisplayVirtualFileSystem.getInstance(project).openEditor(f)
+                                    EtcdKeyValueDisplayVirtualFileSystem.getInstance(project).openEditor(f)
                                     // TODO: addEditorToMap
                                 }
 

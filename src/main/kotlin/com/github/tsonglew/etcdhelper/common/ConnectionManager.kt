@@ -46,7 +46,7 @@ class ConnectionManager(
     /**
      * add a new etcd connection to model
      */
-    fun addConnectionToList( etcdConnectionInfo: EtcdConnectionInfo) {
+    fun addConnectionToList(etcdConnectionInfo: EtcdConnectionInfo) {
         (connectionTree.model as DefaultTreeModel).apply {
             (root as DefaultMutableTreeNode).apply {
                 add(DefaultMutableTreeNode(etcdConnectionInfo))

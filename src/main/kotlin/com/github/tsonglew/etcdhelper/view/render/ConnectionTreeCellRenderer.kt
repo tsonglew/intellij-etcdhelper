@@ -16,7 +16,6 @@ class ConnectionTreeCellRenderer: ColoredTreeCellRenderer() {
         hasFocus: Boolean
     ) {
         val node = value as DefaultMutableTreeNode
-        val userObj = node.userObject
         append(node.toString())
         icon = AllIcons.Debugger.Db_array
     }
