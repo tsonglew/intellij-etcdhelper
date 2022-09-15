@@ -3,6 +3,7 @@ package com.github.tsonglew.etcdhelper.dialog
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyTreeDisplayPanel
+import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayPanel
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.JBTextField
@@ -14,13 +15,14 @@ class KeyValueDialog(
     private val project: Project,
     private val connectionManager: ConnectionManager,
     private val etcdConnectionInfo: EtcdConnectionInfo,
-    private val keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel
+    private val keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel,
+    private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel
 ) : DialogWrapper(project) {
 
     private lateinit var panel: JPanel
     private val keyPanel = JBTextField("", 20)
     private val valuePanel = JBTextField("", 20)
-    private val ttlPanel = JBTextField("", 20)
+    private val ttlPanel = JBTextField("", 20).apply { text = "0" }
 
     init {
         super.init()
@@ -40,9 +42,13 @@ class KeyValueDialog(
         connectionManager.getClient(etcdConnectionInfo)?.put(
             keyPanel.text,
             valuePanel.text,
-            ttlPanel.text.toInt()
+            try {
+                ttlPanel.text.toInt()
+            } catch (e: Exception) {
+                0
+            }
         )
-        keyTreeDisplayPanel.renderKeyTree("", "")
+        keyTreeDisplayPanel.renderKeyTree(keyValueDisplayPanel.searchSymbol, keyValueDisplayPanel.groupSymbol)
         close(OK_EXIT_CODE)
     }
 }

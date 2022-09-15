@@ -4,6 +4,7 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.openapi.ui.Splitter
@@ -12,7 +13,6 @@ import com.intellij.ui.SearchTextField
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.JBUI
-import io.etcd.jetcd.KeyValue
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -27,11 +27,6 @@ class EtcdKeyValueDisplayPanel(
     private val connectionInfo: EtcdConnectionInfo,
     private val connectionManager: ConnectionManager
 ): JPanel(), Disposable {
-
-    companion object {
-        private const val defaultGroupBySymbol = ":"
-        private const val defaultSearchSymbol = "*"
-    }
 
     /**
      * a panel to display tool bar
@@ -95,21 +90,22 @@ class EtcdKeyValueDisplayPanel(
     private fun createSearchBox() = JPanel().apply {
         add(JLabel("Search: "))
         add(SearchTextField().apply {
+            text = "/"
             searchTextField = this
             addKeyboardListener(object : KeyListener {
                 override fun keyTyped(e: KeyEvent?) {
-                    println("search box key typed")
+                    thisLogger().info("search box key typed")
                 }
 
                 override fun keyPressed(e: KeyEvent?) {
-                    println("search box key pressed")
+                    thisLogger().info("search box key pressed")
                 }
 
                 override fun keyReleased(e: KeyEvent?) {
                     if (e?.keyCode == KeyEvent.VK_ENTER) {
                         keyTreeDisplayPanel.resetPageIndex()
                         keyTreeDisplayPanel.renderKeyTree(searchSymbol, groupSymbol)
-                        println("current search symbol: $searchSymbol")
+                        thisLogger().info("current search symbol: $searchSymbol")
                     }
                 }
             })
@@ -119,20 +115,20 @@ class EtcdKeyValueDisplayPanel(
     private fun createGroupByPanel() = JPanel().apply {
         border = JBUI.Borders.empty()
         add(JLabel("Group by: "))
-        add(JBTextField("").apply {
+        add(JBTextField("/").apply {
             groupTextField = this
             addKeyListener(object : KeyListener {
                 override fun keyTyped(e: KeyEvent?) {
-                    println("group key typed")
+                    thisLogger().info("group key typed")
                 }
 
                 override fun keyPressed(e: KeyEvent?) {
-                    println("group key pressed")
+                    thisLogger().info("group key pressed")
                 }
 
                 override fun keyReleased(e: KeyEvent?) {
                     // TODO: rerender after key released
-                    println("group key released, current group symbol: $groupSymbol")
+                    thisLogger().info("group key released, current group symbol: $groupSymbol")
                 }
             })
         })

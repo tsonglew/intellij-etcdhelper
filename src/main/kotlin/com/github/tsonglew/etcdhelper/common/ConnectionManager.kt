@@ -2,6 +2,7 @@ package com.github.tsonglew.etcdhelper.common
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 import javax.swing.tree.DefaultMutableTreeNode
@@ -18,6 +19,7 @@ class ConnectionManager(
      * map of endpoints to {@link EtcdClient}
      */
     private val connectionMap = hashMapOf<String, EtcdClient>()
+    private val connectionEditorMap = hashMapOf<String, FileEditor>()
 
     companion object {
         @JvmStatic

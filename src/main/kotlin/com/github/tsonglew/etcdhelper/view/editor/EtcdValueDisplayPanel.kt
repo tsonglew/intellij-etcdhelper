@@ -13,7 +13,10 @@ import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import io.etcd.jetcd.KeyValue
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Dimension
+import java.awt.FlowLayout
+import java.awt.LayoutManager
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import javax.swing.JButton
@@ -31,6 +34,7 @@ class EtcdValueDisplayPanel(
 ): JPanel(BorderLayout()) {
 
     private lateinit var valueTextArea: LanguageTextField
+    private lateinit var valueSizeLabel: JLabel
 
     init {
         loadingDecorator.startLoading(false)
@@ -58,15 +62,15 @@ class EtcdValueDisplayPanel(
             toolTipText = "tool tip: $text"
             addKeyListener(object : KeyListener {
                 override fun keyTyped(e: KeyEvent?) {
-                    println("value preview toolbar key typed")
+                    thisLogger().info("value preview toolbar key typed")
                 }
 
                 override fun keyPressed(e: KeyEvent?) {
-                    println("value preview toolbar key pressed")
+                    thisLogger().info("value preview toolbar key pressed")
                 }
 
                 override fun keyReleased(e: KeyEvent?) {
-                    println("value preview toolbar key released")
+                    thisLogger().info("value preview toolbar key released")
                     toolTipText = text
                 }
 
@@ -82,9 +86,12 @@ class EtcdValueDisplayPanel(
             add(keyTextField)
             add(JButton("Save").apply {
                 addActionListener {
+                    isEnabled = false
                     val value = valueTextArea.text
                     thisLogger().info("save key $key value $value")
                     connectionManager.getClient(etcdConnectionInfo)?.put(key, value, 0)
+                    isEnabled = true
+                    renderLabels()
                 }
             })
         }
@@ -114,9 +121,7 @@ class EtcdValueDisplayPanel(
         }
 
         // TODO: view as panel(choose value encoding)
-        val valueSizeLabel = JBLabel().apply {
-            text = "Value size: ${keyValue?.value?.bytes?.size} bytes"
-        }
+        valueSizeLabel = JBLabel()
         val valueFunctionPanel = JPanel(BorderLayout()).apply { add(valueSizeLabel, BorderLayout.WEST) }
 
         val valuePreviewAndFunctionPanel = JPanel(BorderLayout()).apply {
@@ -124,5 +129,11 @@ class EtcdValueDisplayPanel(
             add(valueTextArea, BorderLayout.CENTER)
         }
         add(valuePreviewAndFunctionPanel, BorderLayout.CENTER)
+
+        renderLabels()
+    }
+
+    private fun renderLabels() {
+        valueSizeLabel.text = "Value size: ${keyValue?.value?.bytes?.size} bytes"
     }
 }

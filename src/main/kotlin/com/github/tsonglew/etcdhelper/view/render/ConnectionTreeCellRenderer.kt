@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.ui.ColoredTreeCellRenderer
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.xml.crypto.dsig.keyinfo.KeyInfo
 
 class ConnectionTreeCellRenderer: ColoredTreeCellRenderer() {
     override fun customizeCellRenderer(
@@ -19,10 +18,6 @@ class ConnectionTreeCellRenderer: ColoredTreeCellRenderer() {
         val node = value as DefaultMutableTreeNode
         val userObj = node.userObject
         append(node.toString())
-        icon = when {
-            row == 0 -> AllIcons.Debugger.Db_array
-            leaf && userObj is KeyInfo -> AllIcons.Debugger.Value
-            else -> AllIcons.Nodes.Folder
-        }
+        icon = AllIcons.Debugger.Db_array
     }
 }
