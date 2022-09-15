@@ -1,5 +1,6 @@
 package com.github.tsonglew.etcdhelper.view.editor
 
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorLocation
 import com.intellij.openapi.fileEditor.FileEditorState
@@ -13,7 +14,7 @@ class EtcdKeyValueDisplayEditor(
 ): UserDataHolderBase(), FileEditor {
     override fun dispose() {
         // TODO: remove connection -> editor mapping
-        println("dispose etcd key value display editor")
+        thisLogger().info("dispose etcd key value display editor")
     }
 
     override fun getComponent() = virtualFile.etcdKeyValueDisplayPanel

@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.openapi.wm.ToolWindow
@@ -28,7 +29,6 @@ import java.awt.event.MouseEvent
 import javax.swing.JPanel
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.TreeNode
 
 class MainToolWindow(
     private val project: Project,
@@ -39,7 +39,7 @@ class MainToolWindow(
     }
     private val connectionTreeLoadingDecorator = LoadingDecorator(JBScrollPane(connectionTree), this, 0)
     private val connectionPanel = JPanel().apply {
-        layout=BorderLayout()
+        layout = BorderLayout()
     }
 
     private val propertyUtil = PropertyUtil(project)
@@ -89,7 +89,7 @@ class MainToolWindow(
             addMouseListener(object: MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     if (e?.clickCount == 2) {
-                        println("path count: ${connectionTree.selectionPath?.pathCount}")
+                        thisLogger().info("path count: ${connectionTree.selectionPath?.pathCount}")
                         connectionTreeLoadingDecorator.startLoading(false)
                         try {
                             ReadAction.nonBlocking<Any?> {
@@ -103,7 +103,8 @@ class MainToolWindow(
                                     connectionManager
                                 )
                                 ApplicationManager.getApplication().invokeLater {
-                                    EtcdKeyValueDisplayVirtualFileSystem.getInstance(project).openEditor(f)
+
+                                EtcdKeyValueDisplayVirtualFileSystem.getInstance(project).openEditor(f)
                                     // TODO: addEditorToMap
                                 }
 

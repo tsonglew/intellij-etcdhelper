@@ -1,12 +1,10 @@
 package com.github.tsonglew.etcdhelper.common
 
 import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
-import com.intellij.util.containers.toArray
+import com.intellij.openapi.diagnostic.thisLogger
 import io.etcd.jetcd.*
-import io.etcd.jetcd.auth.Permission
 import io.etcd.jetcd.options.GetOption
 import io.etcd.jetcd.options.PutOption
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -39,7 +37,7 @@ class EtcdClient {
             authClient = client!!.authClient
             leaseClient = client!!.leaseClient
         } catch (e: Exception ) {
-            println("invalid connection info")
+            thisLogger().info("invalid connection info")
         }
     }
 
@@ -109,7 +107,7 @@ class EtcdClient {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return listOf();
+        return listOf()
     }
 
     fun get(key: String): List<KeyValue>{
