@@ -4,6 +4,7 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.dialog.KeyValueDialog
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyTreeDisplayPanel
+import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayPanel
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
 
@@ -18,7 +19,8 @@ class KeyCreateAction : CustomAction(
             project: Project,
             connectionManager: ConnectionManager,
             etcdConnectionInfo: EtcdConnectionInfo,
-            keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel
+            keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel,
+            keyValueDisplayPanel: EtcdKeyValueDisplayPanel
         ) = KeyCreateAction()
             .apply {
                 action = {
@@ -26,7 +28,8 @@ class KeyCreateAction : CustomAction(
                         project,
                         connectionManager,
                         etcdConnectionInfo,
-                        keyTreeDisplayPanel
+                        keyTreeDisplayPanel,
+                        keyValueDisplayPanel
                     ).show()
                 }
             }
