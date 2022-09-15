@@ -61,7 +61,7 @@ class EtcdClient {
             return putWithTtl(key, value, ttlSecs)
         }
         try {
-            kvClient!!.put(bytesOf(key), bytesOf(value))[10000L, TimeUnit.MILLISECONDS]
+            kvClient!!.put(bytesOf(key), bytesOf(value))[1L, TimeUnit.SECONDS]
             return true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -76,7 +76,7 @@ class EtcdClient {
                 bytesOf(key),
                 bytesOf(value),
                 PutOption.newBuilder().withLeaseId(leaseId).build()
-            )[10000L, TimeUnit.MILLISECONDS]
+            )[1L, TimeUnit.SECONDS]
             return true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -103,8 +103,9 @@ class EtcdClient {
             if ((limit != null) && (limit > 0)) {
                 optionBuilder.withLimit(limit.toLong())
             }
-            return kvClient!![bytesOf(key), optionBuilder.build()].get().kvs
+            return kvClient!![bytesOf(key), optionBuilder.build()][1L, TimeUnit.SECONDS].kvs
         } catch (e: Exception) {
+            thisLogger().error("get by prefix error: ${e.message}")
             e.printStackTrace()
         }
         return listOf()
@@ -114,6 +115,7 @@ class EtcdClient {
         try {
             return kvClient!![bytesOf(key)].get().kvs
         } catch (e: Exception) {
+            thisLogger().error("get key $key error: ${e.message}")
             e.printStackTrace()
         }
         return listOf()
