@@ -48,7 +48,9 @@ class EtcdValueDisplayPanel(
     }
 
     private val keyValue: KeyValue?
-        get() = connectionManager.getClient(etcdConnectionInfo)?.get(key)?.get(0)
+        get() = connectionManager.getClient(etcdConnectionInfo)?.get(key)?.let {
+            if (it.isNotEmpty()) it[0] else null
+        }
 
     private fun initWithValue() {
         this.removeAll()

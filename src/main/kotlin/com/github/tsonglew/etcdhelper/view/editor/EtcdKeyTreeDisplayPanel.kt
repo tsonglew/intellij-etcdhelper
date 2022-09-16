@@ -6,6 +6,7 @@ import com.github.tsonglew.etcdhelper.action.RefreshAction
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
+import com.github.tsonglew.etcdhelper.data.KeyTreeNode
 import com.github.tsonglew.etcdhelper.view.render.KeyTreeCellRenderer
 import com.intellij.ide.CommonActionsManager
 import com.intellij.openapi.actionSystem.ActionManager
@@ -53,17 +54,16 @@ class EtcdKeyTreeDisplayPanel(
                 if ((selectionPath?.pathCount ?: 0) > 1
                     && (selectionPath?.lastPathComponent as DefaultMutableTreeNode).isLeaf
                 ) {
-                    selectionPath?.path?.let { p ->
-                        p.copyOfRange(1, p.size)
-                            .joinToString(keyValueDisplayPanel.groupSymbol) {
-                                (it as DefaultMutableTreeNode).userObject as String
-                            }
-                    }.also { doubleClickKeyAction.accept(it ?: "") }
+                    doubleClickKeyAction.accept(
+                        (selectionPath?.lastPathComponent as KeyTreeNode).keyValue.key.toString()
+                    )
                 }
                 thisLogger().info("click etcd key tree display panel tree")
             }
         })
     }
+
+    // 多租户，连表查询
     private val keyTreeScrollPane = JBScrollPane(keyTree)
     private val keyDisplayLoadingDecorator = LoadingDecorator(keyTreeScrollPane, keyValueDisplayPanel, 0)
     private val actionManager = CommonActionsManager.getInstance()
@@ -141,6 +141,7 @@ class EtcdKeyTreeDisplayPanel(
         connectionManager,
         etcdConnectionInfo,
         this,
+        keyValueDisplayPanel,
         keyTree
     )
 
@@ -150,7 +151,11 @@ class EtcdKeyTreeDisplayPanel(
         }
         groupRootNode(
             flatRootNode!!,
-            arrayListOf<String>().apply { addAll(allKeys.map { it.key.toString() }) },
+            LinkedHashMap<String, KeyValue>().apply {
+                allKeys.forEach {
+                    this[it.key.toString()] = it
+                }
+            },
             groupSymbol
         )
         treeModel = DefaultTreeModel(flatRootNode)
@@ -158,23 +163,27 @@ class EtcdKeyTreeDisplayPanel(
         treeModel!!.reload()
     }
 
-    private fun groupRootNode(node: DefaultMutableTreeNode, keys: List<String>, groupSymbol: String) {
+    private fun groupRootNode(
+        node: DefaultMutableTreeNode,
+        keys: LinkedHashMap<String, KeyValue>,
+        groupSymbol: String
+    ) {
         val keyNodeMap = hashMapOf<String, DefaultMutableTreeNode>()
-        val nodeChildrenMap = hashMapOf<DefaultMutableTreeNode, ArrayList<String>>()
+        val nodeChildrenMap = hashMapOf<DefaultMutableTreeNode, LinkedHashMap<String, KeyValue>>()
         keys.forEach {
-            val idx = it.indexOf(groupSymbol)
+            val idx = it.key.indexOf(groupSymbol)
             if (idx < 0) {
-                node.add(DefaultMutableTreeNode(it))
+                node.add(KeyTreeNode(it.value, it.key, node))
             } else {
-                val newKey = it.substring(0, idx)
+                val newKey = it.key.substring(0, idx)
                 if (!keyNodeMap.containsKey(newKey)) {
-                    DefaultMutableTreeNode(newKey).also { n ->
+                    KeyTreeNode(it.value, newKey, node).also { n ->
                         keyNodeMap[newKey] = n
-                        nodeChildrenMap[n] = arrayListOf()
+                        nodeChildrenMap[n] = LinkedHashMap()
                         node.add(n)
                     }
                 }
-                nodeChildrenMap[keyNodeMap[newKey]]!!.add(it.substring(idx + 1))
+                nodeChildrenMap[keyNodeMap[newKey]]!![it.key.substring(idx + 1)] = it.value
             }
         }
         nodeChildrenMap.forEach {
