@@ -1,5 +1,6 @@
 package com.github.tsonglew.etcdhelper.view.render
 
+import com.github.tsonglew.etcdhelper.data.KeyTreeNode
 import com.intellij.icons.AllIcons
 import com.intellij.ui.ColoredTreeCellRenderer
 import javax.swing.JTree
@@ -15,9 +16,13 @@ class KeyTreeCellRenderer: ColoredTreeCellRenderer() {
         row: Int,
         hasFocus: Boolean
     ) {
-        val node = value as DefaultMutableTreeNode
-        val userObject = node.userObject
-        append(node.toString())
+        append(
+            when (value) {
+                is KeyTreeNode -> value.keyTreeDisplayName
+                is DefaultMutableTreeNode -> value.userObject.toString()
+                else -> value.toString()
+            }
+        )
         icon = when {
             (row == 0) -> AllIcons.Debugger.Db_array
             (leaf) -> AllIcons.Debugger.Value
