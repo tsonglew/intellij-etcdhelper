@@ -26,7 +26,10 @@
                 <li>Support displaying etcd keys in tree view</li>
             </ul>
         </div>
-        <div>usage:</div>
+        <div>
+            <span>usage:</span>
+            <a href="https://github.com/tsonglew/intellij-etcdhelper/blob/master/README.md">Readme</a>
+        </div>
         <div style="white-space:normal; word-break:break-all; width:100%">
             <ul>
                 <li>
