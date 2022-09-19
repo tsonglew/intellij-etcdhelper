@@ -16,7 +16,6 @@ import io.etcd.jetcd.KeyValue
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
-import java.awt.LayoutManager
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import javax.swing.JButton
@@ -24,9 +23,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 
 class EtcdValueDisplayPanel(
-    private val layoutManager: LayoutManager,
     private val project: Project,
-    private val etcdKeyValueDisplayPanel: EtcdKeyValueDisplayPanel,
     private val key: String,
     private val etcdConnectionInfo: EtcdConnectionInfo,
     private val connectionManager: ConnectionManager,
@@ -35,6 +32,8 @@ class EtcdValueDisplayPanel(
 
     private lateinit var valueTextArea: LanguageTextField
     private lateinit var valueSizeLabel: JLabel
+    private lateinit var revisionLabel: JLabel
+    private lateinit var modRevisionLabel: JLabel
 
     init {
         loadingDecorator.startLoading(false)
@@ -124,10 +123,16 @@ class EtcdValueDisplayPanel(
 
         // TODO: view as panel(choose value encoding)
         valueSizeLabel = JBLabel()
-        val valueFunctionPanel = JPanel(BorderLayout()).apply { add(valueSizeLabel, BorderLayout.WEST) }
+        revisionLabel = JBLabel()
+        modRevisionLabel = JBLabel()
+        val valueLabelsPanel = JPanel(FlowLayout()).apply {
+            add(valueSizeLabel)
+            add(revisionLabel)
+            add(modRevisionLabel)
+        }
 
         val valuePreviewAndFunctionPanel = JPanel(BorderLayout()).apply {
-            add(valueFunctionPanel, BorderLayout.NORTH)
+            add(valueLabelsPanel, BorderLayout.NORTH)
             add(valueTextArea, BorderLayout.CENTER)
         }
         add(valuePreviewAndFunctionPanel, BorderLayout.CENTER)
@@ -136,6 +141,8 @@ class EtcdValueDisplayPanel(
     }
 
     private fun renderLabels() {
-        valueSizeLabel.text = "Value size: ${keyValue?.value?.bytes?.size} bytes"
+        valueSizeLabel.text = "Value size: ${keyValue?.value?.bytes?.size} bytes; "
+        revisionLabel.text = "Create Revision: ${keyValue?.createRevision}; "
+        modRevisionLabel.text = "Mod revision: ${keyValue?.modRevision}; "
     }
 }
