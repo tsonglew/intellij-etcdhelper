@@ -8,7 +8,6 @@ import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
 import com.github.tsonglew.etcdhelper.data.KeyTreeNode
 import com.github.tsonglew.etcdhelper.view.render.KeyTreeCellRenderer
-import com.intellij.ide.CommonActionsManager
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -34,7 +33,7 @@ import javax.swing.tree.DefaultTreeModel
 class EtcdKeyTreeDisplayPanel(
     private val project: Project,
     private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
-    private val splitterContainer: JBSplitter,
+    splitterContainer: JBSplitter,
     private val etcdConnectionInfo: EtcdConnectionInfo,
     private val connectionManager: ConnectionManager,
     private val doubleClickKeyAction: Consumer<String>
@@ -63,10 +62,8 @@ class EtcdKeyTreeDisplayPanel(
         })
     }
 
-    // 多租户，连表查询
     private val keyTreeScrollPane = JBScrollPane(keyTree)
     private val keyDisplayLoadingDecorator = LoadingDecorator(keyTreeScrollPane, keyValueDisplayPanel, 0)
-    private val actionManager = CommonActionsManager.getInstance()
     private val actions = DefaultActionGroup().apply{
         add(createRefreshAction())
         add(createKeyCreateAction())
@@ -78,7 +75,7 @@ class EtcdKeyTreeDisplayPanel(
         minimumSize = Dimension(255, 100)
         add(actionToolbar.component, BorderLayout.NORTH)
         add(keyDisplayLoadingDecorator.component, BorderLayout.CENTER)
-        add(createPagingPanel(keyValueDisplayPanel), BorderLayout.SOUTH)
+        add(createPagingPanel(), BorderLayout.SOUTH)
     }
 
     private val pageCount: Int
@@ -97,7 +94,7 @@ class EtcdKeyTreeDisplayPanel(
         pageIndex = 1
     }
 
-    fun renderKeyTree(searchSymbol: String = "/", groupSymbol: String = "/") {
+    fun renderKeyTree(searchSymbol: String = "/") {
         allKeys = connectionManager
             .getClient(etcdConnectionInfo)
             ?.getByPrefix(searchSymbol, 0)
@@ -118,10 +115,10 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     private fun createRefreshAction() = RefreshAction().apply {
-        action = { renderKeyTree(keyValueDisplayPanel.searchSymbol, keyValueDisplayPanel.groupSymbol) }
+        action = { renderKeyTree(keyValueDisplayPanel.searchSymbol) }
     }
 
-    private fun createPagingPanel(parent: EtcdKeyValueDisplayPanel) = JPanel(BorderLayout()).apply {
+    private fun createPagingPanel() = JPanel(BorderLayout()).apply {
         add(JBLabel("Page Size: " + currentPageKeys.size).apply { border = JBUI.Borders.empty() }, BorderLayout.NORTH)
         add(JBLabel("Page $pageIndex of $pageCount"))
         // TODO: page navigation
