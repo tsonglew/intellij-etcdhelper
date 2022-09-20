@@ -12,7 +12,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 
 class KeyValueDialog(
-    private val project: Project,
+    project: Project,
     private val connectionManager: ConnectionManager,
     private val etcdConnectionInfo: EtcdConnectionInfo,
     private val keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel,
@@ -48,7 +48,7 @@ class KeyValueDialog(
                 0
             }
         )
-        keyTreeDisplayPanel.renderKeyTree(keyValueDisplayPanel.searchSymbol, keyValueDisplayPanel.groupSymbol)
+        keyTreeDisplayPanel.renderKeyTree(keyValueDisplayPanel.searchSymbol)
         close(OK_EXIT_CODE)
     }
 }
