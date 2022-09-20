@@ -106,7 +106,7 @@ class EtcdKeyTreeDisplayPanel(
                 flatRootNode = DefaultMutableTreeNode(etcdConnectionInfo).apply {
                     isVisible = false
                 }
-                groupKeyTree(keyValueDisplayPanel.groupSymbol)
+                groupKeyTree()
                 keyDisplayPanel.updateUI()
             } finally {
                 keyDisplayLoadingDecorator.stopLoading()
@@ -134,7 +134,6 @@ class EtcdKeyTreeDisplayPanel(
     )
 
     private fun createDeleteAction(): KeyDeleteAction = KeyDeleteAction.create(
-        project,
         connectionManager,
         etcdConnectionInfo,
         this,
@@ -142,7 +141,7 @@ class EtcdKeyTreeDisplayPanel(
         keyTree
     )
 
-    private fun groupKeyTree(groupSymbol: String) {
+    private fun groupKeyTree() {
         if (flatRootNode == null) {
             return
         }
@@ -153,7 +152,7 @@ class EtcdKeyTreeDisplayPanel(
                     this[it.key.toString()] = it
                 }
             },
-            groupSymbol
+            keyValueDisplayPanel.groupSymbol
         )
         treeModel = DefaultTreeModel(flatRootNode)
         keyTree.model = treeModel
@@ -165,6 +164,9 @@ class EtcdKeyTreeDisplayPanel(
         keys: LinkedHashMap<String, KeyValue>,
         groupSymbol: String
     ) {
+        if (groupSymbol.isEmpty()) {
+            return
+        }
         val keyNodeMap = hashMapOf<String, DefaultMutableTreeNode>()
         val nodeChildrenMap = hashMapOf<DefaultMutableTreeNode, LinkedHashMap<String, KeyValue>>()
         keys.forEach {

@@ -4,6 +4,7 @@ import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
 import com.intellij.openapi.diagnostic.thisLogger
 import io.etcd.jetcd.*
 import io.etcd.jetcd.options.GetOption
+import io.etcd.jetcd.options.LeaseOption
 import io.etcd.jetcd.options.PutOption
 import java.util.concurrent.TimeUnit
 
@@ -111,7 +112,7 @@ class EtcdClient {
         return listOf()
     }
 
-    fun get(key: String): List<KeyValue>{
+    fun get(key: String): List<KeyValue> {
         try {
             return kvClient!![bytesOf(key)].get().kvs
         } catch (e: Exception) {
@@ -121,9 +122,10 @@ class EtcdClient {
         return listOf()
     }
 
+    fun getLeaseInfo(leaseId: Long) = leaseClient!!.timeToLive(leaseId, LeaseOption.DEFAULT).get().tTl
+
     companion object {
         private val NO_PREFIX_END = byteArrayOf(0)
-        private const val INIT = false
         private fun prefixEndOf(prefix: ByteSequence): ByteSequence {
             val endKey = prefix.bytes.clone()
             for (i in endKey.indices.reversed()) {
