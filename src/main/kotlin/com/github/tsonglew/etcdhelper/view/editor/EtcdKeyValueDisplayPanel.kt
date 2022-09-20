@@ -83,7 +83,7 @@ class EtcdKeyValueDisplayPanel(
             connectionManager,
             this::renderValueDisplayPanel
         ).apply {
-            renderKeyTree(searchSymbol, groupSymbol)
+            renderKeyTree(searchSymbol)
         }
     }
 
@@ -104,7 +104,7 @@ class EtcdKeyValueDisplayPanel(
                 override fun keyReleased(e: KeyEvent?) {
                     if (e?.keyCode == KeyEvent.VK_ENTER) {
                         keyTreeDisplayPanel.resetPageIndex()
-                        keyTreeDisplayPanel.renderKeyTree(searchSymbol, groupSymbol)
+                        keyTreeDisplayPanel.renderKeyTree(searchSymbol)
                         thisLogger().info("current search symbol: $searchSymbol")
                     }
                 }
@@ -145,9 +145,7 @@ class EtcdKeyValueDisplayPanel(
         val loadingDecorator = LoadingDecorator(valueDisplayScrollPanel, this, 0)
         splitterContainer.secondComponent = loadingDecorator.component
         valueDisplayPanel = EtcdValueDisplayPanel(
-            BorderLayout(),
             project,
-            this,
             key,
             connectionInfo,
             connectionManager,

@@ -6,7 +6,6 @@ import com.github.tsonglew.etcdhelper.data.KeyTreeNode
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyTreeDisplayPanel
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayPanel
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 
 class KeyDeleteAction : CustomAction(
@@ -17,7 +16,6 @@ class KeyDeleteAction : CustomAction(
     companion object {
         @JvmStatic
         fun create(
-            project: Project,
             connectionManager: ConnectionManager,
             etcdConnectionInfo: EtcdConnectionInfo,
             keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel,
@@ -31,8 +29,7 @@ class KeyDeleteAction : CustomAction(
                         ?.delete((keyTree.selectionPath?.lastPathComponent as KeyTreeNode).keyValue.key.toString())
 
                     keyTreeDisplayPanel.renderKeyTree(
-                        keyValueDisplayPanel.searchSymbol,
-                        keyValueDisplayPanel.groupSymbol
+                        keyValueDisplayPanel.searchSymbol
                     )
                 }
             }
