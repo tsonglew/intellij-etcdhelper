@@ -6,7 +6,6 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
-import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFile
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFileSystem
 import com.github.tsonglew.etcdhelper.view.render.ConnectionTreeCellRenderer
 import com.intellij.openapi.Disposable
@@ -96,15 +95,9 @@ class MainToolWindow(
 
                                 val connectionNode = connectionTree.selectionPath?.path?.get(1) as DefaultMutableTreeNode
                                 val connectionInfo = connectionNode.userObject as EtcdConnectionInfo
-                                val f = EtcdKeyValueDisplayVirtualFile(
-                                    project,
-                                    connectionInfo.endpoints,
-                                    connectionInfo,
-                                    connectionManager
-                                )
+                                val f = connectionManager.getVirtualFile(connectionInfo)
                                 ApplicationManager.getApplication().invokeLater {
                                     EtcdKeyValueDisplayVirtualFileSystem.getInstance(project).openEditor(f)
-                                    // TODO: addEditorToMap
                                 }
 
                             }.submit(ThreadPoolManager.executor)

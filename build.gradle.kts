@@ -27,7 +27,6 @@ dependencies {
     }
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     compileOnly("org.projectlombok:lombok:1.18.24")
-    testImplementation ("org.jetbrains.kotlin:kotlin-test")
 }
 
 tasks {

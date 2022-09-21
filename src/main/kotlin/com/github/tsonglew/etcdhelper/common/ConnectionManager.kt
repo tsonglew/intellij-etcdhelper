@@ -1,8 +1,8 @@
 package com.github.tsonglew.etcdhelper.common
 
+import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFile
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 import javax.swing.tree.DefaultMutableTreeNode
@@ -19,7 +19,7 @@ class ConnectionManager(
      * map of endpoints to {@link EtcdClient}
      */
     private val connectionMap = hashMapOf<String, EtcdClient>()
-    private val connectionEditorMap = hashMapOf<String, FileEditor>()
+    private val connectionEditorMap = hashMapOf<String, EtcdKeyValueDisplayVirtualFile>()
 
     companion object {
         @JvmStatic
@@ -54,6 +54,18 @@ class ConnectionManager(
             }
             reload()
         }
+    }
+
+    fun getVirtualFile(connectionInfo: EtcdConnectionInfo): EtcdKeyValueDisplayVirtualFile {
+        if (!connectionEditorMap.containsKey(connectionInfo.toString())) {
+            connectionEditorMap[connectionInfo.toString()] = EtcdKeyValueDisplayVirtualFile(
+                project,
+                connectionInfo.endpoints,
+                connectionInfo,
+                this
+            )
+        }
+        return connectionEditorMap[connectionInfo.toString()]!!
     }
 
     /**
