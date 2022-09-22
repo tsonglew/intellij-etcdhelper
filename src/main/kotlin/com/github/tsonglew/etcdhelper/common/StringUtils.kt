@@ -30,7 +30,7 @@ object StringUtils {
     const val ZERO = "0"
     private val CHARSET: Charset = StandardCharsets.UTF_8
 
-    private fun join(delimiter: String?, vararg parts: String?): String {
+    fun join(delimiter: String?, vararg parts: String?): String {
         return Arrays.stream(parts)
             .map { p: String? -> p ?: EMPTY }
             .collect(Collectors.joining(delimiter ?: EMPTY))

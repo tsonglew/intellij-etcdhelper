@@ -5,6 +5,9 @@ import javax.swing.tree.DefaultMutableTreeNode
 
 class KeyTreeNode(
     val keyValue: KeyValue,
-    val keyTreeDisplayName: String,
+    var keyName: String,
     val parent: DefaultMutableTreeNode
-) : DefaultMutableTreeNode(keyValue)
+) : DefaultMutableTreeNode(keyValue) {
+    val keyTreeDisplayName get() = (if (isRemoved) "(Removed)" else "") + keyName
+    var isRemoved = false
+}
