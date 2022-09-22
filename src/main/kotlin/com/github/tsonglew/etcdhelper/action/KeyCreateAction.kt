@@ -7,6 +7,7 @@ import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyTreeDisplayPanel
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayPanel
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
+import javax.swing.tree.DefaultTreeModel
 
 class KeyCreateAction : CustomAction(
     "Create Key",
@@ -20,7 +21,8 @@ class KeyCreateAction : CustomAction(
             connectionManager: ConnectionManager,
             etcdConnectionInfo: EtcdConnectionInfo,
             keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel,
-            keyValueDisplayPanel: EtcdKeyValueDisplayPanel
+            keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
+            treeModel: DefaultTreeModel?
         ) = KeyCreateAction()
             .apply {
                 action = {
@@ -29,7 +31,8 @@ class KeyCreateAction : CustomAction(
                         connectionManager,
                         etcdConnectionInfo,
                         keyTreeDisplayPanel,
-                        keyValueDisplayPanel
+                        keyValueDisplayPanel,
+                        treeModel
                     ).show()
                 }
             }

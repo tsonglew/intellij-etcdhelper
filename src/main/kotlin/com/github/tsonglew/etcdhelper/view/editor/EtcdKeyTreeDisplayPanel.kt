@@ -130,15 +130,18 @@ class EtcdKeyTreeDisplayPanel(
         connectionManager,
         etcdConnectionInfo,
         this,
-        keyValueDisplayPanel
+        keyValueDisplayPanel,
+        treeModel
     )
 
     private fun createDeleteAction(): KeyDeleteAction = KeyDeleteAction.create(
+        project,
         connectionManager,
         etcdConnectionInfo,
         this,
         keyValueDisplayPanel,
-        keyTree
+        keyTree,
+        treeModel
     )
 
     private fun groupKeyTree() {

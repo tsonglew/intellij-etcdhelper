@@ -10,13 +10,15 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.tree.DefaultTreeModel
 
 class KeyValueDialog(
     project: Project,
     private val connectionManager: ConnectionManager,
     private val etcdConnectionInfo: EtcdConnectionInfo,
     private val keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel,
-    private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel
+    private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
+    private val treeModel: DefaultTreeModel?
 ) : DialogWrapper(project) {
 
     private lateinit var panel: JPanel

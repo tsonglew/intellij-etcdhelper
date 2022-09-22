@@ -3,6 +3,7 @@ package com.github.tsonglew.etcdhelper.common
 import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
 import com.intellij.openapi.diagnostic.thisLogger
 import io.etcd.jetcd.*
+import io.etcd.jetcd.options.DeleteOption
 import io.etcd.jetcd.options.GetOption
 import io.etcd.jetcd.options.LeaseOption
 import io.etcd.jetcd.options.PutOption
@@ -85,14 +86,22 @@ class EtcdClient {
         return false
     }
 
-    fun delete(key: String): Boolean {
-        try {
-            kvClient!!.delete(bytesOf(key)).get()
-            return true
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return false
+    fun delete(key: String) = try {
+        thisLogger().info("delete key: $key")
+        kvClient!!.delete(bytesOf(key)).get()
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+
+    fun deleteByPrefix(key: String) = try {
+        thisLogger().info("deleteByPrefix: $key")
+        kvClient!!.delete(bytesOf(key), DeleteOption.newBuilder().isPrefix(true).build()).get()
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
     }
 
     fun getByPrefix(key: String, limit: Int?): List<KeyValue> {
