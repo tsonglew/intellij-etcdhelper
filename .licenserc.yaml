@@ -1,0 +1,36 @@
+header:
+  license:
+    spdx-id: MIT
+    copyright-owner: intellij-etcdhelper
+
+  paths-ignore:
+    - '.github/**'
+    - 'gradle/**'
+    - '.run/**'
+    - '**/.gitignore'
+    - '**/.helmignore'
+    - '.gitmodules'
+    - '.gitattributes'
+    - '.mvn'
+    - '**/*.md'
+    - '**/*.svg'
+    - '**/*.png'
+    - '**/*.json'
+    - '**/*.conf'
+    - '**/*.ftl'
+    - '**/*.iml'
+    - '**/*.tpl'
+    - '**/*.kts'
+    - '**/*.factories'
+    - 'gradlew'
+    - 'gradlew.bat'
+    - '**/target/**'
+    - 'LICENSE.txt'
+    - 'NOTICE'
+    - 'CNAME'
+    - '**/resources/META-INF/**'
+    - '**/vendor/**'
+
+  comment: on-failure
+
+  license-location-threshold: 130
