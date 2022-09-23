@@ -4,6 +4,8 @@ a simple intellij platform etcd plugin
 
 ## Usage
 
+<ul>
+<li>
 <div>Add new connection</div>
 <img width="400px"
 src="https://plugins.jetbrains.com/files/19924/screenshot_0b9812f9-2315-4f0b-bf37-a9eca3bea050"
@@ -72,5 +74,28 @@ alt="create key"/>
 </ul>
 
 ## Contributors
+
+<table>
+<tr>
+<td width="20%">
+<a href="https://github.com/tsonglew">
+<img src="https://avatars.githubusercontent.com/u/14333766?v=4"/>
+</a>
+<p align="center">tsonglew</p>
+</td>
+<td width="20%">
+<a href="https://github.com/sunchaser-lilu">
+<img src="https://avatars.githubusercontent.com/u/40930677?v=4"/>
+</a>
+<p align="center">sunchaser-lilu</p>
+</td>
+<td width="20%">
+<a href="https://github.com/sfjsww">
+<img src="https://avatars.githubusercontent.com/u/59310125?v=4"/>
+</a>
+<p align="center">sfjsww</p>
+</td>
+</tr>
+</table>
 
 ## Acknowledgement
