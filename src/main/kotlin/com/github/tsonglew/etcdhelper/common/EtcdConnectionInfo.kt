@@ -25,19 +25,23 @@
 package com.github.tsonglew.etcdhelper.common
 
 import kotlinx.serialization.Serializable
-import java.io.Serial
-import java.util.UUID
+import java.util.*
 
 
 // use PasswordSafe
 //https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html?from=jetbrains.org#retrieve-stored-credentials
 @Serializable
 data class EtcdConnectionInfo(
-    val endpoints: String,
-    val username: String,
-    val password: String
+    var endpoints: String,
+    var username: String,
+    var password: String,
+    var id: String? = null
 ) {
-    val id: String = UUID.randomUUID().toString()
+    init {
+        if (id == null) {
+            id = UUID.randomUUID().toString()
+        }
+    }
 
     constructor() : this("", "", "")
 
