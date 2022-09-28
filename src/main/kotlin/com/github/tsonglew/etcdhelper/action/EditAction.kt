@@ -22,30 +22,25 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.common
+package com.github.tsonglew.etcdhelper.action
 
-import kotlinx.serialization.Serializable
-import java.util.*
+import com.github.tsonglew.etcdhelper.common.ConnectionManager
+import com.github.tsonglew.etcdhelper.dialog.EtcdConnectionSettingsDialog
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.project.Project
+import com.intellij.ui.treeStructure.Tree
 
-
-// use PasswordSafe
-//https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html?from=jetbrains.org#retrieve-stored-credentials
-@Serializable
-data class EtcdConnectionInfo(
-    var endpoints: String,
-    var username: String,
-    var password: String,
-    var id: String? = null
+class EditAction : CustomAction(
+    "Edit Connection",
+    "Edit Connection",
+    AllIcons.General.Gear
 ) {
-    init {
-        if (id == null) {
-            id = UUID.randomUUID().toString()
-        }
-    }
-
-    constructor() : this("", "", "")
-
-    override fun toString(): String {
-        return "$username@$endpoints"
+    companion object {
+        fun create(project: Project, connectionTree: Tree, connectionManager: ConnectionManager) = EditAction()
+            .apply {
+                action = {
+                    EtcdConnectionSettingsDialog(project, connectionTree, connectionManager).show()
+                }
+            }
     }
 }
