@@ -129,6 +129,7 @@ class EtcdClient {
     }
 
     fun getByPrefix(key: String, limit: Int?): List<KeyValue> {
+        // TODO: use serializable & keyOnly to optimize performance
         try {
             val optionBuilder = GetOption.newBuilder()
                 .withRange(prefixEndOf(bytesOf(key)))

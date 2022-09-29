@@ -29,19 +29,18 @@ import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.PasswordFieldPanel
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.treeStructure.Tree
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.xml.transform.OutputKeys
 
 class EtcdConnectionSettingsDialog(
     private val project: Project,
     private val connectionTree: Tree,
-    private val connectionManager: ConnectionManager
+    private val connectionManager: ConnectionManager,
+    private val etcdConnectionInfo: EtcdConnectionInfo? = null
 ) : DialogWrapper(project){
 
     private lateinit var panel: JPanel
@@ -52,6 +51,12 @@ class EtcdConnectionSettingsDialog(
     init {
         super.init()
         title = "Add Connection"
+
+        etcdConnectionInfo?.apply {
+            endpointsTextField.text = endpoints
+            usernameTextField.text = username
+            passwordTextField.text = password
+        }
     }
 
     override fun createCenterPanel(): JComponent {
@@ -73,6 +78,7 @@ class EtcdConnectionSettingsDialog(
     private fun toEtcdConfiguration() = EtcdConnectionInfo(
         endpointsTextField.text,
         usernameTextField.text,
-        passwordTextField.password.toString()
+        passwordTextField.password.toString(),
+        etcdConnectionInfo?.id
     )
 }
