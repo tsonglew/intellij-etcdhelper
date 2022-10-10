@@ -35,7 +35,8 @@ data class EtcdConnectionInfo(
     var endpoints: String,
     var username: String,
     var password: String,
-    var id: String? = null
+    var id: String? = null,
+    var remark: String? = null,
 ) {
     init {
         if (id == null) {
@@ -46,6 +47,6 @@ data class EtcdConnectionInfo(
     constructor() : this("", "", "")
 
     override fun toString(): String {
-        return "$username@$endpoints"
+        return if (remark != null) "$remark($username@$endpoints)" else "$username@$endpoints"
     }
 }
