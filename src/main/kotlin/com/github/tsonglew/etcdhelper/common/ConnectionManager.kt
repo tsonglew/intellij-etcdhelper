@@ -55,7 +55,7 @@ class ConnectionManager(
             ?: ConnectionManager(project, propertyUtil, connectionTree)
     }
 
-    fun getClient(etcdConnectionInfo: EtcdConnectionInfo) = connectionMap[etcdConnectionInfo.endpoints]
+    fun getClient(etcdConnectionInfo: EtcdConnectionInfo) = connectionMap[etcdConnectionInfo.id!!]
 
     /**
      * init saved connections
@@ -74,12 +74,13 @@ class ConnectionManager(
         (connectionTree.model as DefaultTreeModel).apply {
             (root as DefaultMutableTreeNode).apply {
                 var found = false
-                for (i in 0..getChildCount(this)) {
+                for (i in 0 until getChildCount(this)) {
                     ((getChildAt(i) as DefaultMutableTreeNode).userObject as EtcdConnectionInfo).apply {
                         if (this.id == etcdConnectionInfo.id) {
                             this.endpoints = etcdConnectionInfo.endpoints
                             this.username = etcdConnectionInfo.username
                             this.password = etcdConnectionInfo.password
+                            this.remark = etcdConnectionInfo.remark
                             found = true
                         }
                     }
@@ -87,7 +88,7 @@ class ConnectionManager(
                 if (!found) {
                     add(DefaultMutableTreeNode(etcdConnectionInfo))
                 }
-                connectionMap[etcdConnectionInfo.endpoints] = EtcdClient().apply { init(etcdConnectionInfo) }
+                connectionMap[etcdConnectionInfo.id!!] = EtcdClient().apply { init(etcdConnectionInfo) }
             }
             reload()
         }

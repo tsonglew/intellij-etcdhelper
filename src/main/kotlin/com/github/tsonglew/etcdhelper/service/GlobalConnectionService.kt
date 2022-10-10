@@ -65,7 +65,21 @@ class GlobalConnectionService: PersistentStateComponent<GlobalConnectionService.
 
     fun addConnection(connectionInfo: EtcdConnectionInfo) {
         val connections = myState.connections
-        connections.add(connectionInfo)
+        var oldConn: EtcdConnectionInfo? = null
+        for (c in connections) {
+            if (c.id.equals(connectionInfo.id)) {
+                oldConn = c
+                break
+            }
+        }
+        if (oldConn == null) {
+            connections.add(connectionInfo)
+        } else {
+            oldConn.remark = connectionInfo.remark
+            oldConn.endpoints = connectionInfo.endpoints
+            oldConn.username = connectionInfo.username
+            oldConn.password = connectionInfo.password
+        }
         myState.connections = connections
         thisLogger().info("connections after add: $connections")
     }
