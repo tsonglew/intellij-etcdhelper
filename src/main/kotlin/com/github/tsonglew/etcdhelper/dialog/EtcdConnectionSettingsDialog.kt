@@ -44,27 +44,31 @@ class EtcdConnectionSettingsDialog(
 ) : DialogWrapper(project){
 
     private lateinit var panel: JPanel
-    private val endpointsTextField =  JBTextField("http://localhost:2379", 20)
-    private val usernameTextField=  JBTextField("", 20)
-    private val passwordTextField=  JBPasswordField()
+    private val remarkTextField = JBTextField("", 20)
+    private val endpointsTextField = JBTextField("http://localhost:2379", 20)
+    private val usernameTextField = JBTextField("", 20)
+    private val passwordTextField = JBPasswordField()
 
     init {
         super.init()
         title = "Add Connection"
 
         etcdConnectionInfo?.apply {
+            remarkTextField.text = remark
             endpointsTextField.text = endpoints
             usernameTextField.text = username
             passwordTextField.text = password
+            title = "Edit Connection"
         }
     }
 
     override fun createCenterPanel(): JComponent {
-       panel= panel{
-            row("endpoints: ") { cell(endpointsTextField) }
-            row("username: ") { cell(usernameTextField) }
-            row("password: ") { cell(passwordTextField) }
-        }
+       panel= panel {
+           row("remark: ") { cell(remarkTextField) }
+           row("endpoints: ") { cell(endpointsTextField) }
+           row("username: ") { cell(usernameTextField) }
+           row("password: ") { cell(passwordTextField) }
+       }
         return panel
     }
 
@@ -79,6 +83,7 @@ class EtcdConnectionSettingsDialog(
         endpointsTextField.text,
         usernameTextField.text,
         passwordTextField.password.toString(),
-        etcdConnectionInfo?.id
+        etcdConnectionInfo?.id,
+        remarkTextField.text
     )
 }

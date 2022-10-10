@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.window
 
 import com.github.tsonglew.etcdhelper.action.AddAction
 import com.github.tsonglew.etcdhelper.action.DeleteAction
+import com.github.tsonglew.etcdhelper.action.EditAction
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
@@ -80,6 +81,7 @@ class MainToolWindow(
             DefaultActionGroup().apply {
                 add(AddAction.create(project, connectionTree, connectionManager))
                 add(DeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
+                add(EditAction.create(project, connectionTree, connectionManager))
                 addSeparator()
                 // TODO: create expander
             },

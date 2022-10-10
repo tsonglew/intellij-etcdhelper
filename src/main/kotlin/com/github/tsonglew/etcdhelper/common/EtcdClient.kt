@@ -47,7 +47,7 @@ class EtcdClient {
         init(
             etcdConnectionInfo.endpoints.split(",").toTypedArray(),
             etcdConnectionInfo.username,
-            etcdConnectionInfo.password
+            etcdConnectionInfo.password,
         )
     }
 
