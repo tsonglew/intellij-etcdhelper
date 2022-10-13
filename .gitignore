@@ -41,3 +41,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Fleet ###
+.fleet/
+/.fleet/settings.json
