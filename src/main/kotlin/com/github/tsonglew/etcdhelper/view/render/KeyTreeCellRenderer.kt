@@ -40,13 +40,13 @@ class KeyTreeCellRenderer: ColoredTreeCellRenderer() {
         row: Int,
         hasFocus: Boolean
     ) {
-        append(
-            when (value) {
-                is KeyTreeNode -> value.keyTreeDisplayName
-                is DefaultMutableTreeNode -> value.userObject.toString()
-                else -> value.toString()
-            }
-        )
+        when (value) {
+            is KeyTreeNode -> value.keyTreeDisplayName
+            is DefaultMutableTreeNode -> value.userObject?.toString()
+            else -> value.toString()
+        }?.let {
+            append(it)
+        }
         icon = when {
             (row == 0) -> AllIcons.Debugger.Db_array
             (leaf) -> AllIcons.Debugger.Value
