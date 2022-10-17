@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.common
 
 import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.project.Project
 import io.etcd.jetcd.*
 import io.etcd.jetcd.options.DeleteOption
 import io.etcd.jetcd.options.GetOption
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit
 /**
  * @author tsonglew
  */
-class EtcdClient {
+class EtcdClient(val project: Project) {
     private var client: Client? = null
     private var kvClient: KV? = null
     private var authClient: Auth? = null
@@ -140,8 +141,9 @@ class EtcdClient {
             }
             return kvClient!![bytesOf(key), optionBuilder.build()][1L, TimeUnit.SECONDS].kvs
         } catch (e: Exception) {
-            thisLogger().error("get by prefix error: ${e.message}")
+            thisLogger().info("get by prefix error: ${e.message}")
             e.printStackTrace()
+            Notifier.notifyError("Connection Failed", "Please check your connection info", project)
         }
         return listOf()
     }
@@ -150,8 +152,9 @@ class EtcdClient {
         try {
             return kvClient!![bytesOf(key)].get().kvs
         } catch (e: Exception) {
-            thisLogger().error("get key $key error: ${e.message}")
+            thisLogger().info("get key $key error: ${e.message}")
             e.printStackTrace()
+            Notifier.notifyError("Connection Failed", "Please check your connection info", project)
         }
         return listOf()
     }
