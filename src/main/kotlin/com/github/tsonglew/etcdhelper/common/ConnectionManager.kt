@@ -88,7 +88,7 @@ class ConnectionManager(
                 if (!found) {
                     add(DefaultMutableTreeNode(etcdConnectionInfo))
                 }
-                connectionMap[etcdConnectionInfo.id!!] = EtcdClient().apply { init(etcdConnectionInfo) }
+                connectionMap[etcdConnectionInfo.id!!] = EtcdClient(project).apply { init(etcdConnectionInfo) }
             }
             reload()
         }
