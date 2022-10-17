@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.common
 
 import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.project.Project
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -33,13 +34,13 @@ import java.util.concurrent.ConcurrentHashMap
  */
 object EtcdClientManager {
     private val CONN_MAP = ConcurrentHashMap<String, EtcdClient>()
-    fun addConn(endpoints: String, user: String, password: String): EtcdClient? {
+    fun addConn(project: Project, endpoints: String, user: String, password: String): EtcdClient? {
         thisLogger().info("add etcd connection: ")
         thisLogger().info("endpoints: $endpoints")
         thisLogger().info("user: $user")
         thisLogger().info("password: $password")
         CONN_MAP.computeIfAbsent(endpoints) { k: String ->
-            val c = EtcdClient()
+            val c = EtcdClient(project)
             c.init(k.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), null, null)
             c
         }
