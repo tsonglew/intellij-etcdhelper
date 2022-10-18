@@ -34,7 +34,7 @@ import java.util.*
 data class EtcdConnectionInfo(
         var endpoints: String,
         var username: String,
-        var password: String,
+//        var password: String,
         var id: String? = null,
         var remark: String? = null,
 ) {
@@ -44,7 +44,7 @@ data class EtcdConnectionInfo(
         }
     }
 
-    constructor() : this("", "", "")
+    constructor() : this("", "")
 
     override fun toString(): String {
         return if (remark != null) "$remark($username@$endpoints)" else "$username@$endpoints"
@@ -53,7 +53,7 @@ data class EtcdConnectionInfo(
     fun update(etcdConnectionInfo: EtcdConnectionInfo): EtcdConnectionInfo {
         endpoints = etcdConnectionInfo.endpoints
         username = etcdConnectionInfo.username
-        password = etcdConnectionInfo.password
+//        password = etcdConnectionInfo.password
         remark = etcdConnectionInfo.remark
         return this
     }
