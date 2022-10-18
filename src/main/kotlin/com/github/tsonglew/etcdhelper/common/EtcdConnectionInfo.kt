@@ -32,11 +32,11 @@ import java.util.*
 //https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html?from=jetbrains.org#retrieve-stored-credentials
 @Serializable
 data class EtcdConnectionInfo(
-    var endpoints: String,
-    var username: String,
-    var password: String,
-    var id: String? = null,
-    var remark: String? = null,
+        var endpoints: String,
+        var username: String,
+        var password: String,
+        var id: String? = null,
+        var remark: String? = null,
 ) {
     init {
         if (id == null) {
@@ -48,5 +48,13 @@ data class EtcdConnectionInfo(
 
     override fun toString(): String {
         return if (remark != null) "$remark($username@$endpoints)" else "$username@$endpoints"
+    }
+
+    fun update(etcdConnectionInfo: EtcdConnectionInfo): EtcdConnectionInfo {
+        endpoints = etcdConnectionInfo.endpoints
+        username = etcdConnectionInfo.username
+        password = etcdConnectionInfo.password
+        remark = etcdConnectionInfo.remark
+        return this
     }
 }

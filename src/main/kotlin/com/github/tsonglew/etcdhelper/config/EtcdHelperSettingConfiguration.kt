@@ -25,11 +25,14 @@
 package com.github.tsonglew.etcdhelper.config
 
 import com.intellij.openapi.options.Configurable
+import javax.swing.JLabel
 import javax.swing.JPanel
 
 class EtcdHelperSettingConfiguration : Configurable {
 
-    private val component = JPanel()
+    private val component = JPanel().apply {
+        add(JLabel("Hello EtcdHelper!"))
+    }
 
     override fun createComponent() = component
 

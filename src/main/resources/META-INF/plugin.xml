@@ -1,76 +1,84 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>com.github.tsonglew.etcdhelper</id>
-
-    <!-- Public plugin name should be written in Title Case.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Etcdhelper</name>
-
-    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="klew1879@gmail.com" url="https://tsonglew.github.io">Tsonglew</vendor>
-
-    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-    <description>
-        <![CDATA[
-        <div>a simple intellij-based etcd plugin</div>
-        <div>features:</div>
-        <div style="white-space:normal; word-break:break-all; width:100%">
-            <ul>
-                <li>Convenient management of etcd connections</li>
-                <li>Display of etcd keys and values</li>
-                <li>Support adding, modifying and deleting keys and value</li>
-                <li>Support grouping query result by a user-defined symbol</li>
-                <li>Support displaying etcd keys in tree view</li>
-            </ul>
-        </div>
-        <div>
-            <span>usage:</span>
-            <a href="https://github.com/tsonglew/intellij-etcdhelper/blob/master/README.md">Readme</a>
-        </div>
-        <br>
-        If you have any suggestions, questions or bugs about this plugin,
-        please issue them on <a href="https://github.com/tsonglew/intellij-etcdhelper">Github</a>
-        ]]> ]
-    </description>
-    <change-notes><![CDATA[
-        1.0.0<br>
-        <ul>
-            <li>Initial release</li>
-            <li>Support adding, modifying and deleting keys and value</li>
-            <li>Support grouping query result by a user-defined symbol</li>
-            <li>Support displaying etcd keys in tree view</li>
-        </ul>
-        1.1.0<br>
-        <ul>
-            <li>Support connection remarks</li>
-            <li>Optimize key tree display</li>
-            <li>Fix some bugs</li>
-        </ul>
-        ]]>
+  <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+  <change-notes><![CDATA[
+    1.1.1<br>
+    <b>reset connections is needed after upgrading to v1.1.1</b>
+    <ul>
+      <li>optimize connection info management</li>
+      <li>fix password security issues</li>
+    </ul>
+    1.1.0<br>
+    <ul>
+      <li>Support connection remarks</li>
+      <li>Optimize key tree display</li>
+      <li>Fix some bugs</li>
+    </ul>
+    1.0.0<br>
+    <ul>
+      <li>Initial release</li>
+      <li>Support adding, modifying and deleting keys and value</li>
+      <li>Support grouping query result by a user-defined symbol</li>
+      <li>Support displaying etcd keys in tree view</li>
+    </ul>
+    ]]>
     </change-notes>
 
-    <!-- Product and plugin compatibility requirements.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-    <depends>com.intellij.modules.platform</depends>
+  <!-- Public plugin name should be written in Title Case.
+       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+  <depends>com.intellij.modules.platform</depends>
 
-    <!-- Extension points defined by the plugin.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-    <extensions defaultExtensionNs="com.intellij">
-        <toolWindow
-                factoryClass="com.github.tsonglew.etcdhelper.window.MainToolWindowFactory"
-                id="EtcdHelper"
-                icon="/icons/icon.svg"
-                anchor="right"
-        />
-        <fileEditorProvider
-                implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
-        <applicationService serviceImplementation="com.github.tsonglew.etcdhelper.service.GlobalConnectionService"/>
-        <applicationConfigurable
-                parentId="tools"
-                instance="com.github.tsonglew.etcdhelper.config.EtcdHelperSettingConfiguration"
-                displayName="EtcdHelper"/>
-    </extensions>
+  <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+  <description>
+    <![CDATA[
+    <div>a simple intellij-based etcd plugin</div>
+    <div>features:</div>
+    <div style="white-space:normal; word-break:break-all; width:100%">
+      <ul>
+        <li>Convenient management of etcd connections</li>
+        <li>Display of etcd keys and values</li>
+        <li>Support adding, modifying and deleting keys and value</li>
+        <li>Support grouping query result by a user-defined symbol</li>
+        <li>Support displaying etcd keys in tree view</li>
+      </ul>
+    </div>
+    <div>
+      <span>usage:</span>
+      <a
+        href="https://github.com/tsonglew/intellij-etcdhelper/blob/master/README.md">Readme</a>
+    </div>
+    <br>
+    If you have any suggestions, questions or bugs about this plugin,
+    please issue them on <a href="https://github.com/tsonglew/intellij-etcdhelper">Github</a>
+             ]]>
+  </description>
+
+  <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+       Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationConfigurable
+      displayName="EtcdHelper"
+      instance="com.github.tsonglew.etcdhelper.config.EtcdHelperSettingConfiguration"
+      parentId="tools"/>
+    <applicationService
+      serviceImplementation="com.github.tsonglew.etcdhelper.service.GlobalConnectionSetting"/>
+    <fileEditorProvider
+      implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
+    <toolWindow
+      anchor="right"
+      factoryClass="com.github.tsonglew.etcdhelper.window.MainToolWindowFactory"
+      icon="/icons/icon.svg"
+      id="EtcdHelper"
+    />
+  </extensions>
+  <id>com.github.tsonglew.etcdhelper</id>
+
+  <!-- Product and plugin compatibility requirements.
+       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+  <name>Etcdhelper</name>
+
+  <!-- Extension points defined by the plugin.
+       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+  <vendor email="klew1879@gmail.com" url="https://tsonglew.github.io">Tsonglew</vendor>
 </idea-plugin>
