@@ -43,12 +43,14 @@ class EtcdClient(val project: Project) {
     private var authClient: Auth? = null
     private var leaseClient: Lease? = null
     private lateinit var endpoints: Array<String>
+    private lateinit var etcdConnectionInfo: EtcdConnectionInfo
 
     fun init(etcdConnectionInfo: EtcdConnectionInfo) {
+        this.etcdConnectionInfo = etcdConnectionInfo
         init(
-            etcdConnectionInfo.endpoints.split(",").toTypedArray(),
-            etcdConnectionInfo.username,
-            etcdConnectionInfo.password,
+                etcdConnectionInfo.endpoints.split(",").toTypedArray(),
+                etcdConnectionInfo.username,
+                etcdConnectionInfo.password,
         )
     }
 
@@ -63,7 +65,7 @@ class EtcdClient(val project: Project) {
             kvClient = client!!.kvClient
             authClient = client!!.authClient
             leaseClient = client!!.leaseClient
-        } catch (e: Exception ) {
+        } catch (e: Exception) {
             thisLogger().info("invalid connection info")
         }
     }
@@ -100,9 +102,9 @@ class EtcdClient(val project: Project) {
         try {
             val leaseId = leaseClient!!.grant(ttlSecs.toLong()).get().id
             kvClient!!.put(
-                bytesOf(key),
-                bytesOf(value),
-                PutOption.newBuilder().withLeaseId(leaseId).build()
+                    bytesOf(key),
+                    bytesOf(value),
+                    PutOption.newBuilder().withLeaseId(leaseId).build()
             )[1L, TimeUnit.SECONDS]
             return true
         } catch (e: Exception) {
@@ -133,9 +135,9 @@ class EtcdClient(val project: Project) {
         // TODO: use serializable & keyOnly to optimize performance
         try {
             val optionBuilder = GetOption.newBuilder()
-                .withRange(prefixEndOf(bytesOf(key)))
-                .withSortField(GetOption.SortTarget.MOD)
-                .withSortOrder(GetOption.SortOrder.ASCEND)
+                    .withRange(prefixEndOf(bytesOf(key)))
+                    .withSortField(GetOption.SortTarget.MOD)
+                    .withSortOrder(GetOption.SortOrder.ASCEND)
             if ((limit != null) && (limit > 0)) {
                 optionBuilder.withLimit(limit.toLong())
             }
@@ -143,7 +145,8 @@ class EtcdClient(val project: Project) {
         } catch (e: Exception) {
             thisLogger().info("get by prefix error: ${e.message}")
             e.printStackTrace()
-            Notifier.notifyError("Connection Failed", "Please check your connection info", project)
+            Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo",
+                    project)
         }
         return listOf()
     }
@@ -154,7 +157,7 @@ class EtcdClient(val project: Project) {
         } catch (e: Exception) {
             thisLogger().info("get key $key error: ${e.message}")
             e.printStackTrace()
-            Notifier.notifyError("Connection Failed", "Please check your connection info", project)
+            Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
         }
         return listOf()
     }

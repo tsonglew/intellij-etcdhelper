@@ -23,10 +23,12 @@ intellij {
 
 dependencies {
     implementation("io.etcd:jetcd-core:0.7.3") {
-        exclude(group="org.slf4j", module = "slf4j-api")
+        exclude(group = "org.slf4j", module = "slf4j-api")
     }
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     compileOnly("org.projectlombok:lombok:1.18.24")
+
+    testImplementation("junit:junit:4.13.2")
 }
 
 tasks {
@@ -40,8 +42,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("213")
-        untilBuild.set("223.*")
+        sinceBuild.set("213.3")
     }
 
     signPlugin {
