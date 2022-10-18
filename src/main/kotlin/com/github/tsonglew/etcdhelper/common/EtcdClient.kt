@@ -50,7 +50,7 @@ class EtcdClient(val project: Project) {
         init(
                 etcdConnectionInfo.endpoints.split(",").toTypedArray(),
                 etcdConnectionInfo.username,
-                etcdConnectionInfo.password,
+                PasswordUtil.retrievePassword(etcdConnectionInfo.id!!),
         )
     }
 

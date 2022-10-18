@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.dialog
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.common.PasswordUtil
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
@@ -37,11 +38,11 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 
 class EtcdConnectionSettingsDialog(
-    private val project: Project,
-    private val connectionTree: Tree,
-    private val connectionManager: ConnectionManager,
-    private val etcdConnectionInfo: EtcdConnectionInfo? = null
-) : DialogWrapper(project){
+        private val project: Project,
+        private val connectionTree: Tree,
+        private val connectionManager: ConnectionManager,
+        private val etcdConnectionInfo: EtcdConnectionInfo? = null
+) : DialogWrapper(project) {
 
     private lateinit var panel: JPanel
     private val remarkTextField = JBTextField("", 20)
@@ -57,33 +58,37 @@ class EtcdConnectionSettingsDialog(
             remarkTextField.text = remark
             endpointsTextField.text = endpoints
             usernameTextField.text = username
-            passwordTextField.text = password
+            passwordTextField.text = PasswordUtil.retrievePassword(id!!)
             title = "Edit Connection"
         }
     }
 
     override fun createCenterPanel(): JComponent {
-       panel= panel {
-           row("remark: ") { cell(remarkTextField) }
-           row("endpoints: ") { cell(endpointsTextField) }
-           row("username: ") { cell(usernameTextField) }
-           row("password: ") { cell(passwordTextField) }
-       }
+        panel = panel {
+            row("remark: ") { cell(remarkTextField) }
+            row("endpoints: ") { cell(endpointsTextField) }
+            row("username: ") { cell(usernameTextField) }
+            row("password: ") { cell(passwordTextField) }
+        }
         return panel
     }
 
     override fun doOKAction() {
-        PropertyUtil(project).saveConnection(toEtcdConfiguration())
+        val conf = toEtcdConfiguration()
 
-        connectionManager.addConnectionToList(toEtcdConfiguration())
+
+        PropertyUtil(project).saveConnection(conf)
+        PasswordUtil.savePassword(conf.id!!, passwordTextField.password.toString())
+        connectionManager.addConnectionToList(conf)
+
         close(OK_EXIT_CODE)
     }
 
     private fun toEtcdConfiguration() = EtcdConnectionInfo(
-        endpointsTextField.text,
-        usernameTextField.text,
-        passwordTextField.password.toString(),
-        etcdConnectionInfo?.id,
-        remarkTextField.text
+            endpointsTextField.text,
+            usernameTextField.text,
+//        passwordTextField.password.toString(),
+            etcdConnectionInfo?.id,
+            remarkTextField.text
     )
 }

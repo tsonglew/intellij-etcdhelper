@@ -34,10 +34,10 @@ import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.MutableTreeNode
 
 class ConnectionManager(
-    private val project: Project,
-    private val propertyUtil: PropertyUtil,
-    private val connectionTree: Tree
-): Disposable {
+        private val project: Project,
+        private val propertyUtil: PropertyUtil,
+        private val connectionTree: Tree
+) : Disposable {
 
     /**
      * map of endpoints to {@link EtcdClient}
@@ -48,11 +48,11 @@ class ConnectionManager(
     companion object {
         @JvmStatic
         fun getInstance(
-            project: Project,
-            propertyUtil: PropertyUtil,
-            connectionTree: Tree
+                project: Project,
+                propertyUtil: PropertyUtil,
+                connectionTree: Tree
         ) = project.getService(ConnectionManager::class.java)
-            ?: ConnectionManager(project, propertyUtil, connectionTree)
+                ?: ConnectionManager(project, propertyUtil, connectionTree)
     }
 
     fun getClient(etcdConnectionInfo: EtcdConnectionInfo) = connectionMap[etcdConnectionInfo.id!!]
@@ -76,11 +76,10 @@ class ConnectionManager(
                 var found = false
                 for (i in 0 until getChildCount(this)) {
                     ((getChildAt(i) as DefaultMutableTreeNode).userObject as EtcdConnectionInfo).apply {
-                        if (this.id == etcdConnectionInfo.id) {
-                            this.endpoints = etcdConnectionInfo.endpoints
-                            this.username = etcdConnectionInfo.username
-                            this.password = etcdConnectionInfo.password
-                            this.remark = etcdConnectionInfo.remark
+                        if (id == etcdConnectionInfo.id) {
+                            endpoints = etcdConnectionInfo.endpoints
+                            username = etcdConnectionInfo.username
+                            remark = etcdConnectionInfo.remark
                             found = true
                         }
                     }
@@ -97,10 +96,10 @@ class ConnectionManager(
     fun getVirtualFile(connectionInfo: EtcdConnectionInfo): EtcdKeyValueDisplayVirtualFile {
         if (!connectionEditorMap.containsKey(connectionInfo.toString())) {
             connectionEditorMap[connectionInfo.toString()] = EtcdKeyValueDisplayVirtualFile(
-                project,
-                connectionInfo.endpoints,
-                connectionInfo,
-                this
+                    project,
+                    connectionInfo.endpoints,
+                    connectionInfo,
+                    this
             )
         }
         return connectionEditorMap[connectionInfo.toString()]!!
