@@ -33,7 +33,7 @@ class PropertyUtil(
 
     private val connectionService = GlobalConnectionSetting.getInstance()
 
-    fun getConnections() = connectionService.connectionInfos
+    fun getConnections() = connectionService.getConnectionInfosList()
 
     fun saveConnection(etcdConnectionInfo: EtcdConnectionInfo) = connectionService.addConnection(etcdConnectionInfo)
 

@@ -25,29 +25,28 @@
 package com.github.tsonglew.etcdhelper.service
 
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.project.Project
 
-@State(name = "EtcdHelper", storages = [Storage("etcd-helper-cache.xml")])
-class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>, ConnectionSettings {
+@State(name = "EtcdHelper", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
+class ProjectConnectionSetting : PersistentStateComponent<ProjectConnectionSetting>, ConnectionSettings {
 
     var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
+    override fun getConnectionInfosList(): ArrayList<EtcdConnectionInfo> = connectionInfos
 
     companion object {
         @JvmStatic
-        fun getInstance(): GlobalConnectionSetting = ApplicationManager
-                .getApplication()
-                .getService(GlobalConnectionSetting::class.java)
+        fun getInstance(project: Project): ProjectConnectionSetting =
+                project.getService(ProjectConnectionSetting::class.java)
     }
 
     override fun getState() = this
-    override fun loadState(state: GlobalConnectionSetting) {
+    override fun loadState(state: ProjectConnectionSetting) {
         connectionInfos = state.connectionInfos
         thisLogger().info("load state: $connectionInfos")
     }
-
-    override fun getConnectionInfosList() = connectionInfos
 }
