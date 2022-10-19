@@ -55,9 +55,9 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
 class MainToolWindow(
-    private val project: Project,
-    private val toolWindow: ToolWindow
-): Disposable{
+        private val project: Project,
+        private val toolWindow: ToolWindow
+) : Disposable {
     private val connectionTree = Tree().apply {
         model = DefaultTreeModel(DefaultMutableTreeNode())
     }
@@ -68,28 +68,28 @@ class MainToolWindow(
 
     private val propertyUtil = PropertyUtil(project)
     private val connectionManager = ConnectionManager.getInstance(
-        project,
-        propertyUtil,
-        connectionTree
+            project,
+            propertyUtil,
+            connectionTree
     ).apply {
         initConnections(connectionTree)
     }
     private val connectionActionToolbar = ActionManager
-        .getInstance()
-        .createActionToolbar(
-            "ToolWindowToolbar",
-            DefaultActionGroup().apply {
-                add(AddAction.create(project, connectionTree, connectionManager))
-                add(DeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
-                add(EditAction.create(project, connectionTree, connectionManager))
-                addSeparator()
-                // TODO: create expander
-            },
-            true
-        ).apply {
-            targetComponent = connectionPanel
-            adjustTheSameSize(true)
-        }
+            .getInstance()
+            .createActionToolbar(
+                    "ToolWindowToolbar",
+                    DefaultActionGroup().apply {
+                        add(AddAction.create(project, connectionTree, connectionManager))
+                        add(DeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
+                        add(EditAction.create(project, connectionTree, connectionManager))
+                        addSeparator()
+                        // TODO: create expander
+                    },
+                    true
+            ).apply {
+                targetComponent = connectionPanel
+                adjustTheSameSize(true)
+            }
     private val connectionTreeSpeedSearch = TreeSpeedSearch(connectionTree) {
         (it.lastPathComponent as DefaultMutableTreeNode).userObject.toString()
     }
@@ -111,15 +111,17 @@ class MainToolWindow(
         connectionTree.apply {
             cellRenderer = ConnectionTreeCellRenderer()
             alignmentX = Component.LEFT_ALIGNMENT
-            addMouseListener(object: MouseAdapter() {
+            addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     if (e?.clickCount == 2) {
                         thisLogger().info("path count: ${connectionTree.selectionPath?.pathCount}")
                         connectionTreeLoadingDecorator.startLoading(false)
+                        val connectionTreeNodePath = connectionTree.selectionPath?.path?.get(1)
+                                ?: return
                         try {
                             ReadAction.nonBlocking<Any?> {
 
-                                val connectionNode = connectionTree.selectionPath?.path?.get(1) as DefaultMutableTreeNode
+                                val connectionNode = connectionTreeNodePath as DefaultMutableTreeNode
                                 val connectionInfo = connectionNode.userObject as EtcdConnectionInfo
                                 val f = connectionManager.getVirtualFile(connectionInfo)
                                 ApplicationManager.getApplication().invokeLater {

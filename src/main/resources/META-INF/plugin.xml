@@ -50,7 +50,7 @@
     <br>
     If you have any suggestions, questions or bugs about this plugin,
     please issue them on <a href="https://github.com/tsonglew/intellij-etcdhelper">Github</a>
-             ]]>
+         ]]>
   </description>
 
   <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
@@ -63,6 +63,8 @@
       parentId="tools"/>
     <applicationService
       serviceImplementation="com.github.tsonglew.etcdhelper.service.GlobalConnectionSetting"/>
+    <applicationService
+      serviceImplementation="com.github.tsonglew.etcdhelper.service.ProjectConnectionSetting"/>
     <fileEditorProvider
       implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
     <toolWindow

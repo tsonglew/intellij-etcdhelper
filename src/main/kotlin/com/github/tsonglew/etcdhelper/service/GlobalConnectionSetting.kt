@@ -32,7 +32,7 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.thisLogger
 
 @State(name = "EtcdHelper", storages = [Storage("etcd-helper-cache.xml")])
-class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting> {
+class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>, ConnectionSettings {
 
     var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
 
@@ -49,18 +49,5 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
         thisLogger().info("load state: $connectionInfos")
     }
 
-    fun addConnection(connectionInfo: EtcdConnectionInfo) {
-        val conn = connectionInfos.find { it.id == connectionInfo.id }
-        if (conn != null) {
-            conn.update(connectionInfo)
-        } else {
-            connectionInfos.add(connectionInfo)
-        }
-        thisLogger().info("connections after add: $connectionInfos")
-    }
-
-    fun removeConnection(connectionInfo: EtcdConnectionInfo) {
-        connectionInfos.remove(connectionInfo)
-        thisLogger().info("connections after remove: $connectionInfos")
-    }
+    override fun getConnectionInfosList() = connectionInfos
 }
