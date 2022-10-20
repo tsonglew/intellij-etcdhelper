@@ -43,7 +43,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.OnePixelSplitter
-import com.intellij.ui.TreeSpeedSearch
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
 import java.awt.BorderLayout
@@ -90,9 +89,6 @@ class MainToolWindow(
                 targetComponent = connectionPanel
                 adjustTheSameSize(true)
             }
-    private val connectionTreeSpeedSearch = TreeSpeedSearch(connectionTree) {
-        (it.lastPathComponent as DefaultMutableTreeNode).userObject.toString()
-    }
 
     val content = JPanel(BorderLayout()).apply {
         add(connectionActionToolbar.targetComponent!!, BorderLayout.NORTH)
