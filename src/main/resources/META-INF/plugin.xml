@@ -2,6 +2,11 @@
 <idea-plugin>
   <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
   <change-notes><![CDATA[
+    1.2.0<br>
+    <ul>
+      <li>show random cheatsheet when project is open</li>
+      <li>support query on cluster status</li>
+    </ul>
     1.1.1<br>
     <b>reset connections is needed after upgrading to v1.1.1</b>
     <ul>
@@ -22,7 +27,7 @@
       <li>Support displaying etcd keys in tree view</li>
     </ul>
     ]]>
-    </change-notes>
+  </change-notes>
 
   <!-- Public plugin name should be written in Title Case.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
@@ -82,5 +87,9 @@
 
   <!-- Extension points defined by the plugin.
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+  <projectListeners>
+    <listener class="com.github.tsonglew.etcdhelper.listener.EtcdHelperListener"
+      topic="com.intellij.openapi.project.ProjectManagerListener"/>
+  </projectListeners>
   <vendor email="klew1879@gmail.com" url="https://tsonglew.github.io">Tsonglew</vendor>
 </idea-plugin>

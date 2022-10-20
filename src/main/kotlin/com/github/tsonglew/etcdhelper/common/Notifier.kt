@@ -25,6 +25,7 @@
 package com.github.tsonglew.etcdhelper.common
 
 import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.openapi.project.Project
@@ -32,25 +33,28 @@ import com.intellij.openapi.project.Project
 object Notifier {
     fun notifyError(title: String, message: String, project: Project?) {
         Notifications.Bus.notify(
-            Notification(
-                "Print",
-                title,
-                message,
-                NotificationType.ERROR,
-            ),
-            project
+                Notification(
+                        "Print",
+                        title,
+                        message,
+                        NotificationType.ERROR,
+                ),
+                project
         )
     }
 
     fun notifyInfo(title: String, message: String, project: Project?) {
-        Notifications.Bus.notify(
-            Notification(
+        notifyInfo(title, message, project, null)
+    }
+
+    fun notifyInfo(title: String, message: String, project: Project?, action: NotificationAction?) {
+        val notification = Notification(
                 "Print",
                 title,
                 message,
                 NotificationType.INFORMATION,
-            ),
-            project
         )
+        action?.let { notification.addAction(it) }
+        Notifications.Bus.notify(notification, project)
     }
 }
