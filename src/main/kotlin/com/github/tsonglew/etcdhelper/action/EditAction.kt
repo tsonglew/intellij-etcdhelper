@@ -33,23 +33,23 @@ import com.intellij.ui.treeStructure.Tree
 import javax.swing.tree.DefaultMutableTreeNode
 
 class EditAction : CustomAction(
-    "Edit Connection",
-    "Edit Connection",
-    AllIcons.General.Gear
+        "Edit Connection",
+        "Edit Connection",
+        AllIcons.Actions.Edit
 ) {
     companion object {
         fun create(project: Project, connectionTree: Tree, connectionManager: ConnectionManager) = EditAction()
-            .apply {
-                action = {
-                    connectionTree.selectionPath?.lastPathComponent?.let {
-                        EtcdConnectionSettingsDialog(
-                            project,
-                            connectionTree,
-                            connectionManager,
-                            (it as DefaultMutableTreeNode).userObject as EtcdConnectionInfo
-                        ).show()
+                .apply {
+                    action = {
+                        connectionTree.selectionPath?.lastPathComponent?.let {
+                            EtcdConnectionSettingsDialog(
+                                    project,
+                                    connectionTree,
+                                    connectionManager,
+                                    (it as DefaultMutableTreeNode).userObject as EtcdConnectionInfo
+                            ).show()
+                        }
                     }
                 }
-            }
     }
 }

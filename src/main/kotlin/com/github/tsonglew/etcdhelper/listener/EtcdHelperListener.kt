@@ -37,8 +37,8 @@ class EtcdHelperListener : ProjectManagerListener {
     override fun projectOpened(project: Project) {
         val cheatsheet = CheatSheetUtil.getRandomEntry()
         Notifier.notifyInfo(
-                "EtcdHelper Cheatsheet(${cheatsheet.first})",
-                cheatsheet.second,
+                "EtcdHelper Cheatsheet",
+                "<h3>${cheatsheet.first}</h3>${cheatsheet.second}",
                 project,
                 OpenEtcdHelperSettingsAction()
         )

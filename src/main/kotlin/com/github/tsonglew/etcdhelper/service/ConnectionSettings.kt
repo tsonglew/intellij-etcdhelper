@@ -34,11 +34,8 @@ interface ConnectionSettings {
     fun addConnection(connectionInfo: EtcdConnectionInfo) {
         val connectionInfos = getConnectionInfosList()
         val conn = connectionInfos.find { it.id == connectionInfo.id }
-        if (conn != null) {
-            conn.update(connectionInfo)
-        } else {
-            connectionInfos.add(connectionInfo)
-        }
+
+        conn?.update(connectionInfo) ?: connectionInfos.add(connectionInfo)
         thisLogger().info("connections after add: $connectionInfos")
     }
 

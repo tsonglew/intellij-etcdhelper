@@ -25,13 +25,17 @@
 package com.github.tsonglew.etcdhelper.config
 
 import com.intellij.openapi.options.Configurable
+import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 
 class EtcdHelperSettingConfiguration : Configurable {
 
+    private val clearCacheBtn = JButton("Clear Cache")
+
     private val component = JPanel().apply {
         add(JLabel("Hello EtcdHelper!"))
+        add(clearCacheBtn)
     }
 
     override fun createComponent() = component
