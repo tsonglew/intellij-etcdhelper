@@ -47,12 +47,12 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 
 class EtcdValueDisplayPanel(
-    private val project: Project,
-    private val key: String,
-    private val etcdConnectionInfo: EtcdConnectionInfo,
-    private val connectionManager: ConnectionManager,
-    private val loadingDecorator: LoadingDecorator
-): JPanel(BorderLayout()) {
+        private val project: Project,
+        private val key: String,
+        private val etcdConnectionInfo: EtcdConnectionInfo,
+        private val connectionManager: ConnectionManager,
+        private val loadingDecorator: LoadingDecorator
+) : JPanel(BorderLayout()) {
 
     private lateinit var valueTextArea: LanguageTextField
     private lateinit var valueSizeLabel: JLabel
@@ -126,9 +126,9 @@ class EtcdValueDisplayPanel(
 
     private fun initValuePreviewPanel() {
         valueTextArea = LanguageTextField(
-            PlainTextLanguage.INSTANCE,
-            project,
-            keyValue?.value?.toString() ?: ""
+                PlainTextLanguage.INSTANCE,
+                project,
+                keyValue?.value?.toString() ?: ""
         ).apply {
             autoscrolls = true
             setOneLineMode(false)

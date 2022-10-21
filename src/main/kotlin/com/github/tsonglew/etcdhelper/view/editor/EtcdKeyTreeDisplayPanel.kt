@@ -43,7 +43,6 @@ import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
-import com.intellij.util.ui.JBUI
 import io.etcd.jetcd.KeyValue
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -55,16 +54,14 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
 class EtcdKeyTreeDisplayPanel(
-    private val project: Project,
-    private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
-    splitterContainer: JBSplitter,
-    private val etcdConnectionInfo: EtcdConnectionInfo,
-    private val connectionManager: ConnectionManager,
-    private val doubleClickKeyAction: Consumer<String>
-): JPanel() {
+        private val project: Project,
+        private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
+        splitterContainer: JBSplitter,
+        private val etcdConnectionInfo: EtcdConnectionInfo,
+        private val connectionManager: ConnectionManager,
+        private val doubleClickKeyAction: Consumer<String>
+) : JPanel() {
     private var pageIndex = 1
-    private var pageSize = 100
-    private var currentPageKeys: List<String> = listOf()
     private var flatRootNode: DefaultMutableTreeNode? = null
     private var treeModel: DefaultTreeModel? = null
 
@@ -75,10 +72,10 @@ class EtcdKeyTreeDisplayPanel(
             override fun mouseClicked(e: MouseEvent?) {
                 super.mouseClicked(e)
                 if ((selectionPath?.pathCount ?: 0) > 1
-                    && (selectionPath?.lastPathComponent as DefaultMutableTreeNode).isLeaf
+                        && (selectionPath?.lastPathComponent as DefaultMutableTreeNode).isLeaf
                 ) {
                     doubleClickKeyAction.accept(
-                        (selectionPath?.lastPathComponent as KeyTreeNode).keyValue.key.toString()
+                            (selectionPath?.lastPathComponent as KeyTreeNode).keyValue.key.toString()
                     )
                 }
                 thisLogger().info("click etcd key tree display panel tree")
@@ -88,7 +85,7 @@ class EtcdKeyTreeDisplayPanel(
 
     private val keyTreeScrollPane = JBScrollPane(keyTree)
     private val keyDisplayLoadingDecorator = LoadingDecorator(keyTreeScrollPane, keyValueDisplayPanel, 0)
-    private val actions = DefaultActionGroup().apply{
+    private val actions = DefaultActionGroup().apply {
         add(createRefreshAction())
         add(createKeyCreateAction())
         add(createDeleteAction())
@@ -99,15 +96,9 @@ class EtcdKeyTreeDisplayPanel(
         minimumSize = Dimension(255, 100)
         add(actionToolbar.component, BorderLayout.NORTH)
         add(keyDisplayLoadingDecorator.component, BorderLayout.CENTER)
-        add(createPagingPanel(), BorderLayout.SOUTH)
+        add(createKeyCountPanel(), BorderLayout.SOUTH)
     }
-
-    private val pageCount: Int
-        get() {
-            val result = allKeys.size / pageSize
-            val mod = allKeys.size % pageSize
-            return if (mod  > 0) result + 1 else result
-        }
+    private val keyCountPanel = createKeyCountPanel()
 
     init {
         actionToolbar.targetComponent = keyDisplayPanel
@@ -120,10 +111,10 @@ class EtcdKeyTreeDisplayPanel(
 
     fun renderKeyTree(searchSymbol: String = "/") {
         allKeys = connectionManager
-            .getClient(etcdConnectionInfo)
-            ?.getByPrefix(searchSymbol, 0)
-            ?.apply { sortedBy { it.key.toString() } }
-            ?: listOf()
+                .getClient(etcdConnectionInfo)
+                ?.getByPrefix(searchSymbol, 0)
+                ?.apply { sortedBy { it.key.toString() } }
+                ?: listOf()
         keyDisplayLoadingDecorator.startLoading(false)
         ReadAction.nonBlocking {
             try {
@@ -132,6 +123,7 @@ class EtcdKeyTreeDisplayPanel(
                 }
                 groupKeyTree()
                 keyDisplayPanel.updateUI()
+                keyCountPanel.updateUI()
             } finally {
                 keyDisplayLoadingDecorator.stopLoading()
             }
@@ -142,30 +134,27 @@ class EtcdKeyTreeDisplayPanel(
         action = { renderKeyTree(keyValueDisplayPanel.searchSymbol) }
     }
 
-    private fun createPagingPanel() = JPanel(BorderLayout()).apply {
-        add(JBLabel("Page Size: " + currentPageKeys.size).apply { border = JBUI.Borders.empty() }, BorderLayout.NORTH)
-        add(JBLabel("Page $pageIndex of $pageCount"))
-        // TODO: page navigation
+    private fun createKeyCountPanel() = JPanel(BorderLayout()).apply {
+        add(JBLabel("Key counts: ${allKeys.size}"), BorderLayout.WEST)
     }
 
-
     private fun createKeyCreateAction(): KeyCreateAction = KeyCreateAction.create(
-        project,
-        connectionManager,
-        etcdConnectionInfo,
-        this,
-        keyValueDisplayPanel,
-        treeModel
+            project,
+            connectionManager,
+            etcdConnectionInfo,
+            this,
+            keyValueDisplayPanel,
+            treeModel
     )
 
     private fun createDeleteAction(): KeyDeleteAction = KeyDeleteAction.create(
-        project,
-        connectionManager,
-        etcdConnectionInfo,
-        this,
-        keyValueDisplayPanel,
-        keyTree,
-        treeModel
+            project,
+            connectionManager,
+            etcdConnectionInfo,
+            this,
+            keyValueDisplayPanel,
+            keyTree,
+            treeModel
     )
 
     private fun groupKeyTree() {
@@ -173,13 +162,13 @@ class EtcdKeyTreeDisplayPanel(
             return
         }
         groupRootNode(
-            flatRootNode!!,
-            LinkedHashMap<String, KeyValue>().apply {
-                allKeys.forEach {
-                    this[it.key.toString()] = it
-                }
-            },
-            keyValueDisplayPanel.groupSymbol
+                flatRootNode!!,
+                LinkedHashMap<String, KeyValue>().apply {
+                    allKeys.forEach {
+                        this[it.key.toString()] = it
+                    }
+                },
+                keyValueDisplayPanel.groupSymbol
         )
         treeModel = DefaultTreeModel(flatRootNode)
         keyTree.model = treeModel
@@ -187,9 +176,9 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     private fun groupRootNode(
-        node: DefaultMutableTreeNode,
-        keys: LinkedHashMap<String, KeyValue>,
-        groupSymbol: String
+            node: DefaultMutableTreeNode,
+            keys: LinkedHashMap<String, KeyValue>,
+            groupSymbol: String
     ) {
         if (groupSymbol.isEmpty()) {
             return
