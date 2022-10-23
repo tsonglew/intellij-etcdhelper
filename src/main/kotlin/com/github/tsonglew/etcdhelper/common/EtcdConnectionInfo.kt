@@ -34,7 +34,6 @@ import java.util.*
 data class EtcdConnectionInfo(
         var endpoints: String,
         var username: String,
-//        var password: String,
         var id: String? = null,
         var remark: String? = null,
 ) {
@@ -53,7 +52,6 @@ data class EtcdConnectionInfo(
     fun update(etcdConnectionInfo: EtcdConnectionInfo): EtcdConnectionInfo {
         endpoints = etcdConnectionInfo.endpoints
         username = etcdConnectionInfo.username
-//        password = etcdConnectionInfo.password
         remark = etcdConnectionInfo.remark
         return this
     }
