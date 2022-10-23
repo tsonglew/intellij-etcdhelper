@@ -32,9 +32,18 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
+import com.intellij.openapi.vfs.LocalFileSystem
 
 class EtcdHelperListener : ProjectManagerListener {
+
+    private fun registerVirtualFileListeners() {
+        LocalFileSystem.getInstance().addVirtualFileListener(CustomVirtualFileListener())
+    }
+
     override fun projectOpened(project: Project) {
+
+        registerVirtualFileListeners()
+
         val cheatsheet = CheatSheetUtil.getRandomEntry()
         Notifier.notifyInfo(
                 "EtcdHelper Cheatsheet",

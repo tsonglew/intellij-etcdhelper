@@ -37,28 +37,23 @@ import java.util.concurrent.TimeUnit
 /**
  * @author tsonglew
  */
-class EtcdClient(val project: Project) {
+class EtcdClient(
+        val etcdConnectionInfo: EtcdConnectionInfo,
+        val project: Project? = null
+) {
     private var client: Client? = null
     private var kvClient: KV? = null
     private var authClient: Auth? = null
     private var leaseClient: Lease? = null
-    private lateinit var endpoints: Array<String>
-    private lateinit var etcdConnectionInfo: EtcdConnectionInfo
 
-    fun init(etcdConnectionInfo: EtcdConnectionInfo) {
-        this.etcdConnectionInfo = etcdConnectionInfo
-        init(
-                etcdConnectionInfo.endpoints.split(",").toTypedArray(),
-                etcdConnectionInfo.username,
-                PasswordUtil.retrievePassword(etcdConnectionInfo.id!!),
-        )
-    }
+    init {
+        val etcdUrls = etcdConnectionInfo.endpoints.split(",").toTypedArray()
+        val user = etcdConnectionInfo.username
+        val password = PasswordUtil.retrievePassword(etcdConnectionInfo.id!!)
 
-    fun init(etcdUrls: Array<String>, user: String?, password: String?) {
-        endpoints = etcdUrls
         try {
             val clientBuilder = Client.builder().endpoints(*etcdUrls)
-            if (user != null && password != null && user.isNotEmpty() && password.isNotEmpty()) {
+            if (user.isNotEmpty() && password?.isNotEmpty() == true) {
                 clientBuilder.user(bytesOf(user)).password(bytesOf(password))
             }
             client = clientBuilder.build()
@@ -77,14 +72,6 @@ class EtcdClient(val project: Project) {
         client!!.close()
     }
 
-    /**
-     * 写入数据
-     *
-     * @param key           key
-     * @param value         value
-     * @param ttlSecs  ttl(secs)
-     * @return 是否写入成功
-     */
     fun put(key: String, value: String, ttlSecs: Int): Boolean {
         if (ttlSecs > 0) {
             return putWithTtl(key, value, ttlSecs)
@@ -145,10 +132,11 @@ class EtcdClient(val project: Project) {
         } catch (e: Exception) {
             thisLogger().info("get by prefix error: ${e.message}")
             e.printStackTrace()
+            project ?: return emptyList()
             Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo",
                     project)
         }
-        return listOf()
+        return emptyList()
     }
 
     fun get(key: String): List<KeyValue> {
@@ -157,9 +145,10 @@ class EtcdClient(val project: Project) {
         } catch (e: Exception) {
             thisLogger().info("get key $key error: ${e.message}")
             e.printStackTrace()
+            project ?: return emptyList()
             Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
         }
-        return listOf()
+        return emptyList()
     }
 
     fun getLeaseInfo(leaseId: Long) = leaseClient!!.timeToLive(leaseId, LeaseOption.DEFAULT).get().tTl
@@ -181,7 +170,7 @@ class EtcdClient(val project: Project) {
             return prefixEndOf(bytesOf(prefix)).toString()
         }
 
-        private fun bytesOf(s: String?): ByteSequence {
+        fun bytesOf(s: String?): ByteSequence {
             return ByteSequence.from(string2Bytes(s))
         }
     }

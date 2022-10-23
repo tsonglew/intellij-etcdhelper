@@ -78,7 +78,7 @@ class EtcdConnectionSettingsDialog(
 
 
         PropertyUtil(project).saveConnection(conf)
-        PasswordUtil.savePassword(conf.id!!, passwordTextField.password.toString())
+        PasswordUtil.savePassword(conf.id!!, String(passwordTextField.password))
         connectionManager.addConnectionToList(conf)
 
         close(OK_EXIT_CODE)
