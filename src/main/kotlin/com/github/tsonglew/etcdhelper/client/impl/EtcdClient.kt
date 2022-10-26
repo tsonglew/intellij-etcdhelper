@@ -22,8 +22,12 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.common
+package com.github.tsonglew.etcdhelper.client.impl
 
+import com.github.tsonglew.etcdhelper.client.RpcClient
+import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.common.Notifier
+import com.github.tsonglew.etcdhelper.common.PasswordUtil
 import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -40,7 +44,7 @@ import java.util.concurrent.TimeUnit
 class EtcdClient(
         val etcdConnectionInfo: EtcdConnectionInfo,
         val project: Project? = null
-) {
+) : RpcClient {
     private var client: Client? = null
     private var kvClient: KV? = null
     private var authClient: Auth? = null
@@ -65,14 +69,14 @@ class EtcdClient(
         }
     }
 
-    fun close() {
+    override fun close() {
         kvClient!!.close()
         authClient!!.close()
         leaseClient!!.close()
         client!!.close()
     }
 
-    fun put(key: String, value: String, ttlSecs: Int): Boolean {
+    override fun put(key: String, value: String, ttlSecs: Int): Boolean {
         if (ttlSecs > 0) {
             return putWithTtl(key, value, ttlSecs)
         }
@@ -100,7 +104,7 @@ class EtcdClient(
         return false
     }
 
-    fun delete(key: String) = try {
+    override fun delete(key: String) = try {
         thisLogger().info("delete key: $key")
         kvClient!!.delete(bytesOf(key)).get()
         true
@@ -109,7 +113,7 @@ class EtcdClient(
         false
     }
 
-    fun deleteByPrefix(key: String) = try {
+    override fun deleteByPrefix(key: String) = try {
         thisLogger().info("deleteByPrefix: $key")
         kvClient!!.delete(bytesOf(key), DeleteOption.newBuilder().isPrefix(true).build()).get()
         true
@@ -118,7 +122,7 @@ class EtcdClient(
         false
     }
 
-    fun getByPrefix(key: String, limit: Int?): List<KeyValue> {
+    override fun getByPrefix(key: String, limit: Int?): List<KeyValue> {
         // TODO: use serializable & keyOnly to optimize performance
         try {
             val optionBuilder = GetOption.newBuilder()
@@ -139,7 +143,7 @@ class EtcdClient(
         return emptyList()
     }
 
-    fun get(key: String): List<KeyValue> {
+    override fun get(key: String): List<KeyValue> {
         try {
             return kvClient!![bytesOf(key)].get().kvs
         } catch (e: Exception) {
@@ -151,7 +155,7 @@ class EtcdClient(
         return emptyList()
     }
 
-    fun getLeaseInfo(leaseId: Long) = leaseClient!!.timeToLive(leaseId, LeaseOption.DEFAULT).get().tTl
+    override fun getLeaseInfo(leaseId: Long) = leaseClient!!.timeToLive(leaseId, LeaseOption.DEFAULT).get().tTl
 
     companion object {
         private val NO_PREFIX_END = byteArrayOf(0)
