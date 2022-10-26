@@ -110,8 +110,7 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     fun renderKeyTree(searchSymbol: String = "/") {
-        allKeys = connectionManager
-                .getClient(etcdConnectionInfo)
+        allKeys = connectionManager.getClient(etcdConnectionInfo)
                 ?.getByPrefix(searchSymbol, 0)
                 ?.apply { sortedBy { it.key.toString() } }
                 ?: listOf()

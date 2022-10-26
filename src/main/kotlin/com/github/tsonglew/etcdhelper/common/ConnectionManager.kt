@@ -24,6 +24,8 @@
 
 package com.github.tsonglew.etcdhelper.common
 
+import com.github.tsonglew.etcdhelper.client.RpcClient
+import com.github.tsonglew.etcdhelper.client.impl.EtcdClient
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFile
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.thisLogger
@@ -42,7 +44,7 @@ class ConnectionManager(
     /**
      * map of endpoints to {@link EtcdClient}
      */
-    private val connectionMap = hashMapOf<String, EtcdClient>()
+    private val connectionMap = hashMapOf<String, RpcClient>()
     private val connectionEditorMap = hashMapOf<String, EtcdKeyValueDisplayVirtualFile>()
 
     companion object {
