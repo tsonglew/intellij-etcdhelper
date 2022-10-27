@@ -102,6 +102,46 @@ class MainToolWindow(
         connectionPanel.add(connectionActionToolbar.component, BorderLayout.NORTH)
     }
 
+    private fun openConnection() {
+        thisLogger().info("path count: ${connectionTree.selectionPath?.pathCount}")
+        connectionTreeLoadingDecorator.startLoading(false)
+        val connectionTreeNodePath = connectionTree.selectionPath?.path?.get(1)
+                ?: return
+        try {
+            ReadAction.nonBlocking<Any?> {
+
+                val connectionNode = connectionTreeNodePath as DefaultMutableTreeNode
+                val connectionInfo = connectionNode.userObject as EtcdConnectionInfo
+                val f = connectionManager.getVirtualFile(connectionInfo)
+                ApplicationManager.getApplication().invokeLater {
+                    EtcdKeyValueDisplayVirtualFileSystem.getInstance(project).openEditor(f)
+                }
+
+            }.submit(ThreadPoolManager.executor)
+        } finally {
+            connectionTreeLoadingDecorator.stopLoading()
+        }
+    }
+
+    private fun createCreateConnPopUp(e: MouseEvent) {
+        val actionGroup = DefaultActionGroup().apply {
+            add(AddAction.create(project, connectionTree, connectionManager))
+        }
+        ActionManager.getInstance().createActionPopupMenu("CreateConnPopUp", actionGroup).apply {
+            component.show(connectionTree, e.x, e.y)
+        }
+    }
+
+    private fun createEditConnPopUp(e: MouseEvent) {
+        val actionGroup = DefaultActionGroup().apply {
+            add(DeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
+            add(EditAction.create(project, connectionTree, connectionManager))
+        }
+        ActionManager.getInstance().createActionPopupMenu("EditConnPopUp", actionGroup).apply {
+            component.show(connectionTree, e.x, e.y)
+        }
+    }
+
     private fun initConnectionTree() {
         connectionPanel.add(connectionTreeLoadingDecorator.component, BorderLayout.CENTER)
         connectionTree.apply {
@@ -109,25 +149,16 @@ class MainToolWindow(
             alignmentX = Component.LEFT_ALIGNMENT
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
-                    if (e?.clickCount == 2) {
-                        thisLogger().info("path count: ${connectionTree.selectionPath?.pathCount}")
-                        connectionTreeLoadingDecorator.startLoading(false)
-                        val connectionTreeNodePath = connectionTree.selectionPath?.path?.get(1)
-                                ?: return
-                        try {
-                            ReadAction.nonBlocking<Any?> {
-
-                                val connectionNode = connectionTreeNodePath as DefaultMutableTreeNode
-                                val connectionInfo = connectionNode.userObject as EtcdConnectionInfo
-                                val f = connectionManager.getVirtualFile(connectionInfo)
-                                ApplicationManager.getApplication().invokeLater {
-                                    EtcdKeyValueDisplayVirtualFileSystem.getInstance(project).openEditor(f)
-                                }
-
-                            }.submit(ThreadPoolManager.executor)
-                        } finally {
-                            connectionTreeLoadingDecorator.stopLoading()
+                    // click priority: BUTTON3 > 2 click
+                    when {
+                        // click right button
+                        e?.button == MouseEvent.BUTTON3 -> {
+                            connectionTree.selectionPath?.path?.let { createEditConnPopUp(e) }
+                                    ?: createCreateConnPopUp(e)
                         }
+
+                        connectionTree.selectionPath?.path == null -> return
+                        e?.clickCount == 2 -> openConnection()
                     }
                 }
             })
