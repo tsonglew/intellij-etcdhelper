@@ -32,6 +32,7 @@ import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import io.etcd.jetcd.*
+import io.etcd.jetcd.cluster.Member
 import io.etcd.jetcd.options.DeleteOption
 import io.etcd.jetcd.options.GetOption
 import io.etcd.jetcd.options.LeaseOption
@@ -49,6 +50,7 @@ class EtcdClient(
     private var kvClient: KV? = null
     private var authClient: Auth? = null
     private var leaseClient: Lease? = null
+    private var clusterClient: Cluster? = null
 
     init {
         val etcdUrls = etcdConnectionInfo.endpoints.split(",").toTypedArray()
@@ -64,15 +66,18 @@ class EtcdClient(
             kvClient = client!!.kvClient
             authClient = client!!.authClient
             leaseClient = client!!.leaseClient
+            clusterClient = client!!.clusterClient
         } catch (e: Exception) {
             thisLogger().info("invalid connection info")
         }
     }
 
     override fun close() {
-        kvClient!!.close()
-        authClient!!.close()
-        leaseClient!!.close()
+        kvClient?.close()
+        authClient?.close()
+        leaseClient?.close()
+        clusterClient?.close()
+
         client!!.close()
     }
 
@@ -143,9 +148,64 @@ class EtcdClient(
         return emptyList()
     }
 
+    // User management
+    fun listUsers() {
+        // TODO: etcdctl user list
+    }
+
+    fun addUser() {
+        // TODO: etcdctl user add myusername
+    }
+
+    fun grantRoleToUser() {
+        // TODO: etcdctl user grant myusername --roles foo,bar,baz
+    }
+
+    fun revokeRole() {
+        // TODO: etcdctl user revoke myusername --roles foo,bar,baz
+    }
+
+    fun getUserInfo() {
+        // TODO: etcdctl user get myusername
+    }
+
+    fun changePassword() {
+        // TODO: etcdctl user passwd myusername
+    }
+
+    fun removeUser() {
+        // TODO: etcdctl user remove myusername
+    }
+
+    // Role management
+    fun listRoles() {
+        // TODO: etcdctl role list
+    }
+
+    fun addRole() {
+        // TODO: etcdctl role add myrolename
+    }
+
+    fun grantPermissionToRole() {
+        // TODO: etcdctl role grant-permission myrolename read /foo
+        // TODO: etcdctl role grant-permission myrolename --prefix=true read /foo/; ( range [/foo/, /foo0) )
+    }
+
+    fun getRolePermission() {
+        // TODO: etcdctl role get myrolename
+    }
+
+    fun revokePermission() {
+        // TODO: etcdctl role revoke-permission myrolename /foo
+    }
+
+    fun removeRole() {
+        // TODO: etcdctl role remove myrolename
+    }
+
     override fun get(key: String): List<KeyValue> {
         try {
-            return kvClient!![bytesOf(key)].get().kvs
+            return kvClient!![bytesOf(key)].get(1L, TimeUnit.SECONDS).kvs
         } catch (e: Exception) {
             thisLogger().info("get key $key error: ${e.message}")
             e.printStackTrace()
@@ -156,6 +216,14 @@ class EtcdClient(
     }
 
     override fun getLeaseInfo(leaseId: Long) = leaseClient!!.timeToLive(leaseId, LeaseOption.DEFAULT).get().tTl
+
+    override fun listClusterMembers(): MutableList<Member> = try {
+        clusterClient!!.listMember().get(1, TimeUnit.SECONDS).members
+    } catch (e: Exception) {
+        thisLogger().info("list cluster members error: ${e.message}")
+        Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
+        mutableListOf()
+    }
 
     companion object {
         private val NO_PREFIX_END = byteArrayOf(0)

@@ -64,19 +64,24 @@ class EtcdKeyTreeDisplayPanel(
     private var pageIndex = 1
     private var flatRootNode: DefaultMutableTreeNode? = null
     private var treeModel: DefaultTreeModel? = null
+    private var selectedLeaf: KeyTreeNode? = null
 
     private var allKeys: List<KeyValue> = arrayListOf()
     private val keyTree = Tree().apply {
         cellRenderer = KeyTreeCellRenderer()
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
-                super.mouseClicked(e)
+                if (e?.clickCount != 2) {
+                    return
+                }
                 if ((selectionPath?.pathCount ?: 0) > 1
                         && (selectionPath?.lastPathComponent as DefaultMutableTreeNode).isLeaf
                 ) {
-                    doubleClickKeyAction.accept(
-                            (selectionPath?.lastPathComponent as KeyTreeNode).keyValue.key.toString()
-                    )
+                    for (i in 0..1) {
+                        doubleClickKeyAction.accept(
+                                (selectionPath?.lastPathComponent as KeyTreeNode).keyValue.key.toString()
+                        )
+                    }
                 }
                 thisLogger().info("click etcd key tree display panel tree")
             }
