@@ -47,10 +47,10 @@ import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
 
 class EtcdKeyValueDisplayPanel(
-    private val project: Project,
-    private val connectionInfo: EtcdConnectionInfo,
-    private val connectionManager: ConnectionManager
-): JPanel(), Disposable {
+        private val project: Project,
+        private val connectionInfo: EtcdConnectionInfo,
+        private val connectionManager: ConnectionManager
+) : JPanel(), Disposable {
 
     /**
      * a panel to display tool bar
@@ -58,7 +58,7 @@ class EtcdKeyValueDisplayPanel(
     private val keyToolBarPanel = JPanel(FlowLayout(FlowLayout.LEFT))
     private var valueDisplayPanel: EtcdValueDisplayPanel? = null
     private val splitterContainer = JBSplitter(false, 0.35f).apply {
-        secondComponent = JPanel().apply { minimumSize= Dimension(100, 100) }
+        secondComponent = JPanel().apply { minimumSize = Dimension(100, 100) }
         dividerWidth = 2
         dividerPositionStrategy = Splitter.DividerPositionStrategy.KEEP_FIRST_SIZE
         isShowDividerControls = true
@@ -100,12 +100,12 @@ class EtcdKeyValueDisplayPanel(
 
     private fun initKeyTreePanel() {
         keyTreeDisplayPanel = EtcdKeyTreeDisplayPanel(
-            project,
-            this,
-            splitterContainer,
-            connectionInfo,
-            connectionManager,
-            this::renderValueDisplayPanel
+                project,
+                this,
+                splitterContainer,
+                connectionInfo,
+                connectionManager,
+                this::renderValueDisplayPanel
         ).apply {
             renderKeyTree(searchSymbol)
         }
@@ -163,17 +163,17 @@ class EtcdKeyValueDisplayPanel(
      */
     private fun renderValueDisplayPanel(key: String) {
         val valueDisplayScrollPanel = JBScrollPane(valueDisplayPanel).apply {
-        horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-        verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
+            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+            verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
         }
         val loadingDecorator = LoadingDecorator(valueDisplayScrollPanel, this, 0)
         splitterContainer.secondComponent = loadingDecorator.component
         valueDisplayPanel = EtcdValueDisplayPanel(
-            project,
-            key,
-            connectionInfo,
-            connectionManager,
-            loadingDecorator
+                project,
+                key,
+                connectionInfo,
+                connectionManager,
+                loadingDecorator
         )
     }
 }

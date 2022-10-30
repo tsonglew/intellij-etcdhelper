@@ -4,8 +4,9 @@
   <change-notes><![CDATA[
     1.2.0<br>
     <ul>
-      <li>show random cheatsheet when project is open</li>
-      <li>support query on cluster status</li>
+      <li>show random cheatsheet when opening a project</li>
+      <li>support query on cluster status, members and metrics</li>
+      <li>support connection management result popups</li>
     </ul>
     1.1.2<br>
     <ul>
