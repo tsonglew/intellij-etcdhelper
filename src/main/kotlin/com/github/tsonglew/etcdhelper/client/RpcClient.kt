@@ -25,6 +25,7 @@
 package com.github.tsonglew.etcdhelper.client
 
 import io.etcd.jetcd.KeyValue
+import io.etcd.jetcd.cluster.Member
 
 interface RpcClient {
     fun get(key: String): List<KeyValue>
@@ -34,4 +35,5 @@ interface RpcClient {
     fun put(key: String, value: String, ttlSecs: Int): Boolean
     fun getLeaseInfo(leaseId: Long): Long
     fun deleteByPrefix(key: String): Boolean
+    fun listClusterMembers(): MutableList<Member>?
 }
