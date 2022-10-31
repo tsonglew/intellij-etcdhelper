@@ -33,6 +33,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import io.etcd.jetcd.*
 import io.etcd.jetcd.cluster.Member
+import io.etcd.jetcd.maintenance.AlarmMember
 import io.etcd.jetcd.options.DeleteOption
 import io.etcd.jetcd.options.GetOption
 import io.etcd.jetcd.options.LeaseOption
@@ -51,14 +52,16 @@ class EtcdClient(
     private var authClient: Auth? = null
     private var leaseClient: Lease? = null
     private var clusterClient: Cluster? = null
+    private var maintenanceClient: Maintenance? = null
+    private var etcdUrls: Array<String>? = null
 
     init {
-        val etcdUrls = etcdConnectionInfo.endpoints.split(",").toTypedArray()
+        etcdUrls = etcdConnectionInfo.endpoints.split(",").toTypedArray()
         val user = etcdConnectionInfo.username
         val password = PasswordUtil.retrievePassword(etcdConnectionInfo.id!!)
 
         try {
-            val clientBuilder = Client.builder().endpoints(*etcdUrls)
+            val clientBuilder = Client.builder().endpoints(*etcdUrls!!)
             if (user.isNotEmpty() && password?.isNotEmpty() == true) {
                 clientBuilder.user(bytesOf(user)).password(bytesOf(password))
             }
@@ -67,6 +70,7 @@ class EtcdClient(
             authClient = client!!.authClient
             leaseClient = client!!.leaseClient
             clusterClient = client!!.clusterClient
+            maintenanceClient = client!!.maintenanceClient
         } catch (e: Exception) {
             thisLogger().info("invalid connection info")
         }
@@ -77,6 +81,7 @@ class EtcdClient(
         authClient?.close()
         leaseClient?.close()
         clusterClient?.close()
+        maintenanceClient?.close()
 
         client!!.close()
     }
@@ -221,6 +226,24 @@ class EtcdClient(
         clusterClient!!.listMember().get(1, TimeUnit.SECONDS).members
     } catch (e: Exception) {
         thisLogger().info("list cluster members error: ${e.message}")
+        Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
+        mutableListOf()
+    }
+
+    override fun listAlarms(): MutableList<AlarmMember> = try {
+        maintenanceClient!!.listAlarms().get(1, TimeUnit.SECONDS).alarms
+    } catch (e: Exception) {
+        thisLogger().info("list alarms error: ${e.message}")
+        Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
+        mutableListOf()
+    }
+
+    override fun listMemberStatus() = try {
+        etcdUrls!!.map {
+            maintenanceClient!!.statusMember(it).get(1, TimeUnit.SECONDS)
+        }.toMutableList()
+    } catch (e: Exception) {
+        thisLogger().info("list member status error: ${e.message}")
         Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
         mutableListOf()
     }
