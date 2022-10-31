@@ -36,7 +36,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.ui.JBSplitter
@@ -71,19 +70,13 @@ class EtcdKeyTreeDisplayPanel(
         cellRenderer = KeyTreeCellRenderer()
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
-                if (e?.clickCount != 2) {
-                    return
-                }
-                if ((selectionPath?.pathCount ?: 0) > 1
-                        && (selectionPath?.lastPathComponent as DefaultMutableTreeNode).isLeaf
-                ) {
-                    for (i in 0..1) {
-                        doubleClickKeyAction.accept(
-                                (selectionPath?.lastPathComponent as KeyTreeNode).keyValue.key.toString()
-                        )
+                if (e?.clickCount == 2 && (selectionPath?.pathCount ?: 0) >= 2) {
+                    val selectedNode = selectionPath?.lastPathComponent as DefaultMutableTreeNode
+                    if (selectedNode.isLeaf && selectedNode != selectedLeaf) {
+                        selectedLeaf = selectedNode as KeyTreeNode
+                        doubleClickKeyAction.accept(selectedLeaf!!.keyValue.key.toString())
                     }
                 }
-                thisLogger().info("click etcd key tree display panel tree")
             }
         })
     }

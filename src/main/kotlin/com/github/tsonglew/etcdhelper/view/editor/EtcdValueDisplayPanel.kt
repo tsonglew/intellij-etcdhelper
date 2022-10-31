@@ -46,13 +46,12 @@ import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 
-class EtcdValueDisplayPanel(
-        private val project: Project,
-        private val key: String,
-        private val etcdConnectionInfo: EtcdConnectionInfo,
-        private val connectionManager: ConnectionManager,
-        private val loadingDecorator: LoadingDecorator
-) : JPanel(BorderLayout()) {
+class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
+    private lateinit var project: Project
+    private lateinit var key: String
+    private lateinit var etcdConnectionInfo: EtcdConnectionInfo
+    private lateinit var connectionManager: ConnectionManager
+    private lateinit var loadingDecorator: LoadingDecorator
 
     private lateinit var valueTextArea: LanguageTextField
     private lateinit var valueSizeLabel: JLabel
@@ -60,7 +59,19 @@ class EtcdValueDisplayPanel(
     private lateinit var modRevisionLabel: JLabel
     private lateinit var ttlLabel: JLabel
 
-    init {
+    fun init(
+            project: Project,
+            key: String,
+            etcdConnectionInfo: EtcdConnectionInfo,
+            connectionManager: ConnectionManager,
+            loadingDecorator: LoadingDecorator
+    ) {
+        this.project = project
+        this.key = key
+        this.etcdConnectionInfo = etcdConnectionInfo
+        this.connectionManager = connectionManager
+        this.loadingDecorator = loadingDecorator
+
         loadingDecorator.startLoading(false)
         ReadAction.nonBlocking {
             try {

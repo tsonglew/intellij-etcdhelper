@@ -31,7 +31,9 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
+import com.github.tsonglew.etcdhelper.table.AlarmListTableManager
 import com.github.tsonglew.etcdhelper.table.MemberListTableManager
+import com.github.tsonglew.etcdhelper.table.MemberStatusListTableManager
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFileSystem
 import com.github.tsonglew.etcdhelper.view.render.ConnectionTreeCellRenderer
 import com.intellij.openapi.Disposable
@@ -116,8 +118,13 @@ class MainToolWindow(private val project: Project) : Disposable {
     }
 
     private val memberListTableManager = MemberListTableManager(connectionManager, null)
+    private val alarmListTableManager = AlarmListTableManager(connectionManager, null)
+    private val memberStatusListTableManager = MemberStatusListTableManager(connectionManager, null)
+
     private val connectionInfoPanel = JBTabbedPane(JTabbedPane.TOP, JBTabbedPane.WRAP_TAB_LAYOUT).also {
         it.addTab(memberListTableManager.tableName, JBScrollPane(memberListTableManager.table))
+        it.addTab(memberStatusListTableManager.tableName, JBScrollPane(memberStatusListTableManager.table))
+        it.addTab(alarmListTableManager.tableName, JBScrollPane(alarmListTableManager.table))
     }
     val content = JPanel(BorderLayout()).apply {
         add(connActionPanel, BorderLayout.NORTH)
@@ -160,6 +167,8 @@ class MainToolWindow(private val project: Project) : Disposable {
             val connectionNode = connectionTreeNodePath as DefaultMutableTreeNode
             val connectionInfo = connectionNode.userObject as EtcdConnectionInfo
             memberListTableManager.updateConnectionInfo(connectionInfo)
+            alarmListTableManager.updateAlarmInfo(connectionInfo)
+            memberStatusListTableManager.updateMemberStatusInfo(connectionInfo)
         }.submit(ThreadPoolManager.executor)
     }
 
