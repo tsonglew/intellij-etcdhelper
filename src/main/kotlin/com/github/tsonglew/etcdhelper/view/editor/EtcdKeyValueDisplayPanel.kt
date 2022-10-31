@@ -162,13 +162,16 @@ class EtcdKeyValueDisplayPanel(
      * render value display panel when key tree is clicked
      */
     private fun renderValueDisplayPanel(key: String) {
+        valueDisplayPanel = EtcdValueDisplayPanel().apply {
+            minimumSize = Dimension(100, 100)
+        }
         val valueDisplayScrollPanel = JBScrollPane(valueDisplayPanel).apply {
             horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
             verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
         }
         val loadingDecorator = LoadingDecorator(valueDisplayScrollPanel, this, 0)
         splitterContainer.secondComponent = loadingDecorator.component
-        valueDisplayPanel = EtcdValueDisplayPanel(
+        valueDisplayPanel!!.init(
                 project,
                 key,
                 connectionInfo,
