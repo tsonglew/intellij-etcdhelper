@@ -57,6 +57,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
     private lateinit var valueSizeLabel: JLabel
     private lateinit var revisionLabel: JLabel
     private lateinit var modRevisionLabel: JLabel
+    private lateinit var versionLabel: JLabel
     private lateinit var ttlLabel: JLabel
 
     fun init(
@@ -162,6 +163,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         revisionLabel = JBLabel()
         modRevisionLabel = JBLabel()
         ttlLabel = JBLabel()
+        versionLabel = JBLabel()
         val valueLabelsPanel = JPanel(FlowLayout()).apply {
             add(valueSizeLabel)
             add(revisionLabel)
@@ -182,6 +184,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         valueSizeLabel.text = "Value size: ${keyValue?.value?.bytes?.size} bytes; "
         revisionLabel.text = "Create Revision: ${keyValue?.createRevision}; "
         modRevisionLabel.text = "Mod revision: ${keyValue?.modRevision}; "
+        versionLabel.text = "Version: ${keyValue?.version}; "
         keyValue?.lease?.apply {
             connectionManager.getClient(etcdConnectionInfo)?.getLeaseInfo(this).also {
                 ttlLabel.text = "TTL: $it s; "
