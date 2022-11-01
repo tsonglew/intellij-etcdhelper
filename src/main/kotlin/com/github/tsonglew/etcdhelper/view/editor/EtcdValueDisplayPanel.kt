@@ -33,6 +33,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
+import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
@@ -58,6 +59,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
     private lateinit var revisionLabel: JLabel
     private lateinit var modRevisionLabel: JLabel
     private lateinit var versionLabel: JLabel
+    private lateinit var leaseLabel: JLabel
     private lateinit var ttlLabel: JLabel
 
     fun init(
@@ -162,12 +164,15 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         valueSizeLabel = JBLabel()
         revisionLabel = JBLabel()
         modRevisionLabel = JBLabel()
+        leaseLabel = JBLabel()
         ttlLabel = JBLabel()
         versionLabel = JBLabel()
-        val valueLabelsPanel = JPanel(FlowLayout()).apply {
+        val valueLabelsPanel = JPanel(VerticalFlowLayout()).apply {
             add(valueSizeLabel)
+            add(versionLabel)
             add(revisionLabel)
             add(modRevisionLabel)
+            add(leaseLabel)
             add(ttlLabel)
         }
 
@@ -187,6 +192,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         versionLabel.text = "Version: ${keyValue?.version}; "
         keyValue?.lease?.apply {
             connectionManager.getClient(etcdConnectionInfo)?.getLeaseInfo(this).also {
+                leaseLabel.text = "Lease: %x; ".format(this)
                 ttlLabel.text = "TTL: $it s; "
             }
         }
