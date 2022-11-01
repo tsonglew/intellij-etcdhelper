@@ -90,13 +90,15 @@ class EtcdKeyTreeDisplayPanel(
         addSeparator()
     }
     private val actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true)
+
+    private val keyCountLabel = JBLabel("Key counts: ${allKeys.size}")
+    private val keyCountPanel = JPanel(BorderLayout()).apply { add(keyCountLabel, BorderLayout.WEST) }
     private val keyDisplayPanel = JPanel(BorderLayout()).apply {
         minimumSize = Dimension(255, 100)
         add(actionToolbar.component, BorderLayout.NORTH)
         add(keyDisplayLoadingDecorator.component, BorderLayout.CENTER)
-        add(createKeyCountPanel(), BorderLayout.SOUTH)
+        add(keyCountPanel, BorderLayout.SOUTH)
     }
-    private val keyCountPanel = createKeyCountPanel()
 
     init {
         actionToolbar.targetComponent = keyDisplayPanel
@@ -113,6 +115,7 @@ class EtcdKeyTreeDisplayPanel(
                 ?.apply { sortedBy { it.key.toString() } }
                 ?: listOf()
         keyDisplayLoadingDecorator.startLoading(false)
+        keyCountLabel.text = "Key counts: ${allKeys.size}"
         ReadAction.nonBlocking {
             try {
                 flatRootNode = DefaultMutableTreeNode(etcdConnectionInfo).apply {
@@ -120,7 +123,6 @@ class EtcdKeyTreeDisplayPanel(
                 }
                 groupKeyTree()
                 keyDisplayPanel.updateUI()
-                keyCountPanel.updateUI()
             } finally {
                 keyDisplayLoadingDecorator.stopLoading()
             }
@@ -131,9 +133,6 @@ class EtcdKeyTreeDisplayPanel(
         action = { renderKeyTree(keyValueDisplayPanel.searchSymbol) }
     }
 
-    private fun createKeyCountPanel() = JPanel(BorderLayout()).apply {
-        add(JBLabel("Key counts: ${allKeys.size}"), BorderLayout.WEST)
-    }
 
     private fun createKeyCreateAction(): KeyCreateAction = KeyCreateAction.create(
             project,
