@@ -164,7 +164,7 @@ class EtcdKeyTreeDisplayPanel(
                         this[it.key.toString()] = it
                     }
                 },
-                keyValueDisplayPanel.groupSymbol
+                keyValueDisplayPanel.groupSymbol.ifBlank { " " }
         )
         treeModel = DefaultTreeModel(flatRootNode)
         keyTree.model = treeModel
