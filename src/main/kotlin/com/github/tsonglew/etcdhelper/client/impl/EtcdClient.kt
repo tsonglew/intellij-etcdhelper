@@ -135,14 +135,13 @@ class EtcdClient(
     override fun getByPrefix(key: String, limit: Int?): List<KeyValue> {
         // TODO: use serializable & keyOnly to optimize performance
         try {
-            val optionBuilder = GetOption.newBuilder()
-                    .withRange(prefixEndOf(bytesOf(key)))
-                    .withSortField(GetOption.SortTarget.MOD)
-                    .withSortOrder(GetOption.SortOrder.ASCEND)
+            val searchKey = if (key.isBlank()) ByteSequence.from(byteArrayOf(0)) else bytesOf(key)
+            val endKey = if (key.isBlank()) ByteSequence.from(byteArrayOf(0)) else prefixEndOf(searchKey)
+            val optionBuilder = GetOption.newBuilder().withRange(endKey)
             if ((limit != null) && (limit > 0)) {
                 optionBuilder.withLimit(limit.toLong())
             }
-            return kvClient!![bytesOf(key), optionBuilder.build()][1L, TimeUnit.SECONDS].kvs
+            return kvClient!![searchKey, optionBuilder.build()][1L, TimeUnit.SECONDS].kvs
         } catch (e: Exception) {
             thisLogger().info("get by prefix error: ${e.message}")
             e.printStackTrace()
