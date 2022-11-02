@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.view.editor
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import java.io.InputStream
@@ -55,13 +56,16 @@ class EtcdKeyValueDisplayVirtualFile(
 
     override fun getParent(): VirtualFile? = null
 
-    override fun getChildren(): Array<VirtualFile> = arrayOf();
+    override fun getChildren(): Array<VirtualFile> = arrayOf()
+
+    override fun getFileType(): FileType = KeyValueDisplayFileType()
 
     override fun getOutputStream(requestor: Any?, newModificationStamp: Long, newTimeStamp: Long): OutputStream {
         TODO("Not yet implemented")
     }
 
     override fun contentsToByteArray(): ByteArray = byteArrayOf()
+    override fun getModificationStamp(): Long = timeStamp
 
     override fun getTimeStamp() = 0L
 
