@@ -27,9 +27,9 @@ package com.github.tsonglew.etcdhelper.view.editor
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
+import com.github.tsonglew.etcdhelper.listener.KeyReleasedListener
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
@@ -42,7 +42,6 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -60,7 +59,9 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
     private lateinit var modRevisionLabel: JLabel
     private lateinit var versionLabel: JLabel
     private lateinit var leaseLabel: JLabel
-    private lateinit var ttlLabel: JLabel
+
+    private var keyTextField: JBTextField? = null
+    private var ttlTextField: JBTextField? = null
 
     fun init(
             project: Project,
@@ -97,23 +98,23 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
     }
 
     private fun initValuePreviewToolbarPanel() {
-        val keyTextField = JBTextField(key).apply {
-            preferredSize = Dimension(200, 28)
-            toolTipText = "tool tip: $text"
-            addKeyListener(object : KeyListener {
-                override fun keyTyped(e: KeyEvent?) {
-                    thisLogger().info("value preview toolbar key typed")
-                }
-
-                override fun keyPressed(e: KeyEvent?) {
-                    thisLogger().info("value preview toolbar key pressed")
-                }
-
+        keyTextField = JBTextField(key).apply {
+            preferredSize = Dimension(160, 28)
+            toolTipText = text
+            addKeyListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
-                    thisLogger().info("value preview toolbar key released")
                     toolTipText = text
                 }
 
+            })
+        }
+        ttlTextField = JBTextField().apply {
+            preferredSize = Dimension(60, 28)
+            toolTipText = text
+            addKeyListener(object : KeyReleasedListener {
+                override fun keyReleased(e: KeyEvent?) {
+                    toolTipText = text
+                }
             })
         }
         // TODO: rename button
@@ -124,12 +125,16 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         val valuePreviewToolbarPanel = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
             add(JLabel("key: "))
             add(keyTextField)
+            add(JLabel("ttl: "))
+            add(ttlTextField)
             add(JButton("Save").apply {
                 addActionListener {
                     isEnabled = false
-                    val value = valueTextArea.text
-                    thisLogger().info("save key $key value $value")
-                    connectionManager.getClient(etcdConnectionInfo)?.put(key, value, 0)
+                    connectionManager.getClient(etcdConnectionInfo)?.put(
+                            key,
+                            valueTextArea.text,
+                            if (ttlTextField?.text?.isBlank() == true) 0 else ttlTextField?.text?.toInt()
+                                    ?: 0)
                     isEnabled = true
                     renderLabels()
                 }
@@ -165,7 +170,6 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         revisionLabel = JBLabel()
         modRevisionLabel = JBLabel()
         leaseLabel = JBLabel()
-        ttlLabel = JBLabel()
         versionLabel = JBLabel()
         val valueLabelsPanel = JPanel(VerticalFlowLayout()).apply {
             add(valueSizeLabel)
@@ -173,7 +177,6 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
             add(revisionLabel)
             add(modRevisionLabel)
             add(leaseLabel)
-            add(ttlLabel)
         }
 
         val valuePreviewAndFunctionPanel = JPanel(BorderLayout()).apply {
@@ -186,14 +189,16 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
     }
 
     private fun renderLabels() {
-        valueSizeLabel.text = "Value size: ${keyValue?.value?.bytes?.size} bytes; "
-        revisionLabel.text = "Create Revision: ${keyValue?.createRevision}; "
-        modRevisionLabel.text = "Mod revision: ${keyValue?.modRevision}; "
-        versionLabel.text = "Version: ${keyValue?.version}; "
-        keyValue?.lease?.apply {
+        val kv = keyValue
+        valueSizeLabel.text = "Value size: ${kv?.value?.bytes?.size} bytes; "
+        revisionLabel.text = "Create Revision: ${kv?.createRevision}; "
+        modRevisionLabel.text = "Mod revision: ${kv?.modRevision}; "
+        versionLabel.text = "Version: ${kv?.version}; "
+        kv?.lease?.apply {
             connectionManager.getClient(etcdConnectionInfo)?.getLeaseInfo(this).also {
                 leaseLabel.text = "Lease: %x; ".format(this)
-                ttlLabel.text = "TTL: $it s; "
+                ttlTextField?.text = "%d".format(it)
+                ttlTextField?.toolTipText = "%d".format(it)
             }
         }
     }
