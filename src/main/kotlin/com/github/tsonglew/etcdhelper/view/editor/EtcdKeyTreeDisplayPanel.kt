@@ -60,7 +60,6 @@ class EtcdKeyTreeDisplayPanel(
         private val connectionManager: ConnectionManager,
         private val doubleClickKeyAction: Consumer<String>
 ) : JPanel() {
-    private var pageIndex = 1
     private var flatRootNode: DefaultMutableTreeNode? = null
     private var treeModel: DefaultTreeModel? = null
     private var selectedLeaf: KeyTreeNode? = null
@@ -105,13 +104,9 @@ class EtcdKeyTreeDisplayPanel(
         splitterContainer.firstComponent = keyDisplayPanel
     }
 
-    fun resetPageIndex() {
-        pageIndex = 1
-    }
-
-    fun renderKeyTree(searchSymbol: String = "/") {
+    fun renderKeyTree(searchSymbol: String = "/", limit: Int = 0) {
         allKeys = connectionManager.getClient(etcdConnectionInfo)
-                ?.getByPrefix(searchSymbol, 0)
+                ?.getByPrefix(searchSymbol, limit)
                 ?.apply { sortedBy { it.key.toString() } }
                 ?: listOf()
         keyDisplayLoadingDecorator.startLoading(false)
