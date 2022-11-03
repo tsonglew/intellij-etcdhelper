@@ -26,9 +26,9 @@ package com.github.tsonglew.etcdhelper.view.editor
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.listener.KeyReleasedListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
 import com.intellij.openapi.ui.Splitter
@@ -41,7 +41,6 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
@@ -71,16 +70,23 @@ class EtcdKeyValueDisplayPanel(
 
     private lateinit var searchTextField: SearchTextField
     private lateinit var groupTextField: JBTextField
+    private lateinit var limitTextField: JBTextField
+
     val searchSymbol: String
-        get() {
-            return searchTextField.text
-        }
+        get() = searchTextField.text
     val groupSymbol: String
-        get() {
-            return groupTextField.text
-        }
+        get() = groupTextField.text
+    val limitSymbol: Int
+        get() = limitTextField.text.toIntOrNull() ?: 0
 
     private lateinit var keyTreeDisplayPanel: EtcdKeyTreeDisplayPanel
+    private val keyReleaseListener = object : KeyReleasedListener {
+        override fun keyReleased(e: KeyEvent?) {
+            if (e?.keyCode == KeyEvent.VK_ENTER) {
+                keyTreeDisplayPanel.renderKeyTree(searchSymbol, limitSymbol)
+            }
+        }
+    }
 
     init {
         layout = BorderLayout()
@@ -96,6 +102,7 @@ class EtcdKeyValueDisplayPanel(
     private fun initKeyToolBarPanel() {
         keyToolBarPanel.add(createSearchBox())
         keyToolBarPanel.add(createGroupByPanel())
+        keyToolBarPanel.add(createLimitPanel())
     }
 
     private fun initKeyTreePanel() {
@@ -116,20 +123,11 @@ class EtcdKeyValueDisplayPanel(
         add(SearchTextField().apply {
             text = "/"
             searchTextField = this
-            addKeyboardListener(object : KeyListener {
-                override fun keyTyped(e: KeyEvent?) {
-                    thisLogger().info("search box key typed")
-                }
-
-                override fun keyPressed(e: KeyEvent?) {
-                    thisLogger().info("search box key pressed")
-                }
-
+            addKeyboardListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
                     if (e?.keyCode == KeyEvent.VK_ENTER) {
-                        keyTreeDisplayPanel.resetPageIndex()
-                        keyTreeDisplayPanel.renderKeyTree(searchSymbol)
-                        thisLogger().info("current search symbol: $searchSymbol")
+                        keyTreeDisplayPanel.renderKeyTree(searchSymbol, limitTextField.text.toIntOrNull()
+                                ?: 0)
                     }
                 }
             })
@@ -141,20 +139,16 @@ class EtcdKeyValueDisplayPanel(
         add(JLabel("Group by: "))
         add(JBTextField("/").apply {
             groupTextField = this
-            addKeyListener(object : KeyListener {
-                override fun keyTyped(e: KeyEvent?) {
-                    thisLogger().info("group key typed")
-                }
+            addKeyListener(keyReleaseListener)
+        })
+    }
 
-                override fun keyPressed(e: KeyEvent?) {
-                    thisLogger().info("group key pressed")
-                }
-
-                override fun keyReleased(e: KeyEvent?) {
-                    // TODO: rerender after key released
-                    thisLogger().info("group key released, current group symbol: $groupSymbol")
-                }
-            })
+    private fun createLimitPanel() = JPanel().apply {
+        border = JBUI.Borders.empty()
+        add(JLabel("Limit: "))
+        add(JBTextField("1000").apply {
+            limitTextField = this
+            addKeyListener(keyReleaseListener)
         })
     }
 
