@@ -25,6 +25,10 @@
 package com.github.tsonglew.etcdhelper.config
 
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.ui.VerticalFlowLayout
+import java.awt.FlowLayout
+import java.awt.GridLayout
+import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -33,7 +37,12 @@ class EtcdHelperSettingConfiguration : Configurable {
 
     private val clearCacheBtn = JButton("Clear Cache")
 
-    private val component = JPanel().apply {
+    private val component = JPanel(VerticalFlowLayout()).apply {
+        add(JLabel("Hello EtcdHelper!"))
+        add(JLabel("Hello EtcdHelper!"))
+        add(JLabel("Hello EtcdHelper!"))
+        add(JLabel("Hello EtcdHelper!"))
+        add(JLabel("Hello EtcdHelper!"))
         add(JLabel("Hello EtcdHelper!"))
         add(clearCacheBtn)
     }
