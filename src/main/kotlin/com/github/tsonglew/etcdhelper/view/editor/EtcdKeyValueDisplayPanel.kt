@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.view.editor
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.github.tsonglew.etcdhelper.listener.KeyReleasedListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -47,6 +48,7 @@ import javax.swing.ScrollPaneConstants
 
 class EtcdKeyValueDisplayPanel(
         private val project: Project,
+        private val propertyUtil: PropertyUtil,
         private val connectionInfo: EtcdConnectionInfo,
         private val connectionManager: ConnectionManager
 ) : JPanel(), Disposable {
@@ -121,7 +123,7 @@ class EtcdKeyValueDisplayPanel(
     private fun createSearchBox() = JPanel().apply {
         add(JLabel("Search: "))
         add(SearchTextField().apply {
-            text = "/"
+            text = propertyUtil.connectionService.defaultSearchSymbol
             searchTextField = this
             addKeyboardListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
@@ -137,7 +139,7 @@ class EtcdKeyValueDisplayPanel(
     private fun createGroupByPanel() = JPanel().apply {
         border = JBUI.Borders.empty()
         add(JLabel("Group by: "))
-        add(JBTextField("/").apply {
+        add(JBTextField(propertyUtil.connectionService.defaultGroupSymbol).apply {
             groupTextField = this
             addKeyListener(keyReleaseListener)
         })

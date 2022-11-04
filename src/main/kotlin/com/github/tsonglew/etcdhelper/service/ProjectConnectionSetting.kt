@@ -37,7 +37,6 @@ class ProjectConnectionSetting : PersistentStateComponent<ProjectConnectionSetti
 
     var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
     override fun getConnectionInfosList(): ArrayList<EtcdConnectionInfo> = connectionInfos
-
     companion object {
         @JvmStatic
         fun getInstance(project: Project): ProjectConnectionSetting =

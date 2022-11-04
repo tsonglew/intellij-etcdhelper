@@ -35,6 +35,9 @@ import com.intellij.openapi.diagnostic.thisLogger
 class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>, ConnectionSettings {
 
     var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
+    var defaultSearchSymbol = "/"
+    var defaultGroupSymbol = "/"
+    var defaultSearchLimit = 1000
 
     companion object {
         @JvmStatic
@@ -46,7 +49,10 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
     override fun getState() = this
     override fun loadState(state: GlobalConnectionSetting) {
         connectionInfos = state.connectionInfos
-        thisLogger().info("load state: $connectionInfos")
+        defaultSearchSymbol = state.defaultSearchSymbol
+        defaultGroupSymbol = state.defaultGroupSymbol
+        defaultSearchLimit = state.defaultSearchLimit
+        thisLogger().info("load state, connections: $connectionInfos,  defaultSearchSymbol: $defaultSearchSymbol, defaultGroupSymbol: $defaultGroupSymbol, defaultSearchLimit: $defaultSearchLimit")
     }
 
     override fun getConnectionInfosList() = connectionInfos
