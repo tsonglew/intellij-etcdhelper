@@ -76,7 +76,6 @@ class EtcdConnectionSettingsDialog(
     override fun doOKAction() {
         val conf = toEtcdConfiguration()
 
-
         PropertyUtil(project).saveConnection(conf)
         PasswordUtil.savePassword(conf.id!!, String(passwordTextField.password))
         connectionManager.addConnectionToList(conf)
@@ -87,7 +86,6 @@ class EtcdConnectionSettingsDialog(
     private fun toEtcdConfiguration() = EtcdConnectionInfo(
             endpointsTextField.text,
             usernameTextField.text,
-//        passwordTextField.password.toString(),
             etcdConnectionInfo?.id,
             remarkTextField.text
     )

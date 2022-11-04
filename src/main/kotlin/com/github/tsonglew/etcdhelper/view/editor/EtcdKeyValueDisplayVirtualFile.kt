@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.view.editor
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -33,14 +34,15 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class EtcdKeyValueDisplayVirtualFile(
-    val project: Project,
-    private val name: String,
-    private val etcdConnectionInfo: EtcdConnectionInfo,
-    private val connectionManager: ConnectionManager
+        val project: Project,
+        private val name: String,
+        propertyUtil: PropertyUtil,
+        etcdConnectionInfo: EtcdConnectionInfo,
+        connectionManager: ConnectionManager
 ): VirtualFile() {
 
     val etcdKeyValueDisplayPanel: EtcdKeyValueDisplayPanel =
-        EtcdKeyValueDisplayPanel(project, etcdConnectionInfo, connectionManager)
+            EtcdKeyValueDisplayPanel(project, propertyUtil, etcdConnectionInfo, connectionManager)
 
     override fun getName() = name
 

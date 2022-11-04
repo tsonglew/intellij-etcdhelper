@@ -24,34 +24,52 @@
 
 package com.github.tsonglew.etcdhelper.config
 
+import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.VerticalFlowLayout
+import com.intellij.ui.components.JBTextField
 import java.awt.FlowLayout
-import java.awt.GridLayout
-import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 
 class EtcdHelperSettingConfiguration : Configurable {
 
+    private val propertyUtil = PropertyUtil()
+
+    private val defaultSearchSymbolTextField = JBTextField(propertyUtil.connectionService.defaultSearchSymbol, 100)
+    private val defaultGroupSymbolTextField = JBTextField(propertyUtil.connectionService.defaultGroupSymbol, 100)
+    private val defaultSearchLimitTextField = JBTextField("%d".format(propertyUtil.connectionService.defaultSearchLimit), 100)
     private val clearCacheBtn = JButton("Clear Cache")
 
     private val component = JPanel(VerticalFlowLayout()).apply {
-        add(JLabel("Hello EtcdHelper!"))
-        add(JLabel("Hello EtcdHelper!"))
-        add(JLabel("Hello EtcdHelper!"))
-        add(JLabel("Hello EtcdHelper!"))
-        add(JLabel("Hello EtcdHelper!"))
-        add(JLabel("Hello EtcdHelper!"))
-        add(clearCacheBtn)
+        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+            add(JLabel("Default Search Symbol:"))
+            add(defaultSearchSymbolTextField)
+        })
+        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+            add(JLabel("Default Group Symbol: "))
+            add(defaultGroupSymbolTextField)
+        })
+        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+            add(JLabel("Default Search Limit:  "))
+            add(defaultSearchLimitTextField)
+        })
+        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+            add(clearCacheBtn)
+        })
     }
 
     override fun createComponent() = component
 
-    override fun isModified() = false
+    override fun isModified() = defaultSearchSymbolTextField.text != propertyUtil.connectionService.defaultSearchSymbol ||
+            defaultGroupSymbolTextField.text != propertyUtil.connectionService.defaultGroupSymbol ||
+            defaultSearchLimitTextField.text != "%d".format(propertyUtil.connectionService.defaultSearchLimit)
 
     override fun apply() {
+        propertyUtil.connectionService.defaultSearchSymbol = defaultSearchSymbolTextField.text
+        propertyUtil.connectionService.defaultGroupSymbol = defaultGroupSymbolTextField.text
+        propertyUtil.connectionService.defaultSearchLimit = defaultSearchLimitTextField.text.toInt()
     }
 
     override fun getDisplayName() = "Etcd Helper"
