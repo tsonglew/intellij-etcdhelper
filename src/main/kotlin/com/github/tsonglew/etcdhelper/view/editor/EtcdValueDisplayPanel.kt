@@ -99,7 +99,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
 
     private fun initValuePreviewToolbarPanel() {
         keyTextField = JBTextField(key).apply {
-            preferredSize = Dimension(160, 28)
+            preferredSize = Dimension(200, 28)
             toolTipText = text
             addKeyListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
@@ -109,7 +109,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
             })
         }
         ttlTextField = JBTextField().apply {
-            preferredSize = Dimension(60, 28)
+            preferredSize = Dimension(100, 28)
             toolTipText = text
             addKeyListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
@@ -122,22 +122,26 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         // TODO: delete button
         // TODO: ttl button
 
-        val valuePreviewToolbarPanel = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
-            add(JLabel("key: "))
-            add(keyTextField)
-            add(JLabel("ttl: "))
-            add(ttlTextField)
-            add(JButton("Save").apply {
-                addActionListener {
-                    isEnabled = false
-                    connectionManager.getClient(etcdConnectionInfo)?.put(
-                            key,
-                            valueTextArea.text,
-                            if (ttlTextField?.text?.isBlank() == true) 0 else ttlTextField?.text?.toInt()
-                                    ?: 0)
-                    isEnabled = true
-                    renderLabels()
-                }
+        val valuePreviewToolbarPanel = JPanel(VerticalFlowLayout()).apply {
+            add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+                add(JBLabel("Key:"))
+                add(keyTextField)
+            })
+            add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+                add(JBLabel("TTL:"))
+                add(ttlTextField)
+                add(JButton("Save").apply {
+                    addActionListener {
+                        isEnabled = false
+                        connectionManager.getClient(etcdConnectionInfo)?.put(
+                                key,
+                                valueTextArea.text,
+                                if (ttlTextField?.text?.isBlank() == true) 0 else ttlTextField?.text?.toInt()
+                                        ?: 0)
+                        isEnabled = true
+                        renderLabels()
+                    }
+                })
             })
         }
         add(valuePreviewToolbarPanel, BorderLayout.NORTH)
