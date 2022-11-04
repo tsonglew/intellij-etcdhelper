@@ -100,6 +100,7 @@ class ConnectionManager(
             connectionEditorMap[connectionInfo.toString()] = EtcdKeyValueDisplayVirtualFile(
                     project,
                     connectionInfo.endpoints,
+                    propertyUtil,
                     connectionInfo,
                     this
             )
