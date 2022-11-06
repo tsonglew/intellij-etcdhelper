@@ -28,6 +28,7 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
 import com.github.tsonglew.etcdhelper.listener.KeyReleasedListener
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.fileTypes.PlainTextLanguage
@@ -99,7 +100,8 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
 
     private fun initValuePreviewToolbarPanel() {
         keyTextField = JBTextField(key).apply {
-            preferredSize = Dimension(200, 28)
+            preferredSize = Dimension(290, 28)
+            minimumSize = Dimension(290, 28)
             toolTipText = text
             addKeyListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
@@ -110,6 +112,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         }
         ttlTextField = JBTextField().apply {
             preferredSize = Dimension(100, 28)
+            minimumSize = Dimension(100, 28)
             toolTipText = text
             addKeyListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
@@ -130,7 +133,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
             add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
                 add(JBLabel("TTL:"))
                 add(ttlTextField)
-                add(JButton("Save").apply {
+                add(JButton("Save", AllIcons.Actions.MenuSaveall).apply {
                     addActionListener {
                         isEnabled = false
                         connectionManager.getClient(etcdConnectionInfo)?.put(
@@ -138,8 +141,15 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
                                 valueTextArea.text,
                                 if (ttlTextField?.text?.isBlank() == true) 0 else ttlTextField?.text?.toInt()
                                         ?: 0)
-                        isEnabled = true
                         renderLabels()
+                        isEnabled = true
+                    }
+                })
+                add(JButton("Reload", AllIcons.Actions.Refresh).apply {
+                    addActionListener {
+                        isEnabled = false
+                        renderLabels()
+                        isEnabled = true
                     }
                 })
             })
@@ -205,5 +215,6 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
                 ttlTextField?.toolTipText = "%d".format(it)
             }
         }
+        valueTextArea.text = kv?.value?.toString() ?: ""
     }
 }
