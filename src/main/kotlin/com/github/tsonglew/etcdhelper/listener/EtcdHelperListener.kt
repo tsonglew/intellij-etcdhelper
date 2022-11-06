@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.listener
 
 import com.github.tsonglew.etcdhelper.cheatsheet.CheatSheetUtil
 import com.github.tsonglew.etcdhelper.common.Notifier
+import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -44,13 +45,15 @@ class EtcdHelperListener : ProjectManagerListener {
 
         registerVirtualFileListeners()
 
-        val cheatsheet = CheatSheetUtil.getRandomEntry()
-        Notifier.notifyInfo(
-                "EtcdHelper Cheatsheet",
-                "<h3>${cheatsheet.first}</h3>${cheatsheet.second}",
-                project,
-                OpenEtcdHelperSettingsAction()
-        )
+        if (PropertyUtil().connectionService.enableCheatsheetPopup) {
+            val cheatsheet = CheatSheetUtil.getRandomEntry()
+            Notifier.notifyInfo(
+                    "Etcd Cheatsheet(${cheatsheet.first})",
+                    cheatsheet.second,
+                    project,
+                    OpenEtcdHelperSettingsAction()
+            )
+        }
     }
 
     inner class OpenEtcdHelperSettingsAction : NotificationAction(buildString {
