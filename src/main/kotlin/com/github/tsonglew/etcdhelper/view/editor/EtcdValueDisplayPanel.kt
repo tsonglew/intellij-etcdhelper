@@ -100,8 +100,8 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
 
     private fun initValuePreviewToolbarPanel() {
         keyTextField = JBTextField(key).apply {
-            preferredSize = Dimension(290, 28)
-            minimumSize = Dimension(290, 28)
+            preferredSize = Dimension(290, 30)
+            minimumSize = Dimension(290, 30)
             toolTipText = text
             addKeyListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
@@ -111,8 +111,8 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
             })
         }
         ttlTextField = JBTextField().apply {
-            preferredSize = Dimension(100, 28)
-            minimumSize = Dimension(100, 28)
+            preferredSize = Dimension(100, 30)
+            minimumSize = Dimension(100, 30)
             toolTipText = text
             addKeyListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {

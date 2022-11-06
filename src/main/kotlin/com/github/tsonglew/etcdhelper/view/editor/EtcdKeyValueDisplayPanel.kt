@@ -149,7 +149,7 @@ class EtcdKeyValueDisplayPanel(
         border = JBUI.Borders.empty()
         add(JLabel("Limit: "))
         add(JBTextField("1000").apply {
-            preferredSize = Dimension(50, 20)
+            preferredSize = Dimension(100, 30)
             limitTextField = this
             addKeyListener(keyReleaseListener)
         })
