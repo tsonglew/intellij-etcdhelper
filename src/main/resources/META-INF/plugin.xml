@@ -7,6 +7,7 @@
       <li>support query on cluster status, members and metrics</li>
       <li>support query keys with size limit</li>
       <li>support put key with ttl</li>
+      <li>support configure default search symbol, group symbol and search limit in settings</li>
       <li>show random cheatsheet when opening a project</li>
       <li>support connection management result popups</li>
     </ul>
