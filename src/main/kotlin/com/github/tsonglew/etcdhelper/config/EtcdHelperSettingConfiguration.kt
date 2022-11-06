@@ -27,9 +27,9 @@ package com.github.tsonglew.etcdhelper.config
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.VerticalFlowLayout
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
 import java.awt.FlowLayout
-import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 
@@ -37,10 +37,10 @@ class EtcdHelperSettingConfiguration : Configurable {
 
     private val propertyUtil = PropertyUtil()
 
-    private val defaultSearchSymbolTextField = JBTextField(propertyUtil.connectionService.defaultSearchSymbol, 100)
-    private val defaultGroupSymbolTextField = JBTextField(propertyUtil.connectionService.defaultGroupSymbol, 100)
-    private val defaultSearchLimitTextField = JBTextField("%d".format(propertyUtil.connectionService.defaultSearchLimit), 100)
-    private val clearCacheBtn = JButton("Clear Cache")
+    private val defaultSearchSymbolTextField = JBTextField(propertyUtil.connectionService.defaultSearchSymbol, 10)
+    private val defaultGroupSymbolTextField = JBTextField(propertyUtil.connectionService.defaultGroupSymbol, 10)
+    private val defaultSearchLimitTextField = JBTextField("%d".format(propertyUtil.connectionService.defaultSearchLimit), 10)
+    private val enableCheatsheetPopupCheckBox = JBCheckBox("Enable cheatsheet popup (if enabled, random etcdctl cheatsheet will be popped up when opening a project)", propertyUtil.connectionService.enableCheatsheetPopup)
 
     private val component = JPanel(VerticalFlowLayout()).apply {
         add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
@@ -52,11 +52,11 @@ class EtcdHelperSettingConfiguration : Configurable {
             add(defaultGroupSymbolTextField)
         })
         add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
-            add(JLabel("Default Search Limit:  "))
+            add(JLabel("Default Search Limit: "))
             add(defaultSearchLimitTextField)
         })
         add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
-            add(clearCacheBtn)
+            add(enableCheatsheetPopupCheckBox)
         })
     }
 
@@ -64,12 +64,14 @@ class EtcdHelperSettingConfiguration : Configurable {
 
     override fun isModified() = defaultSearchSymbolTextField.text != propertyUtil.connectionService.defaultSearchSymbol ||
             defaultGroupSymbolTextField.text != propertyUtil.connectionService.defaultGroupSymbol ||
-            defaultSearchLimitTextField.text != "%d".format(propertyUtil.connectionService.defaultSearchLimit)
+            defaultSearchLimitTextField.text != "%d".format(propertyUtil.connectionService.defaultSearchLimit) ||
+            enableCheatsheetPopupCheckBox.isSelected != propertyUtil.connectionService.enableCheatsheetPopup
 
     override fun apply() {
         propertyUtil.connectionService.defaultSearchSymbol = defaultSearchSymbolTextField.text
         propertyUtil.connectionService.defaultGroupSymbol = defaultGroupSymbolTextField.text
         propertyUtil.connectionService.defaultSearchLimit = defaultSearchLimitTextField.text.toInt()
+        propertyUtil.connectionService.enableCheatsheetPopup = enableCheatsheetPopupCheckBox.isSelected
     }
 
     override fun getDisplayName() = "Etcd Helper"

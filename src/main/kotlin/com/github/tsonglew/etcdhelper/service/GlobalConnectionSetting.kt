@@ -38,6 +38,7 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
     var defaultSearchSymbol = "/"
     var defaultGroupSymbol = "/"
     var defaultSearchLimit = 1000
+    var enableCheatsheetPopup = true
 
     companion object {
         @JvmStatic
@@ -52,7 +53,8 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
         defaultSearchSymbol = state.defaultSearchSymbol
         defaultGroupSymbol = state.defaultGroupSymbol
         defaultSearchLimit = state.defaultSearchLimit
-        thisLogger().info("load state, connections: $connectionInfos,  defaultSearchSymbol: $defaultSearchSymbol, defaultGroupSymbol: $defaultGroupSymbol, defaultSearchLimit: $defaultSearchLimit")
+        enableCheatsheetPopup = state.enableCheatsheetPopup
+        thisLogger().info("load state, connections: $connectionInfos,  defaultSearchSymbol: $defaultSearchSymbol, defaultGroupSymbol: $defaultGroupSymbol, defaultSearchLimit: $defaultSearchLimit, enableCheatsheetPopup: $enableCheatsheetPopup")
     }
 
     override fun getConnectionInfosList() = connectionInfos
