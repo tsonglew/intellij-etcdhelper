@@ -29,7 +29,9 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
-import java.awt.FlowLayout
+import java.awt.Component.LEFT_ALIGNMENT
+import java.awt.Dimension
+import javax.swing.BoxLayout
 import javax.swing.JLabel
 import javax.swing.JPanel
 
@@ -42,22 +44,32 @@ class EtcdHelperSettingConfiguration : Configurable {
     private val defaultSearchLimitTextField = JBTextField("%d".format(propertyUtil.connectionService.defaultSearchLimit), 10)
     private val enableCheatsheetPopupCheckBox = JBCheckBox("Enable cheatsheet popup (if enabled, random etcdctl cheatsheet will be popped up when opening a project)", propertyUtil.connectionService.enableCheatsheetPopup)
 
-    private val component = JPanel(VerticalFlowLayout()).apply {
-        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
-            add(JLabel("Default Search Symbol:"))
-            add(defaultSearchSymbolTextField)
+    private val component = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        add(JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.X_AXIS)
+
+            add(JPanel(VerticalFlowLayout()).apply {
+                listOf(
+                        JLabel("Default search symbol:"),
+                        JLabel("Default group symbol:"),
+                        JLabel("Default search limit:"),
+                ).forEach {
+                    it.preferredSize = Dimension(100, 30)
+                    add(it)
+                }
+                alignmentX = LEFT_ALIGNMENT
+            })
+            add(JPanel(VerticalFlowLayout()).apply {
+                listOf(
+                        defaultSearchSymbolTextField,
+                        defaultGroupSymbolTextField,
+                        defaultSearchLimitTextField,
+                ).forEach { add(it) }
+            })
+            alignmentX = LEFT_ALIGNMENT
         })
-        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
-            add(JLabel("Default Group Symbol: "))
-            add(defaultGroupSymbolTextField)
-        })
-        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
-            add(JLabel("Default Search Limit: "))
-            add(defaultSearchLimitTextField)
-        })
-        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
-            add(enableCheatsheetPopupCheckBox)
-        })
+        add(enableCheatsheetPopupCheckBox)
     }
 
     override fun createComponent() = component
