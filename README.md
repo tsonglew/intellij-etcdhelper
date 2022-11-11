@@ -14,3 +14,9 @@ a simple intellij platform etcd plugin
 ### Settings
 
 ![settings.png](assets/images/settings.png)
+
+# Acknowledgements
+
+* JetBrains kindly provides intellij-etcdhelper with a free open-source licence
+
+<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains Logo (Main) logo.">
