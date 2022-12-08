@@ -4,6 +4,8 @@ a simple intellij platform etcd plugin
 
 [![license](https://github.com/tsonglew/intellij-etcdhelper/actions/workflows/license.yml/badge.svg)](https://github.com/tsonglew/intellij-etcdhelper/actions/workflows/license.yml)
 [![Java CI with Gradle](https://github.com/tsonglew/intellij-etcdhelper/actions/workflows/gradle.yml/badge.svg)](https://github.com/tsonglew/intellij-etcdhelper/actions/workflows/gradle.yml)
+![JetBrains plugins](https://img.shields.io/jetbrains/plugin/d/19924?logo=etcd)
+![JetBrains Plugins](https://img.shields.io/jetbrains/plugin/r/stars/19924)
 
 ## Screenshots
 
