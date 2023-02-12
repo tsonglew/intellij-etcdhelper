@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.view.editor
+package com.github.tsonglew.etcdhelper.view.editor.keyvalue
 
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditor
@@ -35,7 +35,7 @@ import javax.swing.JComponent
 
 class EtcdKeyValueDisplayEditor(
     private val virtualFile: EtcdKeyValueDisplayVirtualFile
-): UserDataHolderBase(), FileEditor {
+) : UserDataHolderBase(), FileEditor {
     override fun dispose() {
         // TODO: remove connection -> editor mapping
         thisLogger().info("dispose etcd key value display editor")

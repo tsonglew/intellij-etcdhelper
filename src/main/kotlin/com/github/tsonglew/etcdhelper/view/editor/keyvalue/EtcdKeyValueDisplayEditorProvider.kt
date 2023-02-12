@@ -22,19 +22,23 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.view.editor
+package com.github.tsonglew.etcdhelper.view.editor.keyvalue
 
-import com.github.tsonglew.etcdhelper.icon.EtcdIcons
-import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.fileEditor.FileEditorPolicy
+import com.intellij.openapi.fileEditor.FileEditorProvider
+import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 
-class KeyValueDisplayFileType : FileType {
-    override fun getName() = "EtcdHelper type"
+class EtcdKeyValueDisplayEditorProvider : FileEditorProvider, DumbAware {
+    override fun accept(project: Project, virtualFile: VirtualFile) =
+        virtualFile is EtcdKeyValueDisplayVirtualFile
 
-    override fun getDescription() = "A EtcdHelper file tab"
+    override fun createEditor(project: Project, file: VirtualFile) = EtcdKeyValueDisplayEditor(
+        file as EtcdKeyValueDisplayVirtualFile
+    )
 
-    override fun getDefaultExtension() = ""
+    override fun getEditorTypeId() = "Etcd Key-Value"
 
-    override fun getIcon() = EtcdIcons.ETCD_ICON
-
-    override fun isBinary() = false
+    override fun getPolicy() = FileEditorPolicy.HIDE_DEFAULT_EDITOR
 }

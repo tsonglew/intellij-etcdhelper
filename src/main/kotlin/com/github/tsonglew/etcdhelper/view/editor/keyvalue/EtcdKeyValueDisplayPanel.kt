@@ -22,12 +22,14 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.view.editor
+package com.github.tsonglew.etcdhelper.view.editor.keyvalue
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.github.tsonglew.etcdhelper.listener.KeyReleasedListener
+import com.github.tsonglew.etcdhelper.view.editor.keytree.EtcdKeyTreeDisplayPanel
+import com.github.tsonglew.etcdhelper.view.editor.value.EtcdValueDisplayPanel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
@@ -47,10 +49,10 @@ import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
 
 class EtcdKeyValueDisplayPanel(
-        private val project: Project,
-        private val propertyUtil: PropertyUtil,
-        private val connectionInfo: EtcdConnectionInfo,
-        private val connectionManager: ConnectionManager
+    private val project: Project,
+    private val propertyUtil: PropertyUtil,
+    private val connectionInfo: EtcdConnectionInfo,
+    private val connectionManager: ConnectionManager
 ) : JPanel(), Disposable {
 
     /**
@@ -109,12 +111,12 @@ class EtcdKeyValueDisplayPanel(
 
     private fun initKeyTreePanel() {
         keyTreeDisplayPanel = EtcdKeyTreeDisplayPanel(
-                project,
-                this,
-                splitterContainer,
-                connectionInfo,
-                connectionManager,
-                this::renderValueDisplayPanel
+            project,
+            this,
+            splitterContainer,
+            connectionInfo,
+            connectionManager,
+            this::renderValueDisplayPanel
         ).apply {
             renderKeyTree(searchSymbol)
         }
@@ -128,8 +130,10 @@ class EtcdKeyValueDisplayPanel(
             addKeyboardListener(object : KeyReleasedListener {
                 override fun keyReleased(e: KeyEvent?) {
                     if (e?.keyCode == KeyEvent.VK_ENTER) {
-                        keyTreeDisplayPanel.renderKeyTree(searchSymbol, limitTextField.text.toIntOrNull()
-                                ?: 0)
+                        keyTreeDisplayPanel.renderKeyTree(
+                            searchSymbol, limitTextField.text.toIntOrNull()
+                                ?: 0
+                        )
                     }
                 }
             })
@@ -169,11 +173,11 @@ class EtcdKeyValueDisplayPanel(
         val loadingDecorator = LoadingDecorator(valueDisplayScrollPanel, this, 0)
         splitterContainer.secondComponent = loadingDecorator.component
         valueDisplayPanel!!.init(
-                project,
-                key,
-                connectionInfo,
-                connectionManager,
-                loadingDecorator
+            project,
+            key,
+            connectionInfo,
+            connectionManager,
+            loadingDecorator
         )
     }
 }

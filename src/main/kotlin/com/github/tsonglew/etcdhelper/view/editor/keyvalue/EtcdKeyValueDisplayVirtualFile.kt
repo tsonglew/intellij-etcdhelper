@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.view.editor
+package com.github.tsonglew.etcdhelper.view.editor.keyvalue
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
@@ -34,15 +34,15 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class EtcdKeyValueDisplayVirtualFile(
-        val project: Project,
-        private val name: String,
-        propertyUtil: PropertyUtil,
-        etcdConnectionInfo: EtcdConnectionInfo,
-        connectionManager: ConnectionManager
-): VirtualFile() {
+    val project: Project,
+    private val name: String,
+    propertyUtil: PropertyUtil,
+    etcdConnectionInfo: EtcdConnectionInfo,
+    connectionManager: ConnectionManager
+) : VirtualFile() {
 
     val etcdKeyValueDisplayPanel: EtcdKeyValueDisplayPanel =
-            EtcdKeyValueDisplayPanel(project, propertyUtil, etcdConnectionInfo, connectionManager)
+        EtcdKeyValueDisplayPanel(project, propertyUtil, etcdConnectionInfo, connectionManager)
 
     override fun getName() = name
 
@@ -62,7 +62,11 @@ class EtcdKeyValueDisplayVirtualFile(
 
     override fun getFileType(): FileType = KeyValueDisplayFileType()
 
-    override fun getOutputStream(requestor: Any?, newModificationStamp: Long, newTimeStamp: Long): OutputStream {
+    override fun getOutputStream(
+        requestor: Any?,
+        newModificationStamp: Long,
+        newTimeStamp: Long
+    ): OutputStream {
         TODO("Not yet implemented")
     }
 

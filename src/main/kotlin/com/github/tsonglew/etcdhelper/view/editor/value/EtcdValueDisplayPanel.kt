@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.view.editor
+package com.github.tsonglew.etcdhelper.view.editor.value
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
@@ -65,11 +65,11 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
     private var ttlTextField: JBTextField? = null
 
     fun init(
-            project: Project,
-            key: String,
-            etcdConnectionInfo: EtcdConnectionInfo,
-            connectionManager: ConnectionManager,
-            loadingDecorator: LoadingDecorator
+        project: Project,
+        key: String,
+        etcdConnectionInfo: EtcdConnectionInfo,
+        connectionManager: ConnectionManager,
+        loadingDecorator: LoadingDecorator
     ) {
         this.project = project
         this.key = key
@@ -137,10 +137,11 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
                     addActionListener {
                         isEnabled = false
                         connectionManager.getClient(etcdConnectionInfo)?.put(
-                                key,
-                                valueTextArea.text,
-                                if (ttlTextField?.text?.isBlank() == true) 0 else ttlTextField?.text?.toInt()
-                                        ?: 0)
+                            key,
+                            valueTextArea.text,
+                            if (ttlTextField?.text?.isBlank() == true) 0 else ttlTextField?.text?.toInt()
+                                ?: 0
+                        )
                         renderLabels()
                         isEnabled = true
                     }
@@ -159,9 +160,9 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
 
     private fun initValuePreviewPanel() {
         valueTextArea = LanguageTextField(
-                PlainTextLanguage.INSTANCE,
-                project,
-                keyValue?.value?.toString() ?: ""
+            PlainTextLanguage.INSTANCE,
+            project,
+            keyValue?.value?.toString() ?: ""
         ).apply {
             autoscrolls = true
             setOneLineMode(false)

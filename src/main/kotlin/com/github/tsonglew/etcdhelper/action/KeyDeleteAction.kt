@@ -28,8 +28,8 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.data.KeyTreeNode
 import com.github.tsonglew.etcdhelper.dialog.ConfirmDialog
-import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyTreeDisplayPanel
-import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayPanel
+import com.github.tsonglew.etcdhelper.view.editor.keytree.EtcdKeyTreeDisplayPanel
+import com.github.tsonglew.etcdhelper.view.editor.keyvalue.EtcdKeyValueDisplayPanel
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree

@@ -79,7 +79,11 @@
     <applicationService
       serviceImplementation="com.github.tsonglew.etcdhelper.service.ProjectConnectionSetting"/>
     <fileEditorProvider
-      implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
+      implementation="com.github.tsonglew.etcdhelper.view.editor.keyvalue.EtcdKeyValueDisplayEditorProvider"/>
+    <fileEditorProvider
+      implementation="com.github.tsonglew.etcdhelper.view.editor.console.ConsoleEditorProvider"/>
+    <projectService
+      serviceImplementation="com.github.tsonglew.etcdhelper.view.editor.console.ConsoleFileSystem"/>
     <toolWindow
       anchor="right"
       factoryClass="com.github.tsonglew.etcdhelper.window.MainToolWindowFactory"

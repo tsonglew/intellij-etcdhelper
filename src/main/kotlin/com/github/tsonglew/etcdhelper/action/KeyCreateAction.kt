@@ -27,8 +27,8 @@ package com.github.tsonglew.etcdhelper.action
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.dialog.KeyValueDialog
-import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyTreeDisplayPanel
-import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayPanel
+import com.github.tsonglew.etcdhelper.view.editor.keytree.EtcdKeyTreeDisplayPanel
+import com.github.tsonglew.etcdhelper.view.editor.keyvalue.EtcdKeyValueDisplayPanel
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
 import javax.swing.tree.DefaultTreeModel
