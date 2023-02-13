@@ -57,6 +57,4 @@ class ConsoleVirtualFile(
     override fun getInputStream(): InputStream {
         TODO("Not yet implemented")
     }
-
-
 }

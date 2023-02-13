@@ -25,9 +25,7 @@ class ConsolePanel(
 
     init {
         layout = BorderLayout()
-    }
 
-    private fun init() {
         val resultArea = JBTextArea().apply {
             isEditable = false
             lineWrap = true
@@ -49,6 +47,7 @@ class ConsolePanel(
         val cmdPanel = JPanel(BorderLayout())
         cmdPanel.add(cmdTextArea)
         val cmdScrollPane = JBScrollPane(cmdPanel)
+
         add(
             JBSplitter(true, 0.6f).apply {
                 dividerPositionStrategy = Splitter.DividerPositionStrategy.KEEP_FIRST_SIZE

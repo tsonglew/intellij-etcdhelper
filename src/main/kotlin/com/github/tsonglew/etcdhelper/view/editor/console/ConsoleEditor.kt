@@ -1,11 +1,8 @@
 package com.github.tsonglew.etcdhelper.view.editor.console
 
-import com.intellij.codeHighlighting.BackgroundEditorHighlighter
-import com.intellij.ide.structureView.StructureViewBuilder
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorLocation
 import com.intellij.openapi.fileEditor.FileEditorState
-import com.intellij.openapi.fileEditor.FileEditorStateLevel
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.annotations.Nls
@@ -28,7 +25,7 @@ class ConsoleEditor(consoleVirtualFile: VirtualFile) : UserDataHolderBase(), Fil
     }
 
     override fun getName(): @Nls(capitalization = Nls.Capitalization.Title) String {
-        return "Editor Name"
+        return "EtcdHelper Editor"
     }
 
     override fun setState(fileEditorState: FileEditorState) {}
