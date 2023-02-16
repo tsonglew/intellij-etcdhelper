@@ -27,6 +27,7 @@ package com.github.tsonglew.etcdhelper.view.editor
 import com.github.tsonglew.etcdhelper.action.KeyCreateAction
 import com.github.tsonglew.etcdhelper.action.KeyDeleteAction
 import com.github.tsonglew.etcdhelper.action.RefreshAction
+import com.github.tsonglew.etcdhelper.action.StartWatchAction
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
@@ -53,12 +54,12 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
 class EtcdKeyTreeDisplayPanel(
-        private val project: Project,
-        private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
-        splitterContainer: JBSplitter,
-        private val etcdConnectionInfo: EtcdConnectionInfo,
-        private val connectionManager: ConnectionManager,
-        private val doubleClickKeyAction: Consumer<String>
+    private val project: Project,
+    private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
+    splitterContainer: JBSplitter,
+    private val etcdConnectionInfo: EtcdConnectionInfo,
+    private val connectionManager: ConnectionManager,
+    private val doubleClickKeyAction: Consumer<String>
 ) : JPanel() {
     private var flatRootNode: DefaultMutableTreeNode? = null
     private var treeModel: DefaultTreeModel? = null
@@ -81,17 +82,21 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     private val keyTreeScrollPane = JBScrollPane(keyTree)
-    private val keyDisplayLoadingDecorator = LoadingDecorator(keyTreeScrollPane, keyValueDisplayPanel, 0)
+    private val keyDisplayLoadingDecorator =
+        LoadingDecorator(keyTreeScrollPane, keyValueDisplayPanel, 0)
     private val actions = DefaultActionGroup().apply {
         add(createRefreshAction())
         add(createKeyCreateAction())
         add(createDeleteAction())
         addSeparator()
+        add(createWatchAction())
     }
-    private val actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true)
+    private val actionToolbar =
+        ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true)
 
     private val keyCountLabel = JBLabel("Key counts: ${allKeys.size}")
-    private val keyCountPanel = JPanel(BorderLayout()).apply { add(keyCountLabel, BorderLayout.WEST) }
+    private val keyCountPanel =
+        JPanel(BorderLayout()).apply { add(keyCountLabel, BorderLayout.WEST) }
     private val keyDisplayPanel = JPanel(BorderLayout()).apply {
         minimumSize = Dimension(255, 100)
         add(actionToolbar.component, BorderLayout.NORTH)
@@ -106,9 +111,9 @@ class EtcdKeyTreeDisplayPanel(
 
     fun renderKeyTree(searchSymbol: String = "/", limit: Int = 0) {
         allKeys = connectionManager.getClient(etcdConnectionInfo)
-                ?.getByPrefix(searchSymbol, limit)
-                ?.apply { sortedBy { it.key.toString() } }
-                ?: listOf()
+            ?.getByPrefix(searchSymbol, limit)
+            ?.apply { sortedBy { it.key.toString() } }
+            ?: listOf()
         keyDisplayLoadingDecorator.startLoading(false)
         keyCountLabel.text = "Key counts: ${allKeys.size}"
         ReadAction.nonBlocking {
@@ -129,23 +134,29 @@ class EtcdKeyTreeDisplayPanel(
     }
 
 
-    private fun createKeyCreateAction(): KeyCreateAction = KeyCreateAction.create(
-            project,
-            connectionManager,
-            etcdConnectionInfo,
-            this,
-            keyValueDisplayPanel,
-            treeModel
+    private fun createKeyCreateAction() = KeyCreateAction.create(
+        project,
+        connectionManager,
+        etcdConnectionInfo,
+        this,
+        keyValueDisplayPanel,
+        treeModel
     )
 
-    private fun createDeleteAction(): KeyDeleteAction = KeyDeleteAction.create(
-            project,
-            connectionManager,
-            etcdConnectionInfo,
-            this,
-            keyValueDisplayPanel,
-            keyTree,
-            treeModel
+    private fun createDeleteAction() = KeyDeleteAction.create(
+        project,
+        connectionManager,
+        etcdConnectionInfo,
+        this,
+        keyValueDisplayPanel,
+        keyTree,
+        treeModel
+    )
+
+    private fun createWatchAction() = StartWatchAction.create(
+        project,
+        keyTree,
+        connectionManager,
     )
 
     private fun groupKeyTree() {
@@ -153,13 +164,13 @@ class EtcdKeyTreeDisplayPanel(
             return
         }
         groupRootNode(
-                flatRootNode!!,
-                LinkedHashMap<String, KeyValue>().apply {
-                    allKeys.forEach {
-                        this[it.key.toString()] = it
-                    }
-                },
-                keyValueDisplayPanel.groupSymbol.ifBlank { " " }
+            flatRootNode!!,
+            LinkedHashMap<String, KeyValue>().apply {
+                allKeys.forEach {
+                    this[it.key.toString()] = it
+                }
+            },
+            keyValueDisplayPanel.groupSymbol.ifBlank { " " }
         )
         treeModel = DefaultTreeModel(flatRootNode)
         keyTree.model = treeModel
@@ -167,9 +178,9 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     private fun groupRootNode(
-            node: DefaultMutableTreeNode,
-            keys: LinkedHashMap<String, KeyValue>,
-            groupSymbol: String
+        node: DefaultMutableTreeNode,
+        keys: LinkedHashMap<String, KeyValue>,
+        groupSymbol: String
     ) {
         if (groupSymbol.isEmpty()) {
             return
