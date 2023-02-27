@@ -34,6 +34,7 @@ import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
 import com.github.tsonglew.etcdhelper.table.AlarmListTableManager
 import com.github.tsonglew.etcdhelper.table.MemberListTableManager
 import com.github.tsonglew.etcdhelper.table.MemberStatusListTableManager
+import com.github.tsonglew.etcdhelper.table.WatchListTableManager
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFileSystem
 import com.github.tsonglew.etcdhelper.view.render.ConnectionTreeCellRenderer
 import com.intellij.openapi.Disposable
@@ -67,7 +68,7 @@ class MainToolWindow(private val project: Project) : Disposable {
                     // click right button
                     e?.button == MouseEvent.BUTTON3 -> {
                         selectionPath?.path?.let { createEditConnPopUp(e) }
-                                ?: createCreateConnPopUp(e)
+                            ?: createCreateConnPopUp(e)
                     }
 
                     selectionPath?.path == null -> return
@@ -80,9 +81,9 @@ class MainToolWindow(private val project: Project) : Disposable {
 
     private val propertyUtil = PropertyUtil(project)
     private val connectionManager = ConnectionManager.getInstance(
-            project,
-            propertyUtil,
-            connectionTree
+        project,
+        propertyUtil,
+        connectionTree
     ).apply {
         initConnections(connectionTree)
     }
@@ -105,32 +106,44 @@ class MainToolWindow(private val project: Project) : Disposable {
     private val connActionPanel = JPanel().apply {
         layout = BorderLayout()
         val actionToolBar = ActionManager
-                .getInstance()
-                .createActionToolbar(
-                        "ToolWindowToolbar",
-                        connActionGrp,
-                        true
-                ).also {
-                    it.targetComponent = this
-                    it.adjustTheSameSize(true)
-                }
+            .getInstance()
+            .createActionToolbar(
+                "ToolWindowToolbar",
+                connActionGrp,
+                true
+            ).also {
+                it.targetComponent = this
+                it.adjustTheSameSize(true)
+            }
         add(actionToolBar.component, BorderLayout.NORTH)
     }
 
     private val memberListTableManager = MemberListTableManager(connectionManager, null)
     private val alarmListTableManager = AlarmListTableManager(connectionManager, null)
     private val memberStatusListTableManager = MemberStatusListTableManager(connectionManager, null)
+    private val watchListTableManager = WatchListTableManager(connectionManager, null)
 
-    private val connectionInfoPanel = JBTabbedPane(JTabbedPane.TOP, JBTabbedPane.WRAP_TAB_LAYOUT).also {
-        it.addTab(memberListTableManager.tableName, JBScrollPane(memberListTableManager.table))
-        it.addTab(memberStatusListTableManager.tableName, JBScrollPane(memberStatusListTableManager.table))
-        it.addTab(alarmListTableManager.tableName, JBScrollPane(alarmListTableManager.table))
-    }
+    private val connectionInfoPanel =
+        JBTabbedPane(JTabbedPane.TOP, JBTabbedPane.WRAP_TAB_LAYOUT).also {
+            it.addTab(memberListTableManager.tableName, JBScrollPane(memberListTableManager.table))
+            it.addTab(
+                memberStatusListTableManager.tableName,
+                JBScrollPane(memberStatusListTableManager.table)
+            )
+            it.addTab(alarmListTableManager.tableName, JBScrollPane(alarmListTableManager.table))
+            it.addTab(watchListTableManager.tableName, JBScrollPane(watchListTableManager.table))
+        }
     val content = JPanel(BorderLayout()).apply {
         add(connActionPanel, BorderLayout.NORTH)
         add(OnePixelSplitter(true, 0.5f).apply {
-            firstComponent = JPanel(BorderLayout()).apply { add(JBScrollPane(connectionTree), BorderLayout.CENTER) }
-            secondComponent = JPanel(BorderLayout()).apply { add(connectionInfoPanel, BorderLayout.CENTER) }
+            firstComponent = JPanel(BorderLayout()).apply {
+                add(
+                    JBScrollPane(connectionTree),
+                    BorderLayout.CENTER
+                )
+            }
+            secondComponent =
+                JPanel(BorderLayout()).apply { add(connectionInfoPanel, BorderLayout.CENTER) }
         })
     }
 
@@ -149,21 +162,23 @@ class MainToolWindow(private val project: Project) : Disposable {
     }
 
     private fun createCreateConnPopUp(e: MouseEvent) {
-        ActionManager.getInstance().createActionPopupMenu("CreateConnPopUp", createConnActionGrp).apply {
-            component.show(connectionTree, e.x, e.y)
-        }
+        ActionManager.getInstance().createActionPopupMenu("CreateConnPopUp", createConnActionGrp)
+            .apply {
+                component.show(connectionTree, e.x, e.y)
+            }
     }
 
     private fun createEditConnPopUp(e: MouseEvent) {
-        ActionManager.getInstance().createActionPopupMenu("EditConnPopUp", editConnActionGrp).apply {
-            component.show(connectionTree, e.x, e.y)
-        }
+        ActionManager.getInstance().createActionPopupMenu("EditConnPopUp", editConnActionGrp)
+            .apply {
+                component.show(connectionTree, e.x, e.y)
+            }
     }
 
     private fun updateConnectionInfoPanel() {
         ReadAction.nonBlocking<Any?> {
             val connectionTreeNodePath = connectionTree.selectionPath?.path?.get(1)
-                    ?: return@nonBlocking
+                ?: return@nonBlocking
             val connectionNode = connectionTreeNodePath as DefaultMutableTreeNode
             val connectionInfo = connectionNode.userObject as EtcdConnectionInfo
             memberListTableManager.updateConnectionInfo(connectionInfo)

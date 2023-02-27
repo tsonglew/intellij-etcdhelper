@@ -24,6 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.client.impl
 
+import com.github.tsonglew.etcdhelper.api.WatchItem
 import com.github.tsonglew.etcdhelper.client.RpcClient
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.Notifier
@@ -53,6 +54,7 @@ class EtcdClient(
     private var maintenanceClient: Maintenance? = null
     private var watchClient: Watch? = null
     private var etcdUrls: Array<String>? = null
+    private val watchItems: MutableList<WatchItem> = mutableListOf()
 
     init {
         etcdUrls = etcdConnectionInfo.endpoints.split(",").toTypedArray()
@@ -115,26 +117,26 @@ class EtcdClient(
         return false
     }
 
-    override fun watch(
-        key: String, isPrefix: Boolean, noPut: Boolean, noDelete: Boolean,
-        prevKv: Boolean
-    ): Watcher {
+    override fun watch(watchItem: WatchItem): Watcher {
+        this.watchItems.add(watchItem)
         return watchClient!!.watch(
-            bytesOf(key),
+            bytesOf(watchItem.key),
             WatchOption.newBuilder()
-                .isPrefix(isPrefix)
-                .withNoDelete(noPut)
-                .withNoDelete(noDelete)
-                .withPrevKV(prevKv)
+                .isPrefix(watchItem.isPrefix)
+                .withNoDelete(watchItem.noDelete)
+                .withNoDelete(watchItem.noDelete)
+                .withPrevKV(watchItem.prevKv)
                 .build()
         ) {
             Notifier.notifyInfo(
                 "EtcdHelper WatchResponse",
-                "watch key: $key, value: ${it.events[0].keyValue.value}",
+                "watch key: ${watchItem.key}, value: ${it.events[0].keyValue.value}",
                 project
             )
         }
     }
+
+    override fun getWatchItems() = this.watchItems
 
     override fun delete(key: String) = try {
         thisLogger().info("delete key: $key")

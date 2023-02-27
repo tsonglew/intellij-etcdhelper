@@ -24,6 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.dialog
 
+import com.github.tsonglew.etcdhelper.api.WatchItem
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.intellij.openapi.project.Project
@@ -64,13 +65,17 @@ class WatchSettingsDialog(
     }
 
     override fun doOKAction() {
-        connectionManager.getClient(etcdConnectionInfo!!)!!.watch(
+        connectionManager.getClient(etcdConnectionInfo!!)!!.watch(toWatchItem())
+        close(OK_EXIT_CODE)
+    }
+
+    private fun toWatchItem(): WatchItem {
+        return WatchItem(
             key = keyTextField.text,
             isPrefix = isPrefixCheckBox.isSelected,
             noPut = noPutCheckBox.isSelected,
             noDelete = noDeleteCheckBox.isSelected,
             prevKv = prevKvCheckBox.isSelected
         )
-        close(OK_EXIT_CODE)
     }
 }
