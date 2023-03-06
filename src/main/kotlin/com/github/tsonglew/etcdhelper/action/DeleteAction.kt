@@ -26,4 +26,6 @@ package com.github.tsonglew.etcdhelper.action
 
 import com.intellij.icons.AllIcons
 
-class DeleteAction : CustomAction("Delete", "Delete", AllIcons.General.Remove)
+class DeleteAction : CustomAction("Delete", "Delete", AllIcons.General.Remove) {
+    override fun ifEnabledNotify(): Boolean = false
+}

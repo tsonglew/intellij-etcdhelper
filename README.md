@@ -7,6 +7,18 @@ a simple intellij platform etcd plugin
 ![JetBrains plugins](https://img.shields.io/jetbrains/plugin/d/19924?logo=etcd)
 ![JetBrains Plugins](https://img.shields.io/jetbrains/plugin/r/stars/19924)
 
+# Table of Content
+
+- [ScreenShots](#screenshots)
+    - [Tool Window](#tool-window)
+    - [Settings](#settings)
+    - [Watch](#watch)
+        - [Create](#create-watch-item)
+        - [Settings](#fill-up-the-settings-dialog)
+        - [Query](#fill-up-the-settings-dialog)
+        - [Delete](#stop-watch)
+- [Acknowledgements](#acknowledgements)
+
 ## Screenshots
 
 ### Tool Window
@@ -16,6 +28,24 @@ a simple intellij platform etcd plugin
 ### Settings
 
 ![settings.png](assets/images/settings.png)
+
+### Watch
+
+#### create watch item
+
+![create](assets/images/watch/create.png)
+
+#### fill up the settings dialog
+
+![create](assets/images/watch/settings.png)
+
+#### query watched items
+
+![create](assets/images/watch/list.png)
+
+#### stop watch
+
+![create](assets/images/watch/delete.png)
 
 # Acknowledgements
 

@@ -24,10 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.window
 
-import com.github.tsonglew.etcdhelper.action.ConnectionAddAction
-import com.github.tsonglew.etcdhelper.action.ConnectionDeleteAction
-import com.github.tsonglew.etcdhelper.action.EditAction
-import com.github.tsonglew.etcdhelper.action.RefreshAction
+import com.github.tsonglew.etcdhelper.action.*
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
@@ -155,7 +152,7 @@ class MainToolWindow(private val project: Project) : Disposable {
 
     private fun createWatchPanel(watchListTableManager: WatchListTableManager): JPanel {
         val actions = DefaultActionGroup().apply {
-//            add(DeleteAction().apply { action = { watchListTableManager.deleteSelectedRows() } })
+            add(DeleteAction().apply { action = { watchListTableManager.deleteSelectedRows() } })
             add(RefreshAction().apply { action = { updateConnectionInfoPanel() } })
             addSeparator()
         }
