@@ -29,6 +29,7 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.intellij.ui.JBColor
 import com.intellij.ui.table.JBTable
+import com.jetbrains.rd.util.remove
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.border.LineBorder
@@ -67,7 +68,6 @@ class WatchListTableManager(
         this.connectionInfo = connectionInfo
         val client = connectionManager.getClient(connectionInfo)
         val watchItems = client?.getWatchItems() ?: return
-        watchItems.add(WatchItem())
         sectionInfo.infoArray = watchItems.map {
             arrayOf(
                 it.key,
@@ -81,17 +81,20 @@ class WatchListTableManager(
         table.updateUI()
     }
 
-    //    fun deleteSelectedRows() {
-//        val client = connectionInfo?.let { connectionManager.getClient(it) } ?: return
-//        val watchItem = selectedWatchItem ?: return
-//        client.stopWatch(watchItem)
-//        updateWatchListTable(connectionInfo!!)
-//    }
-//    private val sectionInfo = TableSectionInfo(
-//        tableName,
-//        arrayOf("ID", "Name", "Peer URLs", "Client URLs"),
-//        arrayOf()
-//    )
-
-
+    fun deleteSelectedRows() {
+        if (table.selectedRow < 0) return
+        val client = connectionInfo?.let { connectionManager.getClient(it) } ?: return
+        val selectedItem = sectionInfo.infoArray[table.selectedRow]
+        val watchItem = WatchItem(
+            selectedItem[0],
+            selectedItem[1].toBoolean(),
+            selectedItem[2].toBoolean(),
+            selectedItem[3].toBoolean(),
+            selectedItem[4].toBoolean(),
+            null
+        )
+        client.stopWatch(watchItem)
+        sectionInfo.infoArray.remove(selectedItem)
+        updateConnectionInfo(connectionInfo!!)
+    }
 }

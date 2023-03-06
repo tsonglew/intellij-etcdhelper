@@ -132,11 +132,16 @@ class EtcdClient(
                 .withPrevKV(watchItem.prevKv)
                 .build()
         ) {
-            Notifier.notifyInfo(
-                "EtcdHelper WatchResponse",
-                "watch key: ${watchItem.key}, value: ${it.events[0].keyValue.value}",
-                project
-            )
+            it.events.forEach { e ->
+                Notifier.notifyInfo(
+                    "EtcdHelper WatchResponse",
+                    "watchKey: ${watchItem.key}, " +
+                            "key: ${e.keyValue.key}, " +
+                            "value: ${e.keyValue.value}, " +
+                            "type: ${e.eventType}",
+                    project
+                )
+            }
         }
         return watchItem.watcher!!
     }
