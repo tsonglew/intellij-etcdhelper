@@ -42,6 +42,7 @@ interface RpcClient {
     fun listClusterMembers(): MutableList<Member>?
     fun listAlarms(): MutableList<AlarmMember>
     fun listMemberStatus(): MutableList<StatusResponse>
-    fun watch(watchItem: WatchItem): Watcher
+    fun startWatch(watchItem: WatchItem): Watcher
+    fun stopWatch(watchItem: WatchItem)
     fun getWatchItems(): MutableList<WatchItem>
 }

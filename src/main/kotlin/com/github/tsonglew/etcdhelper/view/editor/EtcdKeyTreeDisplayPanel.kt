@@ -33,6 +33,7 @@ import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
 import com.github.tsonglew.etcdhelper.data.KeyTreeNode
 import com.github.tsonglew.etcdhelper.view.render.KeyTreeCellRenderer
+import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -54,6 +55,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
 class EtcdKeyTreeDisplayPanel(
+    private val mainToolWindow: MainToolWindow,
     private val project: Project,
     private val keyValueDisplayPanel: EtcdKeyValueDisplayPanel,
     splitterContainer: JBSplitter,
@@ -154,9 +156,11 @@ class EtcdKeyTreeDisplayPanel(
     )
 
     private fun createWatchAction() = StartWatchAction.create(
+        mainToolWindow,
         project,
         keyTree,
         connectionManager,
+        etcdConnectionInfo
     )
 
     private fun groupKeyTree() {
@@ -190,11 +194,11 @@ class EtcdKeyTreeDisplayPanel(
         keys.forEach {
             val idx = it.key.indexOf(groupSymbol)
             if (idx < 0) {
-                node.add(KeyTreeNode(it.value, it.key, node))
+                node.add(KeyTreeNode(it.value, it.key, node, groupSymbol))
             } else {
                 val newKey = it.key.substring(0, idx)
                 if (!keyNodeMap.containsKey(newKey)) {
-                    KeyTreeNode(it.value, newKey, node).also { n ->
+                    KeyTreeNode(it.value, newKey, node, groupSymbol).also { n ->
                         keyNodeMap[newKey] = n
                         nodeChildrenMap[n] = LinkedHashMap()
                         node.add(n)

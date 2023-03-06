@@ -24,6 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.table
 
+import com.github.tsonglew.etcdhelper.api.WatchItem
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.intellij.ui.JBColor
@@ -62,9 +63,11 @@ class WatchListTableManager(
         return table
     }
 
-    fun updateWatchListTable(connectionInfo: EtcdConnectionInfo) {
+    fun updateConnectionInfo(connectionInfo: EtcdConnectionInfo) {
+        this.connectionInfo = connectionInfo
         val client = connectionManager.getClient(connectionInfo)
         val watchItems = client?.getWatchItems() ?: return
+        watchItems.add(WatchItem())
         sectionInfo.infoArray = watchItems.map {
             arrayOf(
                 it.key,
@@ -77,4 +80,18 @@ class WatchListTableManager(
         model.setDataVector(sectionInfo.infoArray, sectionInfo.columns)
         table.updateUI()
     }
+
+    //    fun deleteSelectedRows() {
+//        val client = connectionInfo?.let { connectionManager.getClient(it) } ?: return
+//        val watchItem = selectedWatchItem ?: return
+//        client.stopWatch(watchItem)
+//        updateWatchListTable(connectionInfo!!)
+//    }
+//    private val sectionInfo = TableSectionInfo(
+//        tableName,
+//        arrayOf("ID", "Name", "Peer URLs", "Client URLs"),
+//        arrayOf()
+//    )
+
+
 }

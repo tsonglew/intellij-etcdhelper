@@ -27,6 +27,7 @@ package com.github.tsonglew.etcdhelper.action
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.dialog.WatchSettingsDialog
+import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
@@ -37,18 +38,26 @@ class StartWatchAction : CustomAction(
     "Watch",
     AllIcons.General.InspectionsEye
 ) {
+    override fun ifEnabledNotify(): Boolean = false
+
     companion object {
-        fun create(project: Project, connectionTree: Tree, connectionManager: ConnectionManager) =
+        fun create(
+            mainToolWindow: MainToolWindow,
+            project: Project,
+            connectionTree: Tree,
+            connectionManager: ConnectionManager,
+            etcdConnectionInfo: EtcdConnectionInfo
+        ) =
             StartWatchAction()
                 .apply {
                     action = {
-                        connectionTree.selectionPath?.lastPathComponent?.let {
-                            WatchSettingsDialog(
-                                project,
-                                connectionManager,
-                                (it as DefaultMutableTreeNode).userObject as EtcdConnectionInfo
-                            ).show()
-                        }
+                        WatchSettingsDialog(
+                            mainToolWindow,
+                            project,
+                            connectionManager,
+                            etcdConnectionInfo,
+                            connectionTree.selectionPath?.lastPathComponent as? DefaultMutableTreeNode
+                        ).show()
                     }
                 }
     }

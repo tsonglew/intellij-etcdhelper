@@ -27,6 +27,7 @@ package com.github.tsonglew.etcdhelper.common
 import com.github.tsonglew.etcdhelper.client.RpcClient
 import com.github.tsonglew.etcdhelper.client.impl.EtcdClient
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFile
+import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -36,9 +37,10 @@ import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.MutableTreeNode
 
 class ConnectionManager(
-        private val project: Project,
-        private val propertyUtil: PropertyUtil,
-        private val connectionTree: Tree
+    private val mainToolWindow: MainToolWindow,
+    private val project: Project,
+    private val propertyUtil: PropertyUtil,
+    private val connectionTree: Tree
 ) : Disposable {
 
     /**
@@ -50,11 +52,12 @@ class ConnectionManager(
     companion object {
         @JvmStatic
         fun getInstance(
-                project: Project,
-                propertyUtil: PropertyUtil,
-                connectionTree: Tree
+            mainToolWindow: MainToolWindow,
+            project: Project,
+            propertyUtil: PropertyUtil,
+            connectionTree: Tree
         ) = project.getService(ConnectionManager::class.java)
-                ?: ConnectionManager(project, propertyUtil, connectionTree)
+            ?: ConnectionManager(mainToolWindow, project, propertyUtil, connectionTree)
     }
 
     fun getClient(etcdConnectionInfo: EtcdConnectionInfo) = connectionMap[etcdConnectionInfo.id!!]
@@ -98,11 +101,12 @@ class ConnectionManager(
     fun getVirtualFile(connectionInfo: EtcdConnectionInfo): EtcdKeyValueDisplayVirtualFile {
         if (!connectionEditorMap.containsKey(connectionInfo.toString())) {
             connectionEditorMap[connectionInfo.toString()] = EtcdKeyValueDisplayVirtualFile(
-                    project,
-                    connectionInfo.endpoints,
-                    propertyUtil,
-                    connectionInfo,
-                    this
+                mainToolWindow,
+                project,
+                connectionInfo.endpoints,
+                propertyUtil,
+                connectionInfo,
+                this
             )
         }
         return connectionEditorMap[connectionInfo.toString()]!!
