@@ -53,11 +53,6 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
     override fun getState() = this
     override fun loadState(state: GlobalConnectionSetting) {
         XmlSerializerUtil.copyBean(state, this)
-//        connectionInfos = state.connectionInfos
-//        defaultSearchSymbol = state.defaultSearchSymbol
-//        defaultGroupSymbol = state.defaultGroupSymbol
-//        defaultSearchLimit = state.defaultSearchLimit
-//        enableCheatsheetPopup = state.enableCheatsheetPopup
         thisLogger().info("load state, connections: $connectionInfos,  defaultSearchSymbol: $defaultSearchSymbol, defaultGroupSymbol: $defaultGroupSymbol, defaultSearchLimit: $defaultSearchLimit, enableCheatsheetPopup: $enableCheatsheetPopup")
     }
 
