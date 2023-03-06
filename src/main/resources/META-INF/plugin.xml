@@ -2,6 +2,11 @@
 <idea-plugin>
   <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
   <change-notes><![CDATA[
+    1.3.0<br>
+    <ul>
+      <li>support etcd watch, for for details: <a href="https://github.com/tsonglew/intellij-etcdhelper#watch">intellij-etcdhelper watch</a></li>
+      <li>fix some bugs</li>
+    </ul>
     1.2.0<br>
     <ul>
       <li>support query on cluster status, members and metrics</li>
