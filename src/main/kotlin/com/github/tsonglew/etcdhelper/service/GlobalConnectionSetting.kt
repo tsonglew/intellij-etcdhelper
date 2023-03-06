@@ -36,7 +36,8 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>,
     ConnectionSettings {
 
-    private var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
+    @Suppress("MemberVisibilityCanBePrivate")
+    var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
     var defaultSearchSymbol = "/"
     var defaultGroupSymbol = "/"
     var defaultSearchLimit = 1000
