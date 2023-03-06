@@ -30,10 +30,13 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.util.xmlb.XmlSerializerUtil
 
 @State(name = "EtcdHelper", storages = [Storage("etcd-helper-cache.xml")])
-class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>, ConnectionSettings {
+class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>,
+    ConnectionSettings {
 
+    @Suppress("MemberVisibilityCanBePrivate")
     var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
     var defaultSearchSymbol = "/"
     var defaultGroupSymbol = "/"
@@ -43,17 +46,13 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
     companion object {
         @JvmStatic
         fun getInstance(): GlobalConnectionSetting = ApplicationManager
-                .getApplication()
-                .getService(GlobalConnectionSetting::class.java)
+            .getApplication()
+            .getService(GlobalConnectionSetting::class.java)
     }
 
     override fun getState() = this
     override fun loadState(state: GlobalConnectionSetting) {
-        connectionInfos = state.connectionInfos
-        defaultSearchSymbol = state.defaultSearchSymbol
-        defaultGroupSymbol = state.defaultGroupSymbol
-        defaultSearchLimit = state.defaultSearchLimit
-        enableCheatsheetPopup = state.enableCheatsheetPopup
+        XmlSerializerUtil.copyBean(state, this)
         thisLogger().info("load state, connections: $connectionInfos,  defaultSearchSymbol: $defaultSearchSymbol, defaultGroupSymbol: $defaultGroupSymbol, defaultSearchLimit: $defaultSearchLimit, enableCheatsheetPopup: $enableCheatsheetPopup")
     }
 

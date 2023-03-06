@@ -27,6 +27,7 @@ package com.github.tsonglew.etcdhelper.view.editor
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
+import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -34,15 +35,19 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class EtcdKeyValueDisplayVirtualFile(
-        val project: Project,
-        private val name: String,
-        propertyUtil: PropertyUtil,
-        etcdConnectionInfo: EtcdConnectionInfo,
-        connectionManager: ConnectionManager
-): VirtualFile() {
+    mainToolWindow: MainToolWindow,
+    val project: Project,
+    private val name: String,
+    propertyUtil: PropertyUtil,
+    etcdConnectionInfo: EtcdConnectionInfo,
+    connectionManager: ConnectionManager
+) : VirtualFile() {
 
     val etcdKeyValueDisplayPanel: EtcdKeyValueDisplayPanel =
-            EtcdKeyValueDisplayPanel(project, propertyUtil, etcdConnectionInfo, connectionManager)
+        EtcdKeyValueDisplayPanel(
+            mainToolWindow, project, propertyUtil, etcdConnectionInfo,
+            connectionManager
+        )
 
     override fun getName() = name
 
@@ -62,7 +67,11 @@ class EtcdKeyValueDisplayVirtualFile(
 
     override fun getFileType(): FileType = KeyValueDisplayFileType()
 
-    override fun getOutputStream(requestor: Any?, newModificationStamp: Long, newTimeStamp: Long): OutputStream {
+    override fun getOutputStream(
+        requestor: Any?,
+        newModificationStamp: Long,
+        newTimeStamp: Long
+    ): OutputStream {
         TODO("Not yet implemented")
     }
 
