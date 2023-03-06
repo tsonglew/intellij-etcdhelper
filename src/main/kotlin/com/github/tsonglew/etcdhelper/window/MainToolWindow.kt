@@ -24,9 +24,10 @@
 
 package com.github.tsonglew.etcdhelper.window
 
-import com.github.tsonglew.etcdhelper.action.AddAction
-import com.github.tsonglew.etcdhelper.action.DeleteAction
+import com.github.tsonglew.etcdhelper.action.ConnectionAddAction
+import com.github.tsonglew.etcdhelper.action.ConnectionDeleteAction
 import com.github.tsonglew.etcdhelper.action.EditAction
+import com.github.tsonglew.etcdhelper.action.RefreshAction
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
@@ -39,6 +40,7 @@ import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFile
 import com.github.tsonglew.etcdhelper.view.render.ConnectionTreeCellRenderer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
@@ -81,6 +83,7 @@ class MainToolWindow(private val project: Project) : Disposable {
 
     private val propertyUtil = PropertyUtil(project)
     private val connectionManager = ConnectionManager.getInstance(
+        this,
         project,
         propertyUtil,
         connectionTree
@@ -89,16 +92,16 @@ class MainToolWindow(private val project: Project) : Disposable {
     }
 
     private val connActionGrp = DefaultActionGroup().apply {
-        add(AddAction.create(project, connectionTree, connectionManager))
-        add(DeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
+        add(ConnectionAddAction.create(project, connectionTree, connectionManager))
+        add(ConnectionDeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
         add(EditAction.create(project, connectionTree, connectionManager))
         addSeparator()
     }
     private val createConnActionGrp = DefaultActionGroup().apply {
-        add(AddAction.create(project, connectionTree, connectionManager))
+        add(ConnectionAddAction.create(project, connectionTree, connectionManager))
     }
     private val editConnActionGrp = DefaultActionGroup().apply {
-        add(DeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
+        add(ConnectionDeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
         add(EditAction.create(project, connectionTree, connectionManager))
         addSeparator()
     }
@@ -131,7 +134,10 @@ class MainToolWindow(private val project: Project) : Disposable {
                 JBScrollPane(memberStatusListTableManager.table)
             )
             it.addTab(alarmListTableManager.tableName, JBScrollPane(alarmListTableManager.table))
-            it.addTab(watchListTableManager.tableName, JBScrollPane(watchListTableManager.table))
+            it.addTab(
+                watchListTableManager.tableName,
+                createWatchPanel(watchListTableManager)
+            )
         }
     val content = JPanel(BorderLayout()).apply {
         add(connActionPanel, BorderLayout.NORTH)
@@ -145,6 +151,26 @@ class MainToolWindow(private val project: Project) : Disposable {
             secondComponent =
                 JPanel(BorderLayout()).apply { add(connectionInfoPanel, BorderLayout.CENTER) }
         })
+    }
+
+    private fun createWatchPanel(watchListTableManager: WatchListTableManager): JPanel {
+        val actions = DefaultActionGroup().apply {
+//            add(DeleteAction().apply { action = { watchListTableManager.deleteSelectedRows() } })
+            add(RefreshAction().apply { action = { updateConnectionInfoPanel() } })
+            addSeparator()
+        }
+        val actionsToolBar = ActionManager.getInstance()
+            .createActionToolbar(ActionPlaces.TOOLBAR, actions, true)
+            .apply {
+                this.targetComponent = watchListTableManager.table
+            }
+        return JPanel(BorderLayout()).apply {
+            add(
+                actionsToolBar.component,
+                BorderLayout.NORTH
+            )
+            add(JBScrollPane(watchListTableManager.table), BorderLayout.CENTER)
+        }
     }
 
     private fun openConnection() {
@@ -175,7 +201,7 @@ class MainToolWindow(private val project: Project) : Disposable {
             }
     }
 
-    private fun updateConnectionInfoPanel() {
+    fun updateConnectionInfoPanel() {
         ReadAction.nonBlocking<Any?> {
             val connectionTreeNodePath = connectionTree.selectionPath?.path?.get(1)
                 ?: return@nonBlocking
@@ -184,6 +210,7 @@ class MainToolWindow(private val project: Project) : Disposable {
             memberListTableManager.updateConnectionInfo(connectionInfo)
             alarmListTableManager.updateAlarmInfo(connectionInfo)
             memberStatusListTableManager.updateMemberStatusInfo(connectionInfo)
+            watchListTableManager.updateConnectionInfo(connectionInfo)
         }.submit(ThreadPoolManager.executor)
     }
 

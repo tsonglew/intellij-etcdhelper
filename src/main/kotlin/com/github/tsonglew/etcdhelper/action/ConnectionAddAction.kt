@@ -52,16 +52,21 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 
-class AddAction : CustomAction(
-        "Add Connection",
-        "Add Connection",
-        AllIcons.General.Add
+class ConnectionAddAction : CustomAction(
+    "Add Connection",
+    "Add Connection",
+    AllIcons.General.Add
 ) {
     companion object {
-        fun create(project: Project, connectionTree: Tree, connectionManager: ConnectionManager) = AddAction()
+        fun create(project: Project, connectionTree: Tree, connectionManager: ConnectionManager) =
+            ConnectionAddAction()
                 .apply {
                     action = {
-                        EtcdConnectionSettingsDialog(project, connectionTree, connectionManager).show()
+                        EtcdConnectionSettingsDialog(
+                            project,
+                            connectionTree,
+                            connectionManager
+                        ).show()
                     }
                 }
     }

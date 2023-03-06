@@ -27,6 +27,8 @@ package com.github.tsonglew.etcdhelper.dialog
 import com.github.tsonglew.etcdhelper.api.WatchItem
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.data.KeyTreeNode
+import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.JBCheckBox
@@ -34,11 +36,14 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.tree.DefaultMutableTreeNode
 
 class WatchSettingsDialog(
+    private val mainToolWindow: MainToolWindow,
     private val project: Project,
     private val connectionManager: ConnectionManager,
-    private val etcdConnectionInfo: EtcdConnectionInfo? = null
+    private val etcdConnectionInfo: EtcdConnectionInfo? = null,
+    private val selectionNode: DefaultMutableTreeNode?
 ) : DialogWrapper(project) {
 
     private lateinit var panel: JPanel
@@ -51,6 +56,21 @@ class WatchSettingsDialog(
     init {
         super.init()
         title = "Watch Settings"
+        if (selectionNode != null && selectionNode is KeyTreeNode) {
+            var node = selectionNode
+            var fullKeyName = node.keyName
+            node = node.parent
+            while (node is KeyTreeNode) {
+                fullKeyName = node.keyName + node.groupSymbol + fullKeyName
+                if (node.parent !is KeyTreeNode) {
+                    break
+                }
+                node = node.parent as KeyTreeNode
+            }
+            keyTextField.text =
+                fullKeyName + if (selectionNode.isLeaf) "" else selectionNode.groupSymbol
+            isPrefixCheckBox.isSelected = !selectionNode.isLeaf
+        }
     }
 
     override fun createCenterPanel(): JComponent {
@@ -65,17 +85,19 @@ class WatchSettingsDialog(
     }
 
     override fun doOKAction() {
-        connectionManager.getClient(etcdConnectionInfo!!)!!.watch(toWatchItem())
+        connectionManager.getClient(etcdConnectionInfo!!)!!.startWatch(toWatchItem())
+        mainToolWindow.updateConnectionInfoPanel()
         close(OK_EXIT_CODE)
     }
 
     private fun toWatchItem(): WatchItem {
         return WatchItem(
-            key = keyTextField.text,
-            isPrefix = isPrefixCheckBox.isSelected,
-            noPut = noPutCheckBox.isSelected,
-            noDelete = noDeleteCheckBox.isSelected,
-            prevKv = prevKvCheckBox.isSelected
+            keyTextField.text,
+            isPrefixCheckBox.isSelected,
+            noPutCheckBox.isSelected,
+            noDeleteCheckBox.isSelected,
+            prevKvCheckBox.isSelected,
+            null
         )
     }
 }

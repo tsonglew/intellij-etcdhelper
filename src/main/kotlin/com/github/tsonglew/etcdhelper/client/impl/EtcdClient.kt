@@ -54,7 +54,8 @@ class EtcdClient(
     private var maintenanceClient: Maintenance? = null
     private var watchClient: Watch? = null
     private var etcdUrls: Array<String>? = null
-    private val watchItems: MutableList<WatchItem> = mutableListOf()
+
+    private val watchItemsMap: HashMap<String, WatchItem> = HashMap()
 
     init {
         etcdUrls = etcdConnectionInfo.endpoints.split(",").toTypedArray()
@@ -117,9 +118,12 @@ class EtcdClient(
         return false
     }
 
-    override fun watch(watchItem: WatchItem): Watcher {
-        this.watchItems.add(watchItem)
-        return watchClient!!.watch(
+    override fun startWatch(watchItem: WatchItem): Watcher {
+        if (watchItemsMap.containsKey(watchItem.toString())) {
+            return watchItemsMap[watchItem.toString()]!!.watcher!!
+        }
+        watchItemsMap[watchItem.toString()] = watchItem
+        watchItem.watcher = watchClient!!.watch(
             bytesOf(watchItem.key),
             WatchOption.newBuilder()
                 .isPrefix(watchItem.isPrefix)
@@ -134,9 +138,17 @@ class EtcdClient(
                 project
             )
         }
+        return watchItem.watcher!!
     }
 
-    override fun getWatchItems() = this.watchItems
+    override fun stopWatch(watchItem: WatchItem) {
+        watchItemsMap[watchItem.toString()]?.watcher?.apply {
+            close()
+            watchItemsMap.remove(watchItem.toString())
+        }
+    }
+
+    override fun getWatchItems() = ArrayList(this.watchItemsMap.values)
 
     override fun delete(key: String) = try {
         thisLogger().info("delete key: $key")

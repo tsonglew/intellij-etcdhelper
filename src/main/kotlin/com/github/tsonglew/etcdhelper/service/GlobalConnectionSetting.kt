@@ -32,9 +32,10 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.thisLogger
 
 @State(name = "EtcdHelper", storages = [Storage("etcd-helper-cache.xml")])
-class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>, ConnectionSettings {
+class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>,
+    ConnectionSettings {
 
-    var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
+    private var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
     var defaultSearchSymbol = "/"
     var defaultGroupSymbol = "/"
     var defaultSearchLimit = 1000
@@ -43,8 +44,8 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
     companion object {
         @JvmStatic
         fun getInstance(): GlobalConnectionSetting = ApplicationManager
-                .getApplication()
-                .getService(GlobalConnectionSetting::class.java)
+            .getApplication()
+            .getService(GlobalConnectionSetting::class.java)
     }
 
     override fun getState() = this

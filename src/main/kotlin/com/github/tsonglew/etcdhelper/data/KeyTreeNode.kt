@@ -30,7 +30,8 @@ import javax.swing.tree.DefaultMutableTreeNode
 class KeyTreeNode(
     val keyValue: KeyValue,
     var keyName: String,
-    val parent: DefaultMutableTreeNode
+    val parent: DefaultMutableTreeNode,
+    val groupSymbol: String
 ) : DefaultMutableTreeNode(keyValue) {
     val keyTreeDisplayName get() = (if (isRemoved) "(Removed)" else "") + keyName
     var isRemoved = false
