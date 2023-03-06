@@ -30,6 +30,7 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.util.xmlb.XmlSerializerUtil
 
 @State(name = "EtcdHelper", storages = [Storage("etcd-helper-cache.xml")])
 class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting>,
@@ -50,11 +51,12 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
 
     override fun getState() = this
     override fun loadState(state: GlobalConnectionSetting) {
-        connectionInfos = state.connectionInfos
-        defaultSearchSymbol = state.defaultSearchSymbol
-        defaultGroupSymbol = state.defaultGroupSymbol
-        defaultSearchLimit = state.defaultSearchLimit
-        enableCheatsheetPopup = state.enableCheatsheetPopup
+        XmlSerializerUtil.copyBean(state, this)
+//        connectionInfos = state.connectionInfos
+//        defaultSearchSymbol = state.defaultSearchSymbol
+//        defaultGroupSymbol = state.defaultGroupSymbol
+//        defaultSearchLimit = state.defaultSearchLimit
+//        enableCheatsheetPopup = state.enableCheatsheetPopup
         thisLogger().info("load state, connections: $connectionInfos,  defaultSearchSymbol: $defaultSearchSymbol, defaultGroupSymbol: $defaultGroupSymbol, defaultSearchLimit: $defaultSearchLimit, enableCheatsheetPopup: $enableCheatsheetPopup")
     }
 
