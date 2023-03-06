@@ -135,10 +135,10 @@ class EtcdClient(
             it.events.forEach { e ->
                 Notifier.notifyInfo(
                     "EtcdHelper WatchResponse",
-                    "watchKey: ${watchItem.key}, " +
-                            "key: ${e.keyValue.key}, " +
-                            "value: ${e.keyValue.value}, " +
-                            "type: ${e.eventType}",
+                    "type: ${e.eventType}, " +
+                            "watch key: ${watchItem.key}, " +
+                            "event key: ${e.keyValue.key}, " +
+                            "value: ${e.keyValue.value}",
                     project
                 )
             }
