@@ -24,8 +24,41 @@
 
 package com.github.tsonglew.etcdhelper.action
 
+import com.github.tsonglew.etcdhelper.common.ConnectionManager
+import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import com.github.tsonglew.etcdhelper.dialog.WatchSettingsDialog
+import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.project.Project
+import com.intellij.ui.treeStructure.Tree
+import javax.swing.tree.DefaultMutableTreeNode
 
-class DeleteAction : CustomAction("Delete", "Delete", AllIcons.General.Remove) {
+class StartWatchAction : CustomAction(
+    "Watch",
+    "Watch",
+    AllIcons.General.InspectionsEye
+) {
     override fun ifEnabledNotify(): Boolean = false
+
+    companion object {
+        fun create(
+            mainToolWindow: MainToolWindow,
+            project: Project,
+            connectionTree: Tree,
+            connectionManager: ConnectionManager,
+            etcdConnectionInfo: EtcdConnectionInfo
+        ) =
+            StartWatchAction()
+                .apply {
+                    action = {
+                        WatchSettingsDialog(
+                            mainToolWindow,
+                            project,
+                            connectionManager,
+                            etcdConnectionInfo,
+                            connectionTree.selectionPath?.lastPathComponent as? DefaultMutableTreeNode
+                        ).show()
+                    }
+                }
+    }
 }

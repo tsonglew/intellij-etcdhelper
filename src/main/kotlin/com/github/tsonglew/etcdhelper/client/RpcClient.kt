@@ -24,7 +24,9 @@
 
 package com.github.tsonglew.etcdhelper.client
 
+import com.github.tsonglew.etcdhelper.api.WatchItem
 import io.etcd.jetcd.KeyValue
+import io.etcd.jetcd.Watch.Watcher
 import io.etcd.jetcd.cluster.Member
 import io.etcd.jetcd.maintenance.AlarmMember
 import io.etcd.jetcd.maintenance.StatusResponse
@@ -40,4 +42,7 @@ interface RpcClient {
     fun listClusterMembers(): MutableList<Member>?
     fun listAlarms(): MutableList<AlarmMember>
     fun listMemberStatus(): MutableList<StatusResponse>
+    fun startWatch(watchItem: WatchItem): Watcher
+    fun stopWatch(watchItem: WatchItem)
+    fun getWatchItems(): MutableList<WatchItem>
 }

@@ -31,18 +31,24 @@ import com.intellij.openapi.project.DumbAware
 import javax.swing.Icon
 
 abstract class CustomAction(
-        private val text: String,
-        description: String,
-        icon: Icon
+    private val text: String,
+    description: String,
+    icon: Icon
 ) : AnAction(text, description, icon), DumbAware {
 
     lateinit var action: (e: AnActionEvent) -> Unit
 
+    protected open fun ifEnabledNotify(): Boolean = true
+
     override fun actionPerformed(e: AnActionEvent) {
         val messageBus = e.project?.messageBus ?: return
         val publisher = messageBus.syncPublisher(CustomActionListener.TOPIC)
-        publisher.beforeAction(e.project)
+        if (ifEnabledNotify()) {
+            publisher.beforeAction(e.project)
+        }
         action.invoke(e)
-        publisher.afterAction(e.project, text)
+        if (ifEnabledNotify()) {
+            publisher.afterAction(e.project, text)
+        }
     }
 }

@@ -22,17 +22,20 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.data
+package com.github.tsonglew.etcdhelper.api
 
-import io.etcd.jetcd.KeyValue
-import javax.swing.tree.DefaultMutableTreeNode
+import io.etcd.jetcd.Watch.Watcher
 
-class KeyTreeNode(
-    val keyValue: KeyValue,
-    var keyName: String,
-    val parent: DefaultMutableTreeNode,
-    val groupSymbol: String
-) : DefaultMutableTreeNode(keyValue) {
-    val keyTreeDisplayName get() = (if (isRemoved) "(Removed)" else "") + keyName
-    var isRemoved = false
+data class WatchItem(
+    val key: String,
+    val isPrefix: Boolean,
+    val noPut: Boolean,
+    val noDelete: Boolean,
+    val prevKv: Boolean,
+    var watcher: Watcher?
+) {
+    constructor() : this("", false, false, false, false, null)
+
+    override fun toString() =
+        "WatchItem(key='$key', isPrefix=$isPrefix, noPut=$noPut, noDelete=$noDelete, prevKv=$prevKv)"
 }

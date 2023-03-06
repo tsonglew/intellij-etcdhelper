@@ -24,6 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.client.impl
 
+import com.github.tsonglew.etcdhelper.api.WatchItem
 import com.github.tsonglew.etcdhelper.client.RpcClient
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.Notifier
@@ -32,20 +33,18 @@ import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import io.etcd.jetcd.*
+import io.etcd.jetcd.Watch.Watcher
 import io.etcd.jetcd.cluster.Member
 import io.etcd.jetcd.maintenance.AlarmMember
-import io.etcd.jetcd.options.DeleteOption
-import io.etcd.jetcd.options.GetOption
-import io.etcd.jetcd.options.LeaseOption
-import io.etcd.jetcd.options.PutOption
+import io.etcd.jetcd.options.*
 import java.util.concurrent.TimeUnit
 
 /**
  * @author tsonglew
  */
 class EtcdClient(
-        val etcdConnectionInfo: EtcdConnectionInfo,
-        val project: Project? = null
+    val etcdConnectionInfo: EtcdConnectionInfo,
+    val project: Project? = null
 ) : RpcClient {
     private var client: Client? = null
     private var kvClient: KV? = null
@@ -53,7 +52,10 @@ class EtcdClient(
     private var leaseClient: Lease? = null
     private var clusterClient: Cluster? = null
     private var maintenanceClient: Maintenance? = null
+    private var watchClient: Watch? = null
     private var etcdUrls: Array<String>? = null
+
+    private val watchItemsMap: HashMap<String, WatchItem> = HashMap()
 
     init {
         etcdUrls = etcdConnectionInfo.endpoints.split(",").toTypedArray()
@@ -71,6 +73,7 @@ class EtcdClient(
             leaseClient = client!!.leaseClient
             clusterClient = client!!.clusterClient
             maintenanceClient = client!!.maintenanceClient
+            watchClient = client!!.watchClient
         } catch (e: Exception) {
             thisLogger().info("invalid connection info")
         }
@@ -82,6 +85,7 @@ class EtcdClient(
         leaseClient?.close()
         clusterClient?.close()
         maintenanceClient?.close()
+        watchClient?.close()
 
         client!!.close()
     }
@@ -103,9 +107,9 @@ class EtcdClient(
         try {
             val leaseId = leaseClient!!.grant(ttlSecs.toLong()).get().id
             kvClient!!.put(
-                    bytesOf(key),
-                    bytesOf(value),
-                    PutOption.newBuilder().withLeaseId(leaseId).build()
+                bytesOf(key),
+                bytesOf(value),
+                PutOption.newBuilder().withLeaseId(leaseId).build()
             )[1L, TimeUnit.SECONDS]
             return true
         } catch (e: Exception) {
@@ -113,6 +117,43 @@ class EtcdClient(
         }
         return false
     }
+
+    override fun startWatch(watchItem: WatchItem): Watcher {
+        if (watchItemsMap.containsKey(watchItem.toString())) {
+            return watchItemsMap[watchItem.toString()]!!.watcher!!
+        }
+        watchItemsMap[watchItem.toString()] = watchItem
+        watchItem.watcher = watchClient!!.watch(
+            bytesOf(watchItem.key),
+            WatchOption.newBuilder()
+                .isPrefix(watchItem.isPrefix)
+                .withNoDelete(watchItem.noDelete)
+                .withNoDelete(watchItem.noDelete)
+                .withPrevKV(watchItem.prevKv)
+                .build()
+        ) {
+            it.events.forEach { e ->
+                Notifier.notifyInfo(
+                    "EtcdHelper WatchResponse",
+                    "type: ${e.eventType}, " +
+                            "watch key: ${watchItem.key}, " +
+                            "event key: ${e.keyValue.key}, " +
+                            "value: ${e.keyValue.value}",
+                    project
+                )
+            }
+        }
+        return watchItem.watcher!!
+    }
+
+    override fun stopWatch(watchItem: WatchItem) {
+        watchItemsMap[watchItem.toString()]?.watcher?.apply {
+            close()
+            watchItemsMap.remove(watchItem.toString())
+        }
+    }
+
+    override fun getWatchItems() = ArrayList(this.watchItemsMap.values)
 
     override fun delete(key: String) = try {
         thisLogger().info("delete key: $key")
@@ -136,7 +177,8 @@ class EtcdClient(
         // TODO: use serializable & keyOnly to optimize performance
         try {
             val searchKey = if (key.isBlank()) ByteSequence.from(byteArrayOf(0)) else bytesOf(key)
-            val endKey = if (key.isBlank()) ByteSequence.from(byteArrayOf(0)) else prefixEndOf(searchKey)
+            val endKey =
+                if (key.isBlank()) ByteSequence.from(byteArrayOf(0)) else prefixEndOf(searchKey)
             val optionBuilder = GetOption.newBuilder().withRange(endKey)
             if ((limit != null) && (limit > 0)) {
                 optionBuilder.withLimit(limit.toLong())
@@ -146,8 +188,10 @@ class EtcdClient(
             thisLogger().info("get by prefix error: ${e.message}")
             e.printStackTrace()
             project ?: return emptyList()
-            Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo",
-                    project)
+            Notifier.notifyError(
+                "Connection Failed", "Please check your connection info: $etcdConnectionInfo",
+                project
+            )
         }
         return emptyList()
     }
@@ -214,18 +258,27 @@ class EtcdClient(
             thisLogger().info("get key $key error: ${e.message}")
             e.printStackTrace()
             project ?: return emptyList()
-            Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
+            Notifier.notifyError(
+                "Connection Failed",
+                "Please check your connection info: $etcdConnectionInfo",
+                project
+            )
         }
         return emptyList()
     }
 
-    override fun getLeaseInfo(leaseId: Long) = leaseClient!!.timeToLive(leaseId, LeaseOption.DEFAULT).get().tTl
+    override fun getLeaseInfo(leaseId: Long) =
+        leaseClient!!.timeToLive(leaseId, LeaseOption.DEFAULT).get().tTl
 
     override fun listClusterMembers(): MutableList<Member> = try {
         clusterClient!!.listMember().get(1, TimeUnit.SECONDS).members
     } catch (e: Exception) {
         thisLogger().info("list cluster members error: ${e.message}")
-        Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
+        Notifier.notifyError(
+            "Connection Failed",
+            "Please check your connection info: $etcdConnectionInfo",
+            project
+        )
         mutableListOf()
     }
 
@@ -233,7 +286,11 @@ class EtcdClient(
         maintenanceClient!!.listAlarms().get(1, TimeUnit.SECONDS).alarms
     } catch (e: Exception) {
         thisLogger().info("list alarms error: ${e.message}")
-        Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
+        Notifier.notifyError(
+            "Connection Failed",
+            "Please check your connection info: $etcdConnectionInfo",
+            project
+        )
         mutableListOf()
     }
 
@@ -243,7 +300,11 @@ class EtcdClient(
         }.toMutableList()
     } catch (e: Exception) {
         thisLogger().info("list member status error: ${e.message}")
-        Notifier.notifyError("Connection Failed", "Please check your connection info: $etcdConnectionInfo", project)
+        Notifier.notifyError(
+            "Connection Failed",
+            "Please check your connection info: $etcdConnectionInfo",
+            project
+        )
         mutableListOf()
     }
 
