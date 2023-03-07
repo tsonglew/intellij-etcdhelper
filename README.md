@@ -17,6 +17,7 @@ a simple intellij platform etcd plugin
         - [Settings](#fill-up-the-settings-dialog)
         - [Query](#fill-up-the-settings-dialog)
         - [Delete](#stop-watch)
+        - [Notification](#get-notification-when-event-triggered)
 - [Acknowledgements](#acknowledgements)
 
 ## Screenshots
@@ -37,15 +38,19 @@ a simple intellij platform etcd plugin
 
 #### fill up the settings dialog
 
-![create](assets/images/watch/settings.png)
+![settings](assets/images/watch/settings.png)
 
 #### query watched items
 
-![create](assets/images/watch/list.png)
+![list](assets/images/watch/list.png)
 
 #### stop watch
 
-![create](assets/images/watch/delete.png)
+![delete](assets/images/watch/delete.png)
+
+#### get notification when event triggered
+
+![notify](assets/images/watch/notify.png)
 
 # Acknowledgements
 
