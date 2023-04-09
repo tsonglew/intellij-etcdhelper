@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.tsonglew"
-version = "1.3.0"
+version = "1.3.1"
 
 repositories {
     mavenCentral()
@@ -22,7 +22,7 @@ intellij {
 }
 
 dependencies {
-    implementation("io.etcd:jetcd-core:0.7.3") {
+    implementation("io.etcd:jetcd-core:0.7.5") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
