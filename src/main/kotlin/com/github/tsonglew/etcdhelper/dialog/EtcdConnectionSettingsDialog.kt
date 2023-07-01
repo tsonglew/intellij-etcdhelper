@@ -28,20 +28,24 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PasswordUtil
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.treeStructure.Tree
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.JPanel
 
 class EtcdConnectionSettingsDialog(
-        private val project: Project,
-        private val connectionTree: Tree,
-        private val connectionManager: ConnectionManager,
-        private val etcdConnectionInfo: EtcdConnectionInfo? = null
+    private val project: Project,
+    private val connectionTree: Tree,
+    private val connectionManager: ConnectionManager,
+    private val etcdConnectionInfo: EtcdConnectionInfo? = null
 ) : DialogWrapper(project) {
 
     private lateinit var panel: JPanel
@@ -63,12 +67,38 @@ class EtcdConnectionSettingsDialog(
         }
     }
 
+    private val endpointGroups = mutableListOf<EndpointItem>()
+
+
     override fun createCenterPanel(): JComponent {
         panel = panel {
             row("remark: ") { cell(remarkTextField) }
             row("endpoints: ") { cell(endpointsTextField) }
             row("username: ") { cell(usernameTextField) }
             row("password: ") { cell(passwordTextField) }
+            group("Endpoints: ") {
+                row("Row 1:") {
+                    label("http://")
+                        .gap(RightGap.SMALL)
+                    textField()
+                        .gap(RightGap.SMALL)
+                        .columns(20)
+                        .resizableColumn()
+                    label(":")
+                        .gap(RightGap.SMALL)
+                    textField()
+                        .gap(RightGap.SMALL)
+                        .columns(5)
+                        .text("80")
+                        .resizableColumn()
+                    val action = object : DumbAwareAction(AllIcons.General.Add) {
+                        override fun actionPerformed(e: AnActionEvent) {
+                            panel.add(JLabel("12345"))
+                        }
+                    }
+                    actionButton(action)
+                }.layout(RowLayout.PARENT_GRID)
+            }
         }
         return panel
     }
@@ -84,9 +114,11 @@ class EtcdConnectionSettingsDialog(
     }
 
     private fun toEtcdConfiguration() = EtcdConnectionInfo(
-            endpointsTextField.text,
-            usernameTextField.text,
-            etcdConnectionInfo?.id,
-            remarkTextField.text
+        endpointsTextField.text,
+        usernameTextField.text,
+        etcdConnectionInfo?.id,
+        remarkTextField.text
     )
+
+    data class EndpointItem(val host: String, val port: String)
 }

@@ -24,14 +24,22 @@
 
 package com.github.tsonglew.etcdhelper.treenode
 
+import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import javax.swing.tree.DefaultMutableTreeNode
 
 class EtcdConnectionTreeNode(
-    private val etcdConnectionInfo: EtcdConnectionInfo?
-): DefaultMutableTreeNode(etcdConnectionInfo) {
+    private val etcdConnectionInfo: EtcdConnectionInfo?,
+    private val connectionManager: ConnectionManager?
+) : DefaultMutableTreeNode(etcdConnectionInfo) {
 
-    constructor(): this(null)
+    val active: Boolean
+        get() {
+            if (etcdConnectionInfo == null || connectionManager == null) return false
+            return connectionManager.getClient(etcdConnectionInfo)?.isActive() ?: false
+        }
+
+    constructor() : this(null, null)
 
     override fun toString(): String {
         return etcdConnectionInfo.toString()

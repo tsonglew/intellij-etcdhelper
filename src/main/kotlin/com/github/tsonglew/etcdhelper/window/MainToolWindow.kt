@@ -33,6 +33,7 @@ import com.github.tsonglew.etcdhelper.table.AlarmListTableManager
 import com.github.tsonglew.etcdhelper.table.MemberListTableManager
 import com.github.tsonglew.etcdhelper.table.MemberStatusListTableManager
 import com.github.tsonglew.etcdhelper.table.WatchListTableManager
+import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFileSystem
 import com.github.tsonglew.etcdhelper.view.render.ConnectionTreeCellRenderer
 import com.intellij.openapi.Disposable
@@ -57,7 +58,7 @@ import javax.swing.tree.DefaultTreeModel
 
 class MainToolWindow(private val project: Project) : Disposable {
     private val connectionTree = Tree().apply {
-        model = DefaultTreeModel(DefaultMutableTreeNode())
+        model = DefaultTreeModel(EtcdConnectionTreeNode())
         cellRenderer = ConnectionTreeCellRenderer()
         alignmentX = Component.LEFT_ALIGNMENT
         addMouseListener(object : MouseAdapter() {

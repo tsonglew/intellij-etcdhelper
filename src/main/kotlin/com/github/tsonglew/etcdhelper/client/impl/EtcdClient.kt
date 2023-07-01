@@ -154,6 +154,12 @@ class EtcdClient(
     }
 
     override fun getWatchItems() = ArrayList(this.watchItemsMap.values)
+    override fun isActive(): Boolean = try {
+        client?.kvClient
+        true
+    } catch (e: Exception) {
+        false
+    }
 
     override fun delete(key: String) = try {
         thisLogger().info("delete key: $key")
