@@ -24,12 +24,12 @@
 
 package com.github.tsonglew.etcdhelper.view.render
 
+import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
 import com.intellij.icons.AllIcons
 import com.intellij.ui.ColoredTreeCellRenderer
 import javax.swing.JTree
-import javax.swing.tree.DefaultMutableTreeNode
 
-class ConnectionTreeCellRenderer: ColoredTreeCellRenderer() {
+class ConnectionTreeCellRenderer : ColoredTreeCellRenderer() {
     override fun customizeCellRenderer(
         tree: JTree,
         value: Any?,
@@ -39,8 +39,8 @@ class ConnectionTreeCellRenderer: ColoredTreeCellRenderer() {
         row: Int,
         hasFocus: Boolean
     ) {
-        val node = value as DefaultMutableTreeNode
+        val node = value as EtcdConnectionTreeNode
         append(node.toString())
-        icon = AllIcons.Debugger.Db_array
+        icon = if (node.active) AllIcons.Debugger.Value else AllIcons.Debugger.VariablesTab
     }
 }

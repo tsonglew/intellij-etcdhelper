@@ -45,4 +45,5 @@ interface RpcClient {
     fun startWatch(watchItem: WatchItem): Watcher
     fun stopWatch(watchItem: WatchItem)
     fun getWatchItems(): MutableList<WatchItem>
+    fun isActive(): Boolean
 }

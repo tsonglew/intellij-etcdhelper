@@ -26,6 +26,7 @@ package com.github.tsonglew.etcdhelper.common
 
 import com.github.tsonglew.etcdhelper.client.RpcClient
 import com.github.tsonglew.etcdhelper.client.impl.EtcdClient
+import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFile
 import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.openapi.Disposable
@@ -77,10 +78,10 @@ class ConnectionManager(
      */
     fun addConnectionToList(etcdConnectionInfo: EtcdConnectionInfo) {
         (connectionTree.model as DefaultTreeModel).apply {
-            (root as DefaultMutableTreeNode).apply {
+            (root as EtcdConnectionTreeNode).apply {
                 var found = false
                 for (i in 0 until getChildCount(this)) {
-                    ((getChildAt(i) as DefaultMutableTreeNode).userObject as EtcdConnectionInfo).apply {
+                    ((getChildAt(i) as EtcdConnectionTreeNode).userObject as EtcdConnectionInfo).apply {
                         if (id == etcdConnectionInfo.id) {
                             endpoints = etcdConnectionInfo.endpoints
                             username = etcdConnectionInfo.username
@@ -90,7 +91,7 @@ class ConnectionManager(
                     }
                 }
                 if (!found) {
-                    add(DefaultMutableTreeNode(etcdConnectionInfo))
+                    add(EtcdConnectionTreeNode(etcdConnectionInfo, this@ConnectionManager))
                 }
                 connectionMap[etcdConnectionInfo.id!!] = EtcdClient(etcdConnectionInfo)
             }
