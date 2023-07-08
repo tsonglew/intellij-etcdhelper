@@ -28,15 +28,15 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PasswordUtil
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
-import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.treeStructure.Tree
+import java.awt.FlowLayout
+import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -48,11 +48,13 @@ class EtcdConnectionSettingsDialog(
     private val etcdConnectionInfo: EtcdConnectionInfo? = null
 ) : DialogWrapper(project) {
 
-    private lateinit var panel: JPanel
+    private lateinit var centerPanel: JPanel
+    private lateinit var endpointPanel: JPanel
     private val remarkTextField = JBTextField("", 20)
     private val endpointsTextField = JBTextField("http://localhost:2379", 20)
     private val usernameTextField = JBTextField("", 20)
     private val passwordTextField = JBPasswordField()
+    private var addEndpointItemBtn: JButton? = null
 
     init {
         super.init()
@@ -71,36 +73,69 @@ class EtcdConnectionSettingsDialog(
 
 
     override fun createCenterPanel(): JComponent {
-        panel = panel {
-            row("remark: ") { cell(remarkTextField) }
-            row("endpoints: ") { cell(endpointsTextField) }
+//            group("Endpoints: ") {
+//                row("Row 1:") {
+//                    label("http://")
+//                        .gap(RightGap.SMALL)
+//                    textField()
+//                        .gap(RightGap.SMALL)
+//                        .columns(20)
+//                        .resizableColumn()
+//                    label(":")
+//                        .gap(RightGap.SMALL)
+//                    textField()
+//                        .gap(RightGap.SMALL)
+//                        .columns(5)
+//                        .text("80")
+//                        .resizableColumn()
+//                    val action = object : DumbAwareAction(AllIcons.General.Add) {
+//                        override fun actionPerformed(e: AnActionEvent) {
+//                        }
+//                    }
+//                    actionButton(action)
+//                }.layout(RowLayout.PARENT_GRID)
+//            }
+//        }
+        endpointPanel = JPanel(VerticalFlowLayout()).apply {
+            add(JPanel(FlowLayout()).apply {
+                addEndpointItemBtn?.isVisible = false
+                addEndpointItemBtn = JButton("test").apply {
+                    addActionListener {
+                        centerPanel.add(JLabel("test"))
+                        updateUI()
+                    }
+                }
+                add(JLabel("name: "))
+                add(remarkTextField)
+                add(addEndpointItemBtn)
+            })
+        }
+
+        centerPanel = panel {
+            row("name: ") { cell(remarkTextField) }
             row("username: ") { cell(usernameTextField) }
             row("password: ") { cell(passwordTextField) }
             group("Endpoints: ") {
-                row("Row 1:") {
-                    label("http://")
-                        .gap(RightGap.SMALL)
-                    textField()
-                        .gap(RightGap.SMALL)
-                        .columns(20)
-                        .resizableColumn()
-                    label(":")
-                        .gap(RightGap.SMALL)
-                    textField()
-                        .gap(RightGap.SMALL)
-                        .columns(5)
-                        .text("80")
-                        .resizableColumn()
-                    val action = object : DumbAwareAction(AllIcons.General.Add) {
-                        override fun actionPerformed(e: AnActionEvent) {
-                            panel.add(JLabel("12345"))
-                        }
-                    }
-                    actionButton(action)
-                }.layout(RowLayout.PARENT_GRID)
+                endpointPanel
             }
         }
-        return panel
+
+        return centerPanel
+    }
+
+    private fun addEndpointItem() {
+        endpointPanel.add(JPanel(FlowLayout()).apply {
+            add(JLabel("http://"))
+            add(JBTextField("localhost", 20))
+            add(JLabel(":"))
+            add(JBTextField("2379", 5))
+            add(JButton("test").apply {
+                addActionListener {
+                    centerPanel.add(JLabel("test"))
+                    updateUI()
+                }
+            })
+        })
     }
 
     override fun doOKAction() {
