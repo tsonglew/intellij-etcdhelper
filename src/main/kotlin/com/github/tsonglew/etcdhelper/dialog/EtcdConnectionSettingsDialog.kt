@@ -28,18 +28,17 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PasswordUtil
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
+import com.github.tsonglew.etcdhelper.component.ConnectionHostPortRowPanel
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.VerticalFlowLayout
-import com.intellij.ui.components.JBPasswordField
+import com.intellij.ui.TitledSeparator
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.treeStructure.Tree
-import java.awt.FlowLayout
-import javax.swing.JButton
 import javax.swing.JComponent
-import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JPasswordField
 
 class EtcdConnectionSettingsDialog(
     private val project: Project,
@@ -50,11 +49,12 @@ class EtcdConnectionSettingsDialog(
 
     private lateinit var centerPanel: JPanel
     private lateinit var endpointPanel: JPanel
+    private lateinit var addBtnAction: () -> Unit
+    private lateinit var delBtnAction: () -> Unit
     private val remarkTextField = JBTextField("", 20)
     private val endpointsTextField = JBTextField("http://localhost:2379", 20)
     private val usernameTextField = JBTextField("", 20)
-    private val passwordTextField = JBPasswordField()
-    private var addEndpointItemBtn: JButton? = null
+    private val passwordTextField = JPasswordField("", 20)
 
     init {
         super.init()
@@ -71,72 +71,37 @@ class EtcdConnectionSettingsDialog(
 
     private val endpointGroups = mutableListOf<EndpointItem>()
 
-
     override fun createCenterPanel(): JComponent {
-//            group("Endpoints: ") {
-//                row("Row 1:") {
-//                    label("http://")
-//                        .gap(RightGap.SMALL)
-//                    textField()
-//                        .gap(RightGap.SMALL)
-//                        .columns(20)
-//                        .resizableColumn()
-//                    label(":")
-//                        .gap(RightGap.SMALL)
-//                    textField()
-//                        .gap(RightGap.SMALL)
-//                        .columns(5)
-//                        .text("80")
-//                        .resizableColumn()
-//                    val action = object : DumbAwareAction(AllIcons.General.Add) {
-//                        override fun actionPerformed(e: AnActionEvent) {
-//                        }
-//                    }
-//                    actionButton(action)
-//                }.layout(RowLayout.PARENT_GRID)
-//            }
-//        }
         endpointPanel = JPanel(VerticalFlowLayout()).apply {
-            add(JPanel(FlowLayout()).apply {
-                addEndpointItemBtn?.isVisible = false
-                addEndpointItemBtn = JButton("test").apply {
-                    addActionListener {
-                        centerPanel.add(JLabel("test"))
-                        updateUI()
-                    }
-                }
-                add(JLabel("name: "))
-                add(remarkTextField)
-                add(addEndpointItemBtn)
-            })
+            add(TitledSeparator("Endpoints"))
         }
+        addBtnAction = {
+            endpointPanel.add(newEndpointItem())
+        }
+        delBtnAction = {
+            if (endpointPanel.components.size > 2)
+                endpointPanel.apply {
+                    endpointPanel.remove(endpointPanel.components.last())
+                    (endpointPanel.components.last() as ConnectionHostPortRowPanel).updateUI()
+                }
+        }
+        endpointPanel.add(newEndpointItem())
 
         centerPanel = panel {
             row("name: ") { cell(remarkTextField) }
             row("username: ") { cell(usernameTextField) }
             row("password: ") { cell(passwordTextField) }
-            group("Endpoints: ") {
-                endpointPanel
-            }
+            row { cell(endpointPanel) }
         }
 
         return centerPanel
     }
 
-    private fun addEndpointItem() {
-        endpointPanel.add(JPanel(FlowLayout()).apply {
-            add(JLabel("http://"))
-            add(JBTextField("localhost", 20))
-            add(JLabel(":"))
-            add(JBTextField("2379", 5))
-            add(JButton("test").apply {
-                addActionListener {
-                    centerPanel.add(JLabel("test"))
-                    updateUI()
-                }
-            })
-        })
-    }
+    private fun newEndpointItem() = ConnectionHostPortRowPanel(
+        addBtnAction,
+        delBtnAction,
+        endpointPanel
+    )
 
     override fun doOKAction() {
         val conf = toEtcdConfiguration()
