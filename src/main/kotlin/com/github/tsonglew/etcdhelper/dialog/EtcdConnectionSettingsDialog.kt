@@ -36,6 +36,7 @@ import com.intellij.ui.TitledSeparator
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.treeStructure.Tree
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JPasswordField
@@ -55,6 +56,7 @@ class EtcdConnectionSettingsDialog(
     private val endpointsTextField = JBTextField("http://localhost:2379", 20)
     private val usernameTextField = JBTextField("", 20)
     private val passwordTextField = JPasswordField("", 20)
+    private val tlsCheckBox = JCheckBox("TLS")
 
     init {
         super.init()
@@ -68,8 +70,6 @@ class EtcdConnectionSettingsDialog(
             title = "Edit Connection"
         }
     }
-
-    private val endpointGroups = mutableListOf<EndpointItem>()
 
     override fun createCenterPanel(): JComponent {
         endpointPanel = JPanel(VerticalFlowLayout()).apply {
@@ -91,6 +91,7 @@ class EtcdConnectionSettingsDialog(
             row("name: ") { cell(remarkTextField) }
             row("username: ") { cell(usernameTextField) }
             row("password: ") { cell(passwordTextField) }
+            row { cell(tlsCheckBox) }
             row { cell(endpointPanel) }
         }
 
@@ -100,7 +101,7 @@ class EtcdConnectionSettingsDialog(
     private fun newEndpointItem() = ConnectionHostPortRowPanel(
         addBtnAction,
         delBtnAction,
-        endpointPanel
+        endpointPanel,
     )
 
     override fun doOKAction() {
@@ -114,11 +115,12 @@ class EtcdConnectionSettingsDialog(
     }
 
     private fun toEtcdConfiguration() = EtcdConnectionInfo(
-        endpointsTextField.text,
+        endpointPanel.components
+            .filterIsInstance<ConnectionHostPortRowPanel>()
+            .joinToString(",") { it.toEndpointItem(tlsCheckBox.isSelected) },
         usernameTextField.text,
         etcdConnectionInfo?.id,
         remarkTextField.text
     )
 
-    data class EndpointItem(val host: String, val port: String)
 }
