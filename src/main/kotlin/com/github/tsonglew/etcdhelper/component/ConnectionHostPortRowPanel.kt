@@ -13,7 +13,7 @@ class ConnectionHostPortRowPanel(
 ) : JPanel(FlowLayout()) {
 
     private val hostInputText = JBTextField("127.0.0.1", 15)
-    private val portInputText = JBTextField("80", 5)
+    private val portInputText = JBTextField("2379", 5)
     private val addRowBtn = JButton(AllIcons.General.Add).also {
         addRowBtnAction?.also { _ ->
             it.addActionListener {
@@ -49,5 +49,10 @@ class ConnectionHostPortRowPanel(
             delRowBtn.isEnabled = thisIndex == it.components.lastIndex
         }
         super.updateUI()
+    }
+
+    fun toEndpointItem(useTls: Boolean): String {
+        val scheme = if (useTls) "https://" else "http://"
+        return "$scheme${hostInputText.text}:${portInputText.text}"
     }
 }
