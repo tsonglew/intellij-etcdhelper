@@ -19,7 +19,6 @@ class ConnectionHostPortRowPanel(
             it.addActionListener {
                 addRowBtnAction()
                 updateUI()
-                this.updateUI()
             }
         }
     }
@@ -28,7 +27,6 @@ class ConnectionHostPortRowPanel(
             it.addActionListener {
                 delRowBtnAction()
                 updateUI()
-                this.updateUI()
             }
         }
     }
@@ -51,8 +49,7 @@ class ConnectionHostPortRowPanel(
         super.updateUI()
     }
 
-    fun toEndpointItem(useTls: Boolean): String {
-        val scheme = if (useTls) "https://" else "http://"
-        return "$scheme${hostInputText.text}:${portInputText.text}"
-    }
+    infix fun toEndpointItem(useTls: Boolean) = "${
+        if (useTls) "https://" else "http://"
+    }${hostInputText.text}:${portInputText.text}"
 }
