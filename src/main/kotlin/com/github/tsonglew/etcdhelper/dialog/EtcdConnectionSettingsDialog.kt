@@ -117,7 +117,7 @@ class EtcdConnectionSettingsDialog(
     private fun toEtcdConfiguration() = EtcdConnectionInfo(
         endpointPanel.components
             .filterIsInstance<ConnectionHostPortRowPanel>()
-            .joinToString(",") { it.toEndpointItem(tlsCheckBox.isSelected) },
+            .joinToString(",") { it toEndpointItem tlsCheckBox.isSelected },
         usernameTextField.text,
         etcdConnectionInfo?.id,
         remarkTextField.text
