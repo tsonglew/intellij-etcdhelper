@@ -49,11 +49,10 @@ class EtcdConnectionSettingsDialog(
 ) : DialogWrapper(project) {
 
     private lateinit var centerPanel: JPanel
-    private lateinit var endpointPanel: JPanel
     private lateinit var addBtnAction: () -> Unit
     private lateinit var delBtnAction: () -> Unit
+    private var endpointPanel: JPanel? = null
     private val remarkTextField = JBTextField("", 20)
-    private val endpointsTextField = JBTextField("http://localhost:2379", 20)
     private val usernameTextField = JBTextField("", 20)
     private val passwordTextField = JPasswordField("", 20)
     private val tlsCheckBox = JCheckBox("TLS")
@@ -64,45 +63,64 @@ class EtcdConnectionSettingsDialog(
 
         etcdConnectionInfo?.apply {
             remarkTextField.text = remark
-            endpointsTextField.text = endpoints
             usernameTextField.text = username
             passwordTextField.text = PasswordUtil.retrievePassword(id!!)
             title = "Edit Connection"
+
+            while (endpointPanel!!.components.size > 1) {
+                endpointPanel!!.remove(endpointPanel!!.components.last())
+            }
+            endpoints.split(",")
+                .map { it.trimStart("http://") }
+                .map { it.trimStart("https://") }
+                .forEach { conn ->
+                    conn.split(":").let { (host, port) ->
+                        endpointPanel!!.add(newEndpointItem(host, port))
+                    }
+                }
+            endpointPanel!!.components.filterIsInstance<ConnectionHostPortRowPanel>()
+                .forEach { it.updateUI() }
         }
     }
 
     override fun createCenterPanel(): JComponent {
-        endpointPanel = JPanel(VerticalFlowLayout()).apply {
-            add(TitledSeparator("Endpoints"))
+        if (endpointPanel == null) {
+            endpointPanel = JPanel(VerticalFlowLayout()).apply {
+                add(TitledSeparator("Endpoints"))
+            }
+
         }
         addBtnAction = {
-            endpointPanel.add(newEndpointItem())
+            endpointPanel!!.add(newEndpointItem())
         }
         delBtnAction = {
-            if (endpointPanel.components.size > 2)
+            if (endpointPanel!!.components.size > 2)
                 endpointPanel.apply {
-                    endpointPanel.remove(endpointPanel.components.last())
-                    (endpointPanel.components.last() as ConnectionHostPortRowPanel).updateUI()
+                    endpointPanel!!.remove(endpointPanel!!.components.last())
+                    (endpointPanel!!.components.last() as ConnectionHostPortRowPanel).updateUI()
                 }
         }
-        endpointPanel.add(newEndpointItem())
+        endpointPanel!!.add(newEndpointItem())
 
         centerPanel = panel {
             row("name: ") { cell(remarkTextField) }
             row("username: ") { cell(usernameTextField) }
             row("password: ") { cell(passwordTextField) }
             row { cell(tlsCheckBox) }
-            row { cell(endpointPanel) }
+            row { cell(endpointPanel!!) }
         }
 
         return centerPanel
     }
 
-    private fun newEndpointItem() = ConnectionHostPortRowPanel(
-        addBtnAction,
-        delBtnAction,
-        endpointPanel,
-    )
+    private fun newEndpointItem(host: String = "127.0.0.1", port: String = "2379") =
+        ConnectionHostPortRowPanel(
+            host,
+            port,
+            addBtnAction,
+            delBtnAction,
+            endpointPanel,
+        )
 
     override fun doOKAction() {
         val conf = toEtcdConfiguration()
@@ -115,12 +133,22 @@ class EtcdConnectionSettingsDialog(
     }
 
     private fun toEtcdConfiguration() = EtcdConnectionInfo(
-        endpointPanel.components
+        endpointPanel!!.components
             .filterIsInstance<ConnectionHostPortRowPanel>()
             .joinToString(",") { it toEndpointItem tlsCheckBox.isSelected },
         usernameTextField.text,
         etcdConnectionInfo?.id,
         remarkTextField.text
     )
+
+    private fun String.trimStart(string: String): String {
+        var result = this
+
+        while (result.startsWith(string)) {
+            result = result.substring(string.length)
+        }
+
+        return result
+    }
 
 }
