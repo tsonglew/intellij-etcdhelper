@@ -8,12 +8,15 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 
 class ConnectionHostPortRowPanel(
-    addRowBtnAction: (() -> Unit)?, delRowBtnAction: (() -> Unit)?,
+    host: String,
+    port: String,
+    addRowBtnAction: (() -> Unit)?,
+    delRowBtnAction: (() -> Unit)?,
     private val upperPanel: JPanel?
 ) : JPanel(FlowLayout()) {
 
-    private val hostInputText = JBTextField("127.0.0.1", 15)
-    private val portInputText = JBTextField("2379", 5)
+    private val hostInputText = JBTextField(host, 15)
+    private val portInputText = JBTextField(port, 5)
     private val addRowBtn = JButton(AllIcons.General.Add).also {
         addRowBtnAction?.also { _ ->
             it.addActionListener {
