@@ -61,7 +61,13 @@ class ConnectionManager(
             ?: ConnectionManager(mainToolWindow, project, propertyUtil, connectionTree)
     }
 
-    fun getClient(etcdConnectionInfo: EtcdConnectionInfo) = connectionMap[etcdConnectionInfo.id!!]
+    fun getClient(etcdConnectionInfo: EtcdConnectionInfo): RpcClient {
+        if (etcdConnectionInfo.id!! !in connectionMap ||
+            connectionMap[etcdConnectionInfo.id!!] == null
+        )
+            connectionMap[etcdConnectionInfo.id!!] = EtcdClient(etcdConnectionInfo)
+        return connectionMap[etcdConnectionInfo.id!!]!!
+    }
 
     /**
      * init saved connections
@@ -74,7 +80,7 @@ class ConnectionManager(
     }
 
     /**
-     * add a new etcd connection to model
+     * add a new etcd connection to the model
      */
     fun addConnectionToList(etcdConnectionInfo: EtcdConnectionInfo) {
         (connectionTree.model as DefaultTreeModel).apply {

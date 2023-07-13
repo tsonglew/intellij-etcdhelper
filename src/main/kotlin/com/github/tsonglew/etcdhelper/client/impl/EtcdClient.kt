@@ -55,7 +55,7 @@ class EtcdClient(
     private var watchClient: Watch? = null
     private var etcdUrls: Array<String>? = null
 
-    private val watchItemsMap: HashMap<String, WatchItem> = HashMap()
+    private val watchItemMap: HashMap<String, WatchItem> = HashMap()
 
     init {
         etcdUrls = etcdConnectionInfo.endpoints.split(",").toTypedArray()
@@ -119,10 +119,10 @@ class EtcdClient(
     }
 
     override fun startWatch(watchItem: WatchItem): Watcher {
-        if (watchItemsMap.containsKey(watchItem.toString())) {
-            return watchItemsMap[watchItem.toString()]!!.watcher!!
+        if (watchItemMap.containsKey(watchItem.toString())) {
+            return watchItemMap[watchItem.toString()]!!.watcher!!
         }
-        watchItemsMap[watchItem.toString()] = watchItem
+        watchItemMap[watchItem.toString()] = watchItem
         watchItem.watcher = watchClient!!.watch(
             bytesOf(watchItem.key),
             WatchOption.newBuilder()
@@ -147,13 +147,13 @@ class EtcdClient(
     }
 
     override fun stopWatch(watchItem: WatchItem) {
-        watchItemsMap[watchItem.toString()]?.watcher?.apply {
+        watchItemMap[watchItem.toString()]?.watcher?.apply {
             close()
-            watchItemsMap.remove(watchItem.toString())
+            watchItemMap.remove(watchItem.toString())
         }
     }
 
-    override fun getWatchItems() = ArrayList(this.watchItemsMap.values)
+    override fun getWatchItems() = ArrayList(this.watchItemMap.values)
     override fun isActive(): Boolean = try {
         client?.kvClient
         true
