@@ -132,14 +132,17 @@ class EtcdConnectionSettingsDialog(
         close(OK_EXIT_CODE)
     }
 
-    private fun toEtcdConfiguration() = EtcdConnectionInfo(
-        endpointPanel!!.components
+    private fun toEtcdConfiguration(): EtcdConnectionInfo {
+        val connAddr = endpointPanel!!.components
             .filterIsInstance<ConnectionHostPortRowPanel>()
-            .joinToString(",") { it toEndpointItem tlsCheckBox.isSelected },
-        usernameTextField.text,
-        etcdConnectionInfo?.id,
-        remarkTextField.text
-    )
+            .joinToString(",") { it toEndpointItem tlsCheckBox.isSelected }
+        return EtcdConnectionInfo(
+            connAddr,
+            usernameTextField.text,
+            etcdConnectionInfo?.id,
+            remarkTextField.text.ifBlank { connAddr }
+        )
+    }
 
     private fun String.trimStart(string: String): String {
         var result = this
