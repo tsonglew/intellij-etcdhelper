@@ -62,7 +62,7 @@ class EtcdConnectionSettingsDialog(
         title = "Add Connection"
 
         etcdConnectionInfo?.apply {
-            remarkTextField.text = remark
+            remarkTextField.text = name
             usernameTextField.text = username
             passwordTextField.text = PasswordUtil.retrievePassword(id!!)
             title = "Edit Connection"
