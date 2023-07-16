@@ -91,7 +91,7 @@ class ConnectionManager(
                         if (id == etcdConnectionInfo.id) {
                             endpoints = etcdConnectionInfo.endpoints
                             username = etcdConnectionInfo.username
-                            remark = etcdConnectionInfo.remark
+                            name = etcdConnectionInfo.name
                             found = true
                         }
                     }

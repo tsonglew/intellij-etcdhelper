@@ -63,7 +63,7 @@ class MainToolWindow(private val project: Project) : Disposable {
         alignmentX = Component.LEFT_ALIGNMENT
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
-                // click priority: BUTTON3 > 2 click > 1 click
+                // click priority: BUTTON3 > 2 clicks > 1 click
                 when {
                     // click right button
                     e?.button == MouseEvent.BUTTON3 -> {
