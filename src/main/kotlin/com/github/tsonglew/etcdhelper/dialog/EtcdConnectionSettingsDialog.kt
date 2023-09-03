@@ -29,13 +29,15 @@ import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.PasswordUtil
 import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.github.tsonglew.etcdhelper.component.ConnectionHostPortRowPanel
+import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.TextBrowseFolderListener
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.TitledSeparator
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.treeStructure.Tree
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -43,7 +45,6 @@ import javax.swing.JPasswordField
 
 class EtcdConnectionSettingsDialog(
     private val project: Project,
-    private val connectionTree: Tree,
     private val connectionManager: ConnectionManager,
     private val etcdConnectionInfo: EtcdConnectionInfo? = null
 ) : DialogWrapper(project) {
@@ -55,7 +56,17 @@ class EtcdConnectionSettingsDialog(
     private val remarkTextField = JBTextField("", 20)
     private val usernameTextField = JBTextField("", 20)
     private val passwordTextField = JPasswordField("", 20)
-    private val tlsCheckBox = JCheckBox("TLS")
+
+    // How to Build Jectd Client for One TLS Secured Etcd Cluster:
+    // https://github.com/etcd-io/jetcd/blob/main/docs/SslConfig.md
+    private val tlsCaCertBtn = TextFieldWithBrowseButton(JBTextField("", 20))
+    private val tlsClientKeyBtn = TextFieldWithBrowseButton(JBTextField("", 20))
+    private val tlsClientCertBtn = TextFieldWithBrowseButton(JBTextField("", 20))
+    private val tlsCheckBox = JCheckBox().apply {
+        addActionListener {
+            updateTlsCheckBoxStatus()
+        }
+    }
 
     init {
         super.init()
@@ -80,7 +91,27 @@ class EtcdConnectionSettingsDialog(
                 }
             endpointPanel!!.components.filterIsInstance<ConnectionHostPortRowPanel>()
                 .forEach { it.updateUI() }
+            tlsCheckBox.isSelected = tlsEnabled ?: false
+            tlsCaCert?.let { tlsCaCertBtn.text = tlsCaCert!! }
+            tlsClientKey?.let { tlsClientKeyBtn.text = tlsClientKey!! }
+            tlsClientCert?.let { tlsClientCertBtn.text = tlsClientCert!! }
         }
+        updateTlsCheckBoxStatus()
+        bindFileChooserAction(tlsCaCertBtn)
+        bindFileChooserAction(tlsClientKeyBtn)
+        bindFileChooserAction(tlsClientCertBtn)
+    }
+
+    private fun updateTlsCheckBoxStatus() {
+        tlsCaCertBtn.isEnabled = tlsCheckBox.isSelected
+        tlsClientKeyBtn.isEnabled = tlsCheckBox.isSelected
+        tlsClientCertBtn.isEnabled = tlsCheckBox.isSelected
+    }
+
+    private fun bindFileChooserAction(btn: TextFieldWithBrowseButton) {
+        btn.addBrowseFolderListener(
+            TextBrowseFolderListener(FileChooserDescriptor(true, false, false, false, false, false))
+        )
     }
 
     override fun createCenterPanel(): JComponent {
@@ -88,7 +119,6 @@ class EtcdConnectionSettingsDialog(
             endpointPanel = JPanel(VerticalFlowLayout()).apply {
                 add(TitledSeparator("Endpoints"))
             }
-
         }
         addBtnAction = {
             endpointPanel!!.add(newEndpointItem())
@@ -103,10 +133,14 @@ class EtcdConnectionSettingsDialog(
         endpointPanel!!.add(newEndpointItem())
 
         centerPanel = panel {
-            row("name: ") { cell(remarkTextField) }
-            row("username: ") { cell(usernameTextField) }
-            row("password: ") { cell(passwordTextField) }
-            row { cell(tlsCheckBox) }
+            row("Connection Name:") { cell(remarkTextField) }
+            row("Username:") { cell(usernameTextField) }
+            row("Password:") { cell(passwordTextField) }
+            separator("SSL/TLS Configuration")
+            row("Enable SSL/TLS:") { cell(tlsCheckBox) }
+            row("SSL/TLS CA Certificate:") { cell(tlsCaCertBtn) }
+            row("SSL/TLS Client Key:") { cell(tlsClientKeyBtn) }
+            row("SSL/TLS Client Certificate:") { cell(tlsClientCertBtn) }
             row { cell(endpointPanel!!) }
         }
 
@@ -140,7 +174,11 @@ class EtcdConnectionSettingsDialog(
             connAddr,
             usernameTextField.text,
             etcdConnectionInfo?.id,
-            remarkTextField.text.ifBlank { connAddr }
+            remarkTextField.text.ifBlank { connAddr },
+            tlsCheckBox.isSelected,
+            tlsCaCertBtn.text,
+            tlsClientKeyBtn.text,
+            tlsClientCertBtn.text
         )
     }
 

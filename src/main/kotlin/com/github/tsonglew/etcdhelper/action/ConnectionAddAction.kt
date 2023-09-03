@@ -50,7 +50,6 @@ import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.dialog.EtcdConnectionSettingsDialog
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
-import com.intellij.ui.treeStructure.Tree
 
 class ConnectionAddAction : CustomAction(
     "Add Connection",
@@ -58,13 +57,12 @@ class ConnectionAddAction : CustomAction(
     AllIcons.General.Add
 ) {
     companion object {
-        fun create(project: Project, connectionTree: Tree, connectionManager: ConnectionManager) =
+        fun create(project: Project, connectionManager: ConnectionManager) =
             ConnectionAddAction()
                 .apply {
                     action = {
                         EtcdConnectionSettingsDialog(
                             project,
-                            connectionTree,
                             connectionManager
                         ).show()
                     }
