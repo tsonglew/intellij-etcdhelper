@@ -29,7 +29,6 @@ import com.intellij.openapi.project.Project
 
 class CustomActionListenerA : CustomActionListener {
     override fun beforeAction(project: Project?) {
-        println("beforeActionA")
     }
 
     override fun afterAction(project: Project?, msg: String) {

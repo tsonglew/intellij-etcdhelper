@@ -36,6 +36,10 @@ data class EtcdConnectionInfo(
     var username: String,
     var id: String? = null,
     var name: String? = null,
+    var tlsEnabled: Boolean? = false,
+    var tlsClientCert: String? = null,
+    var tlsClientKey: String? = null,
+    var tlsCaCert: String? = null,
 ) {
     init {
         if (id == null) {
@@ -53,6 +57,9 @@ data class EtcdConnectionInfo(
         endpoints = etcdConnectionInfo.endpoints
         username = etcdConnectionInfo.username
         name = etcdConnectionInfo.name
+        tlsEnabled = etcdConnectionInfo.tlsEnabled
+        tlsClientCert = etcdConnectionInfo.tlsClientCert
+        tlsClientKey = etcdConnectionInfo.tlsClientKey
         return this
     }
 }

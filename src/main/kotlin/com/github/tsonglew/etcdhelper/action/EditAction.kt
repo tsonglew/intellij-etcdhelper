@@ -43,10 +43,9 @@ class EditAction : CustomAction(
                     action = {
                         connectionTree.selectionPath?.lastPathComponent?.let {
                             EtcdConnectionSettingsDialog(
-                                    project,
-                                    connectionTree,
-                                    connectionManager,
-                                    (it as DefaultMutableTreeNode).userObject as EtcdConnectionInfo
+                                project,
+                                connectionManager,
+                                (it as DefaultMutableTreeNode).userObject as EtcdConnectionInfo
                             ).show()
                         }
                     }
