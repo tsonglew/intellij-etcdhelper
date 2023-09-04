@@ -18,6 +18,11 @@ a simple intellij platform etcd plugin
         - [Query](#fill-up-the-settings-dialog)
         - [Delete](#stop-watch)
         - [Notification](#get-notification-when-event-triggered)
+- [Install](#install)
+    - [JetBrains Plugins](#jetbrains-plugins)
+    - [Manually](#manually)
+        - [Download GitHub Releases](#download-github-releases)
+        - [Install from disk](#install-from-disk)
 - [Acknowledgements](#acknowledgements)
 
 ## Screenshots
@@ -51,6 +56,23 @@ a simple intellij platform etcd plugin
 #### get notification when event triggered
 
 ![notify](assets/images/watch/notify.png)
+
+# Install
+
+## JetBrains Plugins
+
+[JetBrains Plugins](https://plugins.jetbrains.com/plugin/19924-etcdhelper)
+
+## Manually
+
+### Download GitHub Releases
+
+Download zip from [GitHub Releases](https://github.com/tsonglew/intellij-etcdhelper/releases)
+
+### Install from disk
+
+Install from disk,
+see [Install from disk](https://www.jetbrains.com/help/idea/managing-plugins.html#install_plugin_from_disk)
 
 # Acknowledgements
 
