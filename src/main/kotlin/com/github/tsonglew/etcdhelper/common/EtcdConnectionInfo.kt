@@ -34,6 +34,7 @@ import java.util.*
 data class EtcdConnectionInfo(
     var endpoints: String,
     var username: String,
+    var enableAuth: Boolean? = false,
     var id: String? = null,
     var name: String? = null,
     var tlsEnabled: Boolean? = false,
@@ -56,6 +57,7 @@ data class EtcdConnectionInfo(
     fun update(etcdConnectionInfo: EtcdConnectionInfo): EtcdConnectionInfo {
         endpoints = etcdConnectionInfo.endpoints
         username = etcdConnectionInfo.username
+        enableAuth = etcdConnectionInfo.enableAuth
         name = etcdConnectionInfo.name
         tlsEnabled = etcdConnectionInfo.tlsEnabled
         tlsClientCert = etcdConnectionInfo.tlsClientCert

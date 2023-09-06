@@ -64,7 +64,7 @@ class EtcdClient(
 
         try {
             val clientBuilder = Client.builder().endpoints(*etcdUrls!!)
-            if (user.isNotEmpty() && password?.isNotEmpty() == true) {
+            if (etcdConnectionInfo.enableAuth == true) {
                 clientBuilder.user(bytesOf(user)).password(bytesOf(password))
             }
             client = clientBuilder.build()
