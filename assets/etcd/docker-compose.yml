@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  node1:
+    image: 'bitnami/etcd:latest'
+    environment:
+      - "ETCD_NAME=node1"
+      - "ETCD_ROOT_PASSWORD=hillstone"
+      - "ETCD_CLIENT_CERT_AUTH=true"
+      - "ETCD_PEER_CLIENT_CERT_AUTH=true"
+      - "ETCD_ADVERTISE_CLIENT_URLS=https://192.168.0.81:42379"
+      - "ETCD_INITIAL_ADVERTISE_PEER_URLS=https://192.168.0.81:42380"
+      - "ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379"
+      - "ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380"
+      - "ETCD_INITIAL_CLUSTER_TOKEN=etcd_cluster"
+      - "ETCD_INITIAL_CLUSTER=node1=https://192.168.0.81:42380"
+      - "ETCD_INITIAL_CLUSTER_STATE=new"
+      - "ETCD_DATA_DIR=/opt/bitnami/etcd/data"
+      - "ETCD_TRUSTED_CA_FILE=/opt/bitnami/etcd/conf/ca.pem"
+      - "ETCD_KEY_FILE=/opt/bitnami/etcd/conf/server-key.pem"
+      - "ETCD_CERT_FILE=/opt/bitnami/etcd/conf/server.pem"
+      - "ETCD_PEER_TRUSTED_CA_FILE=/opt/bitnami/etcd/conf/ca.pem"
+      - "ETCD_PEER_KEY_FILE=/opt/bitnami/etcd/conf/peer-key.pem"
+      - "ETCD_PEER_CERT_FILE=/opt/bitnami/etcd/conf/peer.pem"
+    volumes:
+      - ./cfssl/ca.pem:/opt/bitnami/etcd/conf/ca.pem
+      - ./cfssl/node1.pem:/opt/bitnami/etcd/conf/peer.pem
+      - ./cfssl/node1-key.pem:/opt/bitnami/etcd/conf/peer-key.pem
+      - ./cfssl/server.pem:/opt/bitnami/etcd/conf/server.pem
+      - ./cfssl/server-key.pem:/opt/bitnami/etcd/conf/server-key.pem
+      - ./cfssl/client-key.pem:/opt/bitnami/etcd/client-key.pem
+      - ./cfssl/client.pem:/opt/bitnami/etcd/client.pem
+    ports:
+      - "42379:2379"
+      - "42380:2380"

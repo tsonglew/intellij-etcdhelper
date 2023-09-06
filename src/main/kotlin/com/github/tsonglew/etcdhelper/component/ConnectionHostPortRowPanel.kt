@@ -2,6 +2,7 @@ package com.github.tsonglew.etcdhelper.component
 
 import com.intellij.icons.AllIcons
 import com.intellij.ui.components.JBTextField
+import java.awt.Dimension
 import java.awt.FlowLayout
 import javax.swing.JButton
 import javax.swing.JLabel
@@ -18,6 +19,7 @@ class ConnectionHostPortRowPanel(
     private val hostInputText = JBTextField(host, 15)
     private val portInputText = JBTextField(port, 5)
     private val addRowBtn = JButton(AllIcons.General.Add).also {
+        it.preferredSize = Dimension(30, 30)
         addRowBtnAction?.also { _ ->
             it.addActionListener {
                 addRowBtnAction()
@@ -26,6 +28,7 @@ class ConnectionHostPortRowPanel(
         }
     }
     private val delRowBtn = JButton(AllIcons.General.Remove).also {
+        it.preferredSize = Dimension(30, 30)
         delRowBtnAction?.also { _ ->
             it.addActionListener {
                 delRowBtnAction()

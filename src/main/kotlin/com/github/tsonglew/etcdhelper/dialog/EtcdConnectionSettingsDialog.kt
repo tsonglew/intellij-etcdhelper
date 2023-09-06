@@ -56,6 +56,11 @@ class EtcdConnectionSettingsDialog(
     private val remarkTextField = JBTextField("", 20)
     private val usernameTextField = JBTextField("", 20)
     private val passwordTextField = JPasswordField("", 20)
+    private val enableAuthCheckBox = JCheckBox().apply {
+        addActionListener {
+            updateEnableAuthCheckBoxStatus()
+        }
+    }
 
     // How to Build Jectd Client for One TLS Secured Etcd Cluster:
     // https://github.com/etcd-io/jetcd/blob/main/docs/SslConfig.md
@@ -76,6 +81,7 @@ class EtcdConnectionSettingsDialog(
             remarkTextField.text = name
             usernameTextField.text = username
             passwordTextField.text = PasswordUtil.retrievePassword(id!!)
+            enableAuthCheckBox.isSelected = enableAuth ?: false
             title = "Edit Connection"
 
             while (endpointPanel!!.components.size > 1) {
@@ -96,10 +102,16 @@ class EtcdConnectionSettingsDialog(
             tlsClientKey?.let { tlsClientKeyBtn.text = tlsClientKey!! }
             tlsClientCert?.let { tlsClientCertBtn.text = tlsClientCert!! }
         }
+        updateEnableAuthCheckBoxStatus()
         updateTlsCheckBoxStatus()
         bindFileChooserAction(tlsCaCertBtn)
         bindFileChooserAction(tlsClientKeyBtn)
         bindFileChooserAction(tlsClientCertBtn)
+    }
+
+    private fun updateEnableAuthCheckBoxStatus() {
+        usernameTextField.isEnabled = enableAuthCheckBox.isSelected
+        passwordTextField.isEnabled = enableAuthCheckBox.isSelected
     }
 
     private fun updateTlsCheckBoxStatus() {
@@ -134,6 +146,8 @@ class EtcdConnectionSettingsDialog(
 
         centerPanel = panel {
             row("Connection Name:") { cell(remarkTextField) }
+            separator("Authentication")
+            row("Enable Auth:") { cell(enableAuthCheckBox) }
             row("Username:") { cell(usernameTextField) }
             row("Password:") { cell(passwordTextField) }
             separator("SSL/TLS Configuration")
@@ -173,6 +187,7 @@ class EtcdConnectionSettingsDialog(
         return EtcdConnectionInfo(
             connAddr,
             usernameTextField.text,
+            enableAuthCheckBox.isSelected,
             etcdConnectionInfo?.id,
             remarkTextField.text.ifBlank { connAddr },
             tlsCheckBox.isSelected,

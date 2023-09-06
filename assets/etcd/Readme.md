@@ -4,22 +4,32 @@
 
 ### Download cfssl
 
+#### Linux
+
 ```bash
 mkdir ~/bin
 curl -s -L -o ~/bin/cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 curl -s -L -o ~/bin/cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
 chmod +x ~/bin/{cfssl,cfssljson}
+export PATH=$PATH:~/bin
+```
+
+#### Mac
+
+```bash
+brew install cfssl
 ```
 
 ### Generate CA
 
 ```bash
-export PATH=$PATH:~/bin
-mkdir ~/cfssl
-cd ~/cfssl
+mkdir cfssl
+cd cfssl
 cfssl print-defaults config > ca-config.json
 cfssl print-defaults csr > ca-csr.json
 ```
+
+###
 
 # Refer
 
