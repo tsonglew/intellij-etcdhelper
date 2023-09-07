@@ -113,9 +113,8 @@ class EtcdKeyTreeDisplayPanel(
 
     fun renderKeyTree(searchSymbol: String = "/", limit: Int = 0) {
         allKeys = connectionManager.getClient(etcdConnectionInfo)
-            ?.getByPrefix(searchSymbol, limit)
-            ?.apply { sortedBy { it.key.toString() } }
-            ?: listOf()
+            .getByPrefix(searchSymbol, limit)
+            .apply { sortedBy { it.key.toString() } }
         keyDisplayLoadingDecorator.startLoading(false)
         keyCountLabel.text = "Key counts: ${allKeys.size}"
         ReadAction.nonBlocking {

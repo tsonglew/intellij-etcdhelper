@@ -97,7 +97,7 @@ class EtcdConnectionSettingsDialog(
                 }
             endpointPanel!!.components.filterIsInstance<ConnectionHostPortRowPanel>()
                 .forEach { it.updateUI() }
-            tlsCheckBox.isSelected = tlsEnabled ?: false
+            tlsCheckBox.isSelected = enableTls ?: false
             tlsCaCert?.let { tlsCaCertBtn.text = tlsCaCert!! }
             tlsClientKey?.let { tlsClientKeyBtn.text = tlsClientKey!! }
             tlsClientCert?.let { tlsClientCertBtn.text = tlsClientCert!! }
