@@ -37,6 +37,8 @@ import io.etcd.jetcd.Watch.Watcher
 import io.etcd.jetcd.cluster.Member
 import io.etcd.jetcd.maintenance.AlarmMember
 import io.etcd.jetcd.options.*
+import io.grpc.netty.GrpcSslContexts
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /**
@@ -66,6 +68,16 @@ class EtcdClient(
             val clientBuilder = Client.builder().endpoints(*etcdUrls!!)
             if (etcdConnectionInfo.enableAuth == true) {
                 clientBuilder.user(bytesOf(user)).password(bytesOf(password))
+            }
+            if (etcdConnectionInfo.enableTls == true) {
+                val cert = File(etcdConnectionInfo.tlsCaCert!!)
+                val keyCertChainFile = File(etcdConnectionInfo.tlsClientCert!!)
+                val keyFile = File(etcdConnectionInfo.tlsClientKey!!)
+                val ctx = GrpcSslContexts.forClient()
+                    .trustManager(cert)
+                    .keyManager(keyCertChainFile, keyFile)
+                    .build()
+                clientBuilder.sslContext(ctx)
             }
             client = clientBuilder.build()
             kvClient = client!!.kvClient
@@ -195,7 +207,8 @@ class EtcdClient(
             e.printStackTrace()
             project ?: return emptyList()
             Notifier.notifyError(
-                "Connection Failed", "Please check your connection info: $etcdConnectionInfo",
+                "Connection Failed", "Please check your connection info: $etcdConnectionInfo, " +
+                        "error: $e",
                 project
             )
         }
@@ -266,7 +279,7 @@ class EtcdClient(
             project ?: return emptyList()
             Notifier.notifyError(
                 "Connection Failed",
-                "Please check your connection info: $etcdConnectionInfo",
+                "Please check your connection info: $etcdConnectionInfo, error: $e",
                 project
             )
         }
@@ -282,7 +295,7 @@ class EtcdClient(
         thisLogger().info("list cluster members error: ${e.message}")
         Notifier.notifyError(
             "Connection Failed",
-            "Please check your connection info: $etcdConnectionInfo",
+            "Please check your connection info: $etcdConnectionInfo, error: $e",
             project
         )
         mutableListOf()
@@ -294,7 +307,7 @@ class EtcdClient(
         thisLogger().info("list alarms error: ${e.message}")
         Notifier.notifyError(
             "Connection Failed",
-            "Please check your connection info: $etcdConnectionInfo",
+            "Please check your connection info: $etcdConnectionInfo, error: $e",
             project
         )
         mutableListOf()
@@ -308,7 +321,7 @@ class EtcdClient(
         thisLogger().info("list member status error: ${e.message}")
         Notifier.notifyError(
             "Connection Failed",
-            "Please check your connection info: $etcdConnectionInfo",
+            "Please check your connection info: $etcdConnectionInfo, error: $e",
             project
         )
         mutableListOf()

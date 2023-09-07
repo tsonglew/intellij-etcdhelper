@@ -65,7 +65,7 @@ class ConnectionManager(
         if (etcdConnectionInfo.id!! !in connectionMap ||
             connectionMap[etcdConnectionInfo.id!!] == null
         )
-            connectionMap[etcdConnectionInfo.id!!] = EtcdClient(etcdConnectionInfo)
+            connectionMap[etcdConnectionInfo.id!!] = EtcdClient(etcdConnectionInfo, project)
         return connectionMap[etcdConnectionInfo.id!!]!!
     }
 
@@ -99,7 +99,7 @@ class ConnectionManager(
                 if (!found) {
                     add(EtcdConnectionTreeNode(etcdConnectionInfo, this@ConnectionManager))
                 }
-                connectionMap[etcdConnectionInfo.id!!] = EtcdClient(etcdConnectionInfo)
+                connectionMap[etcdConnectionInfo.id!!] = EtcdClient(etcdConnectionInfo, project)
             }
             reload()
         }
