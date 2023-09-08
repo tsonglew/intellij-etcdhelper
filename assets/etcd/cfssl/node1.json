@@ -1,0 +1,23 @@
+{
+  "CN": "etcd-ssl-cluster-node1",
+  "hosts": [
+    "10.182.51.82",
+    "172.28.0.1",
+    "127.0.0.1",
+    "node1",
+    "192.168.0.81"
+  ],
+  "key": {
+    "algo": "ecdsa",
+    "size": 256
+  },
+  "names": [
+    {
+      "C": "CN",
+      "L": "SZ",
+      "ST": "JS",
+      "O": "Hillstone",
+      "OU": "Cloud"
+    }
+  ]
+}
