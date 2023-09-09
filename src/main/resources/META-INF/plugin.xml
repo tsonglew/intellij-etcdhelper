@@ -2,6 +2,10 @@
 <idea-plugin>
   <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
   <change-notes><![CDATA[
+    1.4.1<br>
+    <ul>
+      <li> fix usage of scheduled for removal API </li>
+    </ul>
     1.4.0<br>
     <ul>
       <li> support tls/ssl connection </li>
@@ -94,6 +98,8 @@
       serviceImplementation="com.github.tsonglew.etcdhelper.service.ProjectConnectionSetting"/>
     <fileEditorProvider
       implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
+    <postStartupActivity
+      implementation="com.github.tsonglew.etcdhelper.activity.EhProjectStartupActivity"/>
     <toolWindow
       anchor="right"
       factoryClass="com.github.tsonglew.etcdhelper.window.MainToolWindowFactory"
@@ -110,8 +116,8 @@
   <!-- Extension points defined by the plugin.
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
   <projectListeners>
-    <listener class="com.github.tsonglew.etcdhelper.listener.EtcdHelperListener"
-      topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    <!--    <listener class="com.github.tsonglew.etcdhelper.listener.EtcdHelperListener"-->
+    <!--      topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
     <listener class="com.github.tsonglew.etcdhelper.listener.CustomActionListenerA"
       topic="com.github.tsonglew.etcdhelper.listener.CustomActionListener"/>
   </projectListeners>
