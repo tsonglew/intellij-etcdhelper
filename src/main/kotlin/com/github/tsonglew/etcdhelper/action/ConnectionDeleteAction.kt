@@ -26,7 +26,6 @@ package com.github.tsonglew.etcdhelper.action
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
-import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.github.tsonglew.etcdhelper.dialog.ConfirmDialog
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
@@ -43,17 +42,19 @@ class ConnectionDeleteAction : CustomAction(
         fun create(
             project: Project,
             connectionTree: Tree,
-            connectionManager: ConnectionManager,
-            propertyUtil: PropertyUtil
+            connectionManager: ConnectionManager
         ) = ConnectionDeleteAction()
             .apply {
                 action = {
-                    val selectedConn =
-                        (connectionTree.selectionPath?.lastPathComponent as DefaultMutableTreeNode).userObject as EtcdConnectionInfo
+                    val selectedConnectionList = connectionTree.selectionPaths?.map {
+                        it.lastPathComponent as DefaultMutableTreeNode
+                    }?.map {
+                        it.userObject as EtcdConnectionInfo
+                    }?.joinToString { it.toString() }
                     ConfirmDialog(
                         project,
                         "Delete Connection",
-                        "Are you sure to delete connection: ${selectedConn}?",
+                        "Are you sure to delete connection(s): ${selectedConnectionList}?",
                     ) {
                         connectionManager.removeSelectedConnection()
                     }.show()
