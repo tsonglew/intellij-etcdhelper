@@ -26,10 +26,10 @@ package com.github.tsonglew.etcdhelper.dialog
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.util.ui.JBUI
 import java.awt.event.ActionEvent
 import java.util.function.Consumer
 import javax.swing.JLabel
-import javax.swing.border.EmptyBorder
 
 class ConfirmDialog(
     val project: Project,
@@ -47,7 +47,7 @@ class ConfirmDialog(
     }
 
     override fun createCenterPanel() = JLabel(centralPanelText).apply {
-        border = EmptyBorder(10, 0, 10, 0)
+        border = JBUI.Borders.empty(10, 0)
     }
 
     private inner class CustomOkAction : DialogWrapperAction("OK") {
