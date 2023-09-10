@@ -91,7 +91,7 @@ class MainToolWindow(private val project: Project) : Disposable {
 
     private val connActionGrp = DefaultActionGroup().apply {
         add(ConnectionAddAction.create(project, connectionManager))
-        add(ConnectionDeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
+        add(ConnectionDeleteAction.create(project, connectionTree, connectionManager))
         add(EditAction.create(project, connectionTree, connectionManager))
         addSeparator()
     }
@@ -99,7 +99,7 @@ class MainToolWindow(private val project: Project) : Disposable {
         add(ConnectionAddAction.create(project, connectionManager))
     }
     private val editConnActionGrp = DefaultActionGroup().apply {
-        add(ConnectionDeleteAction.create(project, connectionTree, connectionManager, propertyUtil))
+        add(ConnectionDeleteAction.create(project, connectionTree, connectionManager))
         add(EditAction.create(project, connectionTree, connectionManager))
         addSeparator()
     }
