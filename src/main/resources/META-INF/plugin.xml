@@ -5,6 +5,7 @@
     1.4.1<br>
     <ul>
       <li> fix usage of scheduled for removal API </li>
+      <li> make etcd value preview panel vertical-scrollable, authored by <a href="https://github.com/machenity">machenity</a></li>
     </ul>
     1.4.0<br>
     <ul>

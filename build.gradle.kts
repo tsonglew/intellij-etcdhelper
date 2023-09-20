@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.tsonglew"
-version = "1.4.1-rc1"
+version = "1.4.1-rc2"
 
 repositories {
     mavenCentral()
