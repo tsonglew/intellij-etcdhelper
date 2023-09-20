@@ -176,6 +176,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
                     isRefrainFromScrolling = false
                     isAnimatedScrolling = true
                 }
+                editor.setVerticalScrollbarVisible(true)
             }
         }
 
