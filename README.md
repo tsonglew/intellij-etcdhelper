@@ -20,6 +20,8 @@ a simple intellij platform etcd plugin
         - [Notification](#get-notification-when-event-triggered)
 - [Install](#install)
     - [JetBrains Plugins](#jetbrains-plugins)
+        - [Stable Version](#stable-version)
+        - [EAP Version](#eap-version)
     - [Manually](#manually)
         - [Download GitHub Releases](#download-github-releases)
         - [Install from disk](#install-from-disk)
@@ -61,7 +63,15 @@ a simple intellij platform etcd plugin
 
 ## JetBrains Plugins
 
-[JetBrains Plugins](https://plugins.jetbrains.com/plugin/19924-etcdhelper)
+### Stable Version
+
+[EtcdHelper on JetBrains Plugins Marketplace](https://plugins.jetbrains.com/plugin/19924-etcdhelper)
+
+### EAP Version
+
+See [Configuring a Custom Channel in IntelliJ Platform Based IDEs](https://plugins.jetbrains.com/docs/marketplace/custom-release-channels.html#9efde0b8)
+and install from EAP channel
+
 
 ## Manually
 
