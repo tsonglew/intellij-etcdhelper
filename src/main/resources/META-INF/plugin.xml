@@ -95,8 +95,6 @@
       parentId="tools"/>
     <applicationService
       serviceImplementation="com.github.tsonglew.etcdhelper.service.GlobalConnectionSetting"/>
-    <applicationService
-      serviceImplementation="com.github.tsonglew.etcdhelper.service.ProjectConnectionSetting"/>
     <fileEditorProvider
       implementation="com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayEditorProvider"/>
     <postStartupActivity
