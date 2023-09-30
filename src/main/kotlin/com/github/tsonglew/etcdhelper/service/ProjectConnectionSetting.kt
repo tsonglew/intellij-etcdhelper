@@ -25,17 +25,16 @@
 package com.github.tsonglew.etcdhelper.service
 
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
-import com.intellij.openapi.components.StoragePathMacros
+import com.intellij.openapi.components.*
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 
+@Service(Service.Level.PROJECT)
 @State(name = "EtcdHelper", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
+@Suppress("unused")
 class ProjectConnectionSetting : PersistentStateComponent<ProjectConnectionSetting>, ConnectionSettings {
 
-    var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
+    private var connectionInfos: ArrayList<EtcdConnectionInfo> = arrayListOf()
     override fun getConnectionInfosList(): ArrayList<EtcdConnectionInfo> = connectionInfos
     companion object {
         @JvmStatic
