@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.treenode
+package com.github.tsonglew.etcdhelper.tree.node
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
@@ -36,7 +36,7 @@ class EtcdConnectionTreeNode(
     val active: Boolean
         get() {
             if (etcdConnectionInfo == null || connectionManager == null) return false
-            return connectionManager.getClient(etcdConnectionInfo)?.isActive() ?: false
+            return connectionManager.getClient(etcdConnectionInfo).isActive()
         }
 
     constructor() : this(null, null)

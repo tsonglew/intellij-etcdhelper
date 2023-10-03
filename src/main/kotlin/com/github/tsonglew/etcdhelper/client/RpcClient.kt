@@ -24,6 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.client
 
+import com.github.tsonglew.etcdhelper.api.UserItem
 import com.github.tsonglew.etcdhelper.api.WatchItem
 import io.etcd.jetcd.KeyValue
 import io.etcd.jetcd.Watch.Watcher
@@ -46,4 +47,5 @@ interface RpcClient {
     fun stopWatch(watchItem: WatchItem)
     fun getWatchItems(): MutableList<WatchItem>
     fun isActive(): Boolean
+    fun listUsers(): List<UserItem>
 }

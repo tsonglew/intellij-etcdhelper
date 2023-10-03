@@ -24,6 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.client.impl
 
+import com.github.tsonglew.etcdhelper.api.UserItem
 import com.github.tsonglew.etcdhelper.api.WatchItem
 import com.github.tsonglew.etcdhelper.client.RpcClient
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
@@ -216,8 +217,22 @@ class EtcdClient(
     }
 
     // User management
-    fun listUsers() {
-        // TODO: etcdctl user list
+    override fun listUsers(): List<UserItem> {
+        try {
+            return authClient?.userList()?.get()?.users?.map { u ->
+                UserItem(u, authClient?.userGet(bytesOf(u))?.get()?.roles ?: emptyList())
+            } ?: emptyList()
+        } catch (e: Exception) {
+            thisLogger().info("list users error: ${e.message}")
+            e.printStackTrace()
+            project ?: return emptyList()
+            Notifier.notifyError(
+                "Connection Failed",
+                "Please check your connection info: $etcdConnectionInfo, error: $e",
+                project
+            )
+        }
+        return emptyList()
     }
 
     fun addUser() {

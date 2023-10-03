@@ -38,6 +38,7 @@ import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.TitledSeparator
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.layout.selected
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -56,22 +57,14 @@ class EtcdConnectionSettingsDialog(
     private val remarkTextField = JBTextField("", 20)
     private val usernameTextField = JBTextField("", 20)
     private val passwordTextField = JPasswordField("", 20)
-    private val enableAuthCheckBox = JCheckBox().apply {
-        addActionListener {
-            updateEnableAuthCheckBoxStatus()
-        }
-    }
+    private val enableAuthCheckBox = JCheckBox()
 
     // How to Build Jectd Client for One TLS Secured Etcd Cluster:
     // https://github.com/etcd-io/jetcd/blob/main/docs/SslConfig.md
     private val tlsCaCertBtn = TextFieldWithBrowseButton(JBTextField("", 20))
     private val tlsClientKeyBtn = TextFieldWithBrowseButton(JBTextField("", 20))
     private val tlsClientCertBtn = TextFieldWithBrowseButton(JBTextField("", 20))
-    private val tlsCheckBox = JCheckBox().apply {
-        addActionListener {
-            updateTlsCheckBoxStatus()
-        }
-    }
+    private val tlsCheckBox = JCheckBox()
 
     init {
         super.init()
@@ -102,22 +95,9 @@ class EtcdConnectionSettingsDialog(
             tlsClientKey?.let { tlsClientKeyBtn.text = tlsClientKey!! }
             tlsClientCert?.let { tlsClientCertBtn.text = tlsClientCert!! }
         }
-        updateEnableAuthCheckBoxStatus()
-        updateTlsCheckBoxStatus()
         bindFileChooserAction(tlsCaCertBtn)
         bindFileChooserAction(tlsClientKeyBtn)
         bindFileChooserAction(tlsClientCertBtn)
-    }
-
-    private fun updateEnableAuthCheckBoxStatus() {
-        usernameTextField.isEnabled = enableAuthCheckBox.isSelected
-        passwordTextField.isEnabled = enableAuthCheckBox.isSelected
-    }
-
-    private fun updateTlsCheckBoxStatus() {
-        tlsCaCertBtn.isEnabled = tlsCheckBox.isSelected
-        tlsClientKeyBtn.isEnabled = tlsCheckBox.isSelected
-        tlsClientCertBtn.isEnabled = tlsCheckBox.isSelected
     }
 
     private fun bindFileChooserAction(btn: TextFieldWithBrowseButton) {
@@ -148,13 +128,18 @@ class EtcdConnectionSettingsDialog(
             row("Connection Name:") { cell(remarkTextField) }
             separator("Authentication")
             row("Enable Auth:") { cell(enableAuthCheckBox) }
-            row("Username:") { cell(usernameTextField) }
-            row("Password:") { cell(passwordTextField) }
+            row("Username:") { cell(usernameTextField).enabledIf(enableAuthCheckBox.selected) }
+            row("Password:") { cell(passwordTextField).enabledIf(enableAuthCheckBox.selected) }
             separator("SSL/TLS Configuration")
             row("Enable SSL/TLS:") { cell(tlsCheckBox) }
-            row("SSL/TLS CA Certificate:") { cell(tlsCaCertBtn) }
-            row("SSL/TLS Client Key:") { cell(tlsClientKeyBtn) }
-            row("SSL/TLS Client Certificate:") { cell(tlsClientCertBtn) }
+            row("SSL/TLS CA Certificate:") { cell(tlsCaCertBtn).enabledIf(tlsCheckBox.selected) }
+            row("SSL/TLS Client Key:") { cell(tlsClientKeyBtn).enabledIf(tlsCheckBox.selected) }
+            row("SSL/TLS Client Certificate:") {
+                cell(tlsClientCertBtn).enabledIf(
+                    tlsCheckBox
+                        .selected
+                )
+            }
             row { cell(endpointPanel!!) }
         }
 

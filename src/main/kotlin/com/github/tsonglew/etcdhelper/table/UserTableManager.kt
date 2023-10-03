@@ -22,25 +22,29 @@
  * SOFTWARE.
  */
 
-package com.github.tsonglew.etcdhelper.view.render
+package com.github.tsonglew.etcdhelper.table
 
-import com.github.tsonglew.etcdhelper.tree.node.EtcdConnectionTreeNode
-import com.intellij.icons.AllIcons
-import com.intellij.ui.ColoredTreeCellRenderer
-import javax.swing.JTree
+import com.github.tsonglew.etcdhelper.common.ConnectionManager
+import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import javax.swing.table.DefaultTableModel
 
-class ConnectionTreeCellRenderer : ColoredTreeCellRenderer() {
-    override fun customizeCellRenderer(
-        tree: JTree,
-        value: Any?,
-        selected: Boolean,
-        expanded: Boolean,
-        leaf: Boolean,
-        row: Int,
-        hasFocus: Boolean
-    ) {
-        val node = value as EtcdConnectionTreeNode
-        append(node.toString())
-        icon = if (node.active) AllIcons.Debugger.Value else AllIcons.Debugger.VariablesTab
+class UserTableManager(
+    override val connectionManager: ConnectionManager,
+    override var connectionInfo: EtcdConnectionInfo?
+) : BaseTableManager {
+    override val tableName = "Users"
+    override val sectionInfo = TableSectionInfo(tableName, arrayOf("User", "Roles"), arrayOf())
+    override val model = DefaultTableModel(sectionInfo.infoArray, sectionInfo.columns)
+    override val table = createTable()
+
+    override fun getSectionInfoArr(connectionInfo: EtcdConnectionInfo): Array<Array<String>> {
+        val client = connectionManager.getClient(connectionInfo)
+        val users = client.listUsers()
+        return users.map {
+            arrayOf(
+                it.user,
+                it.roles.joinToString(",")
+            )
+        }.toTypedArray()
     }
 }
