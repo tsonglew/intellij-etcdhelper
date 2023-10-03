@@ -24,19 +24,15 @@
 
 package com.github.tsonglew.etcdhelper.window
 
-import com.github.tsonglew.etcdhelper.action.*
-import com.github.tsonglew.etcdhelper.common.ConnectionManager
-import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
-import com.github.tsonglew.etcdhelper.common.PropertyUtil
-import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
-import com.github.tsonglew.etcdhelper.table.AlarmListTableManager
-import com.github.tsonglew.etcdhelper.table.MemberListTableManager
-import com.github.tsonglew.etcdhelper.table.MemberStatusListTableManager
-import com.github.tsonglew.etcdhelper.table.WatchListTableManager
-import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
+import com.github.tsonglew.etcdhelper.action.DeleteAction
+import com.github.tsonglew.etcdhelper.action.RefreshAction
+import com.github.tsonglew.etcdhelper.action.group.ConnectionActionGroup
+import com.github.tsonglew.etcdhelper.common.*
+import com.github.tsonglew.etcdhelper.table.*
+import com.github.tsonglew.etcdhelper.tree.ConnectionTree
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFileSystem
-import com.github.tsonglew.etcdhelper.view.render.ConnectionTreeCellRenderer
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -46,38 +42,24 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.OnePixelSplitter
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.ui.treeStructure.Tree
+import com.intellij.util.xml.ui.DomCollectionControl.AddAction
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.annotations.NonNls
 import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.DefaultTreeModel
 
 class MainToolWindow(private val project: Project) : Disposable {
-    private val connectionTree = Tree().apply {
-        model = DefaultTreeModel(EtcdConnectionTreeNode())
-        cellRenderer = ConnectionTreeCellRenderer()
-        alignmentX = Component.LEFT_ALIGNMENT
-        addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent?) {
-                // click priority: BUTTON3 > 2 clicks > 1 click
-                when {
-                    // click right button
-                    e?.button == MouseEvent.BUTTON3 -> {
-                        selectionPath?.path?.let { createEditConnPopUp(e) }
-                            ?: createCreateConnPopUp(e)
-                    }
 
-                    selectionPath?.path == null -> return
-                    e?.clickCount == 2 -> openConnection()
-                    e?.clickCount == 1 -> updateConnectionInfoPanel()
-                }
-            }
-        })
-    }
+    private val connectionTree: ConnectionTree = ConnectionTree(
+        { _ -> updateConnectionInfoPanel() },
+        { _ -> openConnection() },
+        { e -> popUpAtEventPosition("EditConnPopUp", editConnActionGrp, e) },
+        { e -> popUpAtEventPosition("AddConnPopUp", addConnActionGrp, e) },
+    )
 
     private val propertyUtil = PropertyUtil(project)
     private val connectionManager = ConnectionManager.getInstance(
@@ -88,20 +70,24 @@ class MainToolWindow(private val project: Project) : Disposable {
     ).apply {
         initConnections(connectionTree)
     }
+    private val connActionGrp = createConnectionActionGroup(
+        ActionTypeEnum.ADD, ActionTypeEnum.DELETE,
+        ActionTypeEnum.EDIT, ActionTypeEnum.SEPARATOR
+    )
+    private val addConnActionGrp = createConnectionActionGroup(ActionTypeEnum.ADD)
+    private val editConnActionGrp = createConnectionActionGroup(
+        ActionTypeEnum.ADD,
+        ActionTypeEnum.EDIT, ActionTypeEnum.SEPARATOR
+    )
 
-    private val connActionGrp = DefaultActionGroup().apply {
-        add(ConnectionAddAction.create(project, connectionManager))
-        add(ConnectionDeleteAction.create(project, connectionTree, connectionManager))
-        add(EditAction.create(project, connectionTree, connectionManager))
-        addSeparator()
-    }
-    private val createConnActionGrp = DefaultActionGroup().apply {
-        add(ConnectionAddAction.create(project, connectionManager))
-    }
-    private val editConnActionGrp = DefaultActionGroup().apply {
-        add(ConnectionDeleteAction.create(project, connectionTree, connectionManager))
-        add(EditAction.create(project, connectionTree, connectionManager))
-        addSeparator()
+    private fun createConnectionActionGroup(vararg actionTypeEnum: ActionTypeEnum) =
+        ConnectionActionGroup(project, connectionManager, connectionTree, *actionTypeEnum)
+
+    private fun popUpAtEventPosition(place: @NonNls String, group: ActionGroup, e: MouseEvent) {
+        ActionManager.getInstance().createActionPopupMenu(place, group)
+            .apply {
+                component.show(connectionTree, e.x, e.y)
+            }
     }
 
     private val connActionPanel = JPanel().apply {
@@ -123,6 +109,7 @@ class MainToolWindow(private val project: Project) : Disposable {
     private val alarmListTableManager = AlarmListTableManager(connectionManager, null)
     private val memberStatusListTableManager = MemberStatusListTableManager(connectionManager, null)
     private val watchListTableManager = WatchListTableManager(connectionManager, null)
+    private val userTableManager = UserTableManager(connectionManager, null)
 
     private val connectionInfoPanel =
         JBTabbedPane(JTabbedPane.TOP, JBTabbedPane.WRAP_TAB_LAYOUT).also {
@@ -136,6 +123,7 @@ class MainToolWindow(private val project: Project) : Disposable {
                 watchListTableManager.tableName,
                 createWatchPanel(watchListTableManager)
             )
+            it.addTab(userTableManager.tableName, JBScrollPane(userTableManager.table))
         }
     val content = JPanel(BorderLayout()).apply {
         add(connActionPanel, BorderLayout.NORTH)
@@ -151,20 +139,36 @@ class MainToolWindow(private val project: Project) : Disposable {
         })
     }
 
+    private fun createMemberListPanel(memberListTableManager: MemberListTableManager): JPanel {
+        val actions = DefaultActionGroup().apply {
+            add(AddAction().apply { })
+            add(DeleteAction().apply { action = { } })
+            add(RefreshAction().apply { action = { updateConnectionInfoPanel() } })
+            addSeparator()
+        }
+        val actionToolBar = ActionManager.getInstance()
+            .createActionToolbar(ActionPlaces.TOOLBAR, actions, true)
+            .apply { this.targetComponent = memberListTableManager.table }
+        return JPanel(BorderLayout()).apply {
+            add(actionToolBar.component, BorderLayout.NORTH)
+            add(JBScrollPane(memberListTableManager.table), BorderLayout.CENTER)
+        }
+    }
+
     private fun createWatchPanel(watchListTableManager: WatchListTableManager): JPanel {
         val actions = DefaultActionGroup().apply {
             add(DeleteAction().apply { action = { watchListTableManager.deleteSelectedRows() } })
             add(RefreshAction().apply { action = { updateConnectionInfoPanel() } })
             addSeparator()
         }
-        val actionsToolBar = ActionManager.getInstance()
+        val actionToolBar = ActionManager.getInstance()
             .createActionToolbar(ActionPlaces.TOOLBAR, actions, true)
             .apply {
                 this.targetComponent = watchListTableManager.table
             }
         return JPanel(BorderLayout()).apply {
             add(
-                actionsToolBar.component,
+                actionToolBar.component,
                 BorderLayout.NORTH
             )
             add(JBScrollPane(watchListTableManager.table), BorderLayout.CENTER)
@@ -185,30 +189,29 @@ class MainToolWindow(private val project: Project) : Disposable {
         }.submit(ThreadPoolManager.executor)
     }
 
-    private fun createCreateConnPopUp(e: MouseEvent) {
-        ActionManager.getInstance().createActionPopupMenu("CreateConnPopUp", createConnActionGrp)
-            .apply {
-                component.show(connectionTree, e.x, e.y)
-            }
-    }
-
-    private fun createEditConnPopUp(e: MouseEvent) {
-        ActionManager.getInstance().createActionPopupMenu("EditConnPopUp", editConnActionGrp)
-            .apply {
-                component.show(connectionTree, e.x, e.y)
-            }
-    }
-
     fun updateConnectionInfoPanel() {
         ReadAction.nonBlocking<Any?> {
             val connectionTreeNodePath = connectionTree.selectionPath?.path?.get(1)
                 ?: return@nonBlocking
             val connectionNode = connectionTreeNodePath as DefaultMutableTreeNode
             val connectionInfo = connectionNode.userObject as EtcdConnectionInfo
-            memberListTableManager.updateConnectionInfo(connectionInfo)
-            alarmListTableManager.updateAlarmInfo(connectionInfo)
-            memberStatusListTableManager.updateMemberStatusInfo(connectionInfo)
-            watchListTableManager.updateConnectionInfo(connectionInfo)
+            runBlocking {
+                launch {
+                    memberListTableManager.updateConnectionInfo(connectionInfo)
+                }
+                launch {
+                    alarmListTableManager.updateAlarmInfo(connectionInfo)
+                }
+                launch {
+                    memberStatusListTableManager.updateMemberStatusInfo(connectionInfo)
+                }
+                launch {
+                    watchListTableManager.updateConnectionInfo(connectionInfo)
+                }
+                launch {
+                    userTableManager.updateConnectionInfo(connectionInfo)
+                }
+            }
         }.submit(ThreadPoolManager.executor)
     }
 

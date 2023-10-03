@@ -67,7 +67,7 @@ class WatchListTableManager(
     fun updateConnectionInfo(connectionInfo: EtcdConnectionInfo) {
         this.connectionInfo = connectionInfo
         val client = connectionManager.getClient(connectionInfo)
-        val watchItems = client?.getWatchItems() ?: return
+        val watchItems = client.getWatchItems()
         sectionInfo.infoArray = watchItems.map {
             arrayOf(
                 it.key,

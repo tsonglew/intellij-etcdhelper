@@ -24,7 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.view.render
 
-import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
+import com.github.tsonglew.etcdhelper.tree.node.EtcdConnectionTreeNode
 import com.intellij.icons.AllIcons
 import com.intellij.ui.ColoredTreeCellRenderer
 import javax.swing.JTree

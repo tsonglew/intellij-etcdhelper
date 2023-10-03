@@ -26,7 +26,7 @@ package com.github.tsonglew.etcdhelper.common
 
 import com.github.tsonglew.etcdhelper.client.RpcClient
 import com.github.tsonglew.etcdhelper.client.impl.EtcdClient
-import com.github.tsonglew.etcdhelper.treenode.EtcdConnectionTreeNode
+import com.github.tsonglew.etcdhelper.tree.node.EtcdConnectionTreeNode
 import com.github.tsonglew.etcdhelper.view.editor.EtcdKeyValueDisplayVirtualFile
 import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.openapi.Disposable
