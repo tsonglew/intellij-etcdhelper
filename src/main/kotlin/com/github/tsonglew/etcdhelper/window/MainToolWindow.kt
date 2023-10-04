@@ -110,6 +110,7 @@ class MainToolWindow(private val project: Project) : Disposable {
     private val memberStatusListTableManager = MemberStatusListTableManager(connectionManager, null)
     private val watchListTableManager = WatchListTableManager(connectionManager, null)
     private val userTableManager = UserTableManager(connectionManager, null)
+    private val roleTableManager = RoleTableManager(connectionManager, null)
 
     private val connectionInfoPanel =
         JBTabbedPane(JTabbedPane.TOP, JBTabbedPane.WRAP_TAB_LAYOUT).also {
@@ -124,6 +125,7 @@ class MainToolWindow(private val project: Project) : Disposable {
                 createWatchPanel(watchListTableManager)
             )
             it.addTab(userTableManager.tableName, JBScrollPane(userTableManager.table))
+            it.addTab(roleTableManager.tableName, JBScrollPane(roleTableManager.table))
         }
     val content = JPanel(BorderLayout()).apply {
         add(connActionPanel, BorderLayout.NORTH)
@@ -210,6 +212,9 @@ class MainToolWindow(private val project: Project) : Disposable {
                 }
                 launch {
                     userTableManager.updateConnectionInfo(connectionInfo)
+                }
+                launch {
+                    roleTableManager.updateConnectionInfo(connectionInfo)
                 }
             }
         }.submit(ThreadPoolManager.executor)

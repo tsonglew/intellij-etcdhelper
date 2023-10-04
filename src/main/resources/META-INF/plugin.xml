@@ -4,8 +4,10 @@
   <change-notes><![CDATA[
     1.4.1<br>
     <ul>
-      <li> fix usage of scheduled for removal API </li>
+      <li> support user/role query </li>
       <li> make etcd value preview panel vertical-scrollable, authored by <a href="https://github.com/machenity">machenity</a></li>
+      <li> fix usage of scheduled for removal API </li>
+      <li> optimize main tool window loading with kotlin coroutine </li>
     </ul>
     1.4.0<br>
     <ul>

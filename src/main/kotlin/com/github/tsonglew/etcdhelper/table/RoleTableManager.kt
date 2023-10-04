@@ -26,25 +26,36 @@ package com.github.tsonglew.etcdhelper.table
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
+import io.etcd.jetcd.auth.Permission
 import javax.swing.table.DefaultTableModel
 
-class UserTableManager(
+class RoleTableManager(
     override val connectionManager: ConnectionManager,
     override var connectionInfo: EtcdConnectionInfo?
 ) : BaseTableManager {
-    override val tableName = "Users"
-    override val sectionInfo = TableSectionInfo(tableName, arrayOf("User", "Roles"), arrayOf())
+    override val tableName = "Roles"
+    override val sectionInfo = TableSectionInfo(
+        tableName, arrayOf("Roles", "Permissions"),
+        arrayOf()
+    )
     override val model = DefaultTableModel(sectionInfo.infoArray, sectionInfo.columns)
     override val table = createTable()
 
     override suspend fun getSectionInfoArr(connectionInfo: EtcdConnectionInfo): Array<Array<String>> {
         val client = connectionManager.getClient(connectionInfo)
-        val users = client.listUsers()
-        return users.map {
-            arrayOf(
-                it.user,
-                it.roles.joinToString(",")
-            )
-        }.toTypedArray()
+        val roles = client.listRoles()
+        var result = arrayOf<Array<String>>()
+        roles.forEach {
+            it.permissions.forEach { p ->
+                result += arrayOf(it.role, p.toColumnString())
+            }
+        }
+        return result
     }
+
+    private fun Permission.toColumnString() =
+        "Type: ${this.permType}, Key: ${this.key}, rangeEnd: ${
+            this
+                .rangeEnd
+        }"
 }

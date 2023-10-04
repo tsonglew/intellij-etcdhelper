@@ -24,6 +24,7 @@
 
 package com.github.tsonglew.etcdhelper.client.impl
 
+import com.github.tsonglew.etcdhelper.api.RoleItem
 import com.github.tsonglew.etcdhelper.api.UserItem
 import com.github.tsonglew.etcdhelper.api.WatchItem
 import com.github.tsonglew.etcdhelper.client.RpcClient
@@ -39,6 +40,9 @@ import io.etcd.jetcd.cluster.Member
 import io.etcd.jetcd.maintenance.AlarmMember
 import io.etcd.jetcd.options.*
 import io.grpc.netty.GrpcSslContexts
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -217,22 +221,28 @@ class EtcdClient(
     }
 
     // User management
-    override fun listUsers(): List<UserItem> {
+    override suspend fun listUsers(): List<UserItem> = coroutineScope {
         try {
-            return authClient?.userList()?.get()?.users?.map { u ->
-                UserItem(u, authClient?.userGet(bytesOf(u))?.get()?.roles ?: emptyList())
-            } ?: emptyList()
+            val userListDeferred = async { authClient?.userList()?.get()?.users ?: emptyList() }
+
+            val usersWithRoles = userListDeferred.await().map { user ->
+                async {
+                    val roles = authClient?.userGet(bytesOf(user))?.get()?.roles ?: emptyList()
+                    UserItem(user, roles)
+                }
+            }.awaitAll()
+            return@coroutineScope usersWithRoles.sortedBy { it.user }
         } catch (e: Exception) {
             thisLogger().info("list users error: ${e.message}")
             e.printStackTrace()
-            project ?: return emptyList()
+            project ?: return@coroutineScope emptyList()
             Notifier.notifyError(
                 "Connection Failed",
                 "Please check your connection info: $etcdConnectionInfo, error: $e",
                 project
             )
         }
-        return emptyList()
+        return@coroutineScope emptyList()
     }
 
     fun addUser() {
@@ -260,8 +270,29 @@ class EtcdClient(
     }
 
     // Role management
-    fun listRoles() {
-        // TODO: etcdctl role list
+    override suspend fun listRoles(): List<RoleItem> = coroutineScope {
+        try {
+            val rolesListDeferred = async { authClient?.roleList()?.get()?.roles ?: emptyList() }
+
+            val rolesWithPermission = rolesListDeferred.await().map { role ->
+                async {
+                    val permissions =
+                        authClient?.roleGet(bytesOf(role))?.get()?.permissions ?: emptyList()
+                    RoleItem(role, permissions)
+                }
+            }.awaitAll()
+            return@coroutineScope rolesWithPermission.sortedBy { it.role }
+        } catch (e: Exception) {
+            thisLogger().info("list users error: ${e.message}")
+            e.printStackTrace()
+            project ?: return@coroutineScope emptyList()
+            Notifier.notifyError(
+                "Connection Failed",
+                "Please check your connection info: $etcdConnectionInfo, error: $e",
+                project
+            )
+        }
+        return@coroutineScope emptyList()
     }
 
     fun addRole() {
