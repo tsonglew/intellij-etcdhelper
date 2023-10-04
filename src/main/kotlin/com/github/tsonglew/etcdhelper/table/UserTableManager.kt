@@ -37,7 +37,7 @@ class UserTableManager(
     override val model = DefaultTableModel(sectionInfo.infoArray, sectionInfo.columns)
     override val table = createTable()
 
-    override fun getSectionInfoArr(connectionInfo: EtcdConnectionInfo): Array<Array<String>> {
+    override suspend fun getSectionInfoArr(connectionInfo: EtcdConnectionInfo): Array<Array<String>> {
         val client = connectionManager.getClient(connectionInfo)
         val users = client.listUsers()
         return users.map {

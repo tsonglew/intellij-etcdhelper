@@ -24,7 +24,7 @@ interface BaseTableManager {
             border = LineBorder(JBColor.GRAY)
         }
 
-    fun getSectionInfoArr(connectionInfo: EtcdConnectionInfo): Array<Array<String>>
+    suspend fun getSectionInfoArr(connectionInfo: EtcdConnectionInfo): Array<Array<String>>
 
     fun createTable(): JBTable {
         val tableCellRenderer = renderer
@@ -37,7 +37,7 @@ interface BaseTableManager {
         }
     }
 
-    fun updateConnectionInfo(connectionInfo: EtcdConnectionInfo) {
+    suspend fun updateConnectionInfo(connectionInfo: EtcdConnectionInfo) {
         if (this.connectionInfo == connectionInfo) {
             return
         }
