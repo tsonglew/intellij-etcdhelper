@@ -45,6 +45,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
 import io.etcd.jetcd.KeyValue
+import kotlinx.coroutines.runBlocking
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
@@ -112,12 +113,12 @@ class EtcdKeyTreeDisplayPanel(
     }
 
     fun renderKeyTree(searchSymbol: String = "/", limit: Int = 0) {
-        allKeys = connectionManager.getClient(etcdConnectionInfo)
-            .getByPrefix(searchSymbol, limit)
-            .apply { sortedBy { it.key.toString() } }
         keyDisplayLoadingDecorator.startLoading(false)
-        keyCountLabel.text = "Key counts: ${allKeys.size}"
         ReadAction.nonBlocking {
+            allKeys = connectionManager.getClient(etcdConnectionInfo)
+                .getByPrefix(searchSymbol, limit)
+                .apply { sortedBy { it.key.toString() } }
+            keyCountLabel.text = "Key counts: ${allKeys.size}"
             try {
                 flatRootNode = DefaultMutableTreeNode(etcdConnectionInfo).apply {
                     isVisible = false

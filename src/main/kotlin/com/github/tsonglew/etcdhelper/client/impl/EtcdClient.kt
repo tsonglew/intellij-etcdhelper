@@ -31,6 +31,7 @@ import com.github.tsonglew.etcdhelper.client.RpcClient
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
 import com.github.tsonglew.etcdhelper.common.Notifier
 import com.github.tsonglew.etcdhelper.common.PasswordUtil
+import com.github.tsonglew.etcdhelper.common.PropertyUtil
 import com.github.tsonglew.etcdhelper.common.StringUtils.string2Bytes
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -51,7 +52,8 @@ import java.util.concurrent.TimeUnit
  */
 class EtcdClient(
     val etcdConnectionInfo: EtcdConnectionInfo,
-    val project: Project? = null
+    val project: Project? = null,
+    private val propertyUtil: PropertyUtil
 ) : RpcClient {
     private var client: Client? = null
     private var kvClient: KV? = null
@@ -206,7 +208,9 @@ class EtcdClient(
             if ((limit != null) && (limit > 0)) {
                 optionBuilder.withLimit(limit.toLong())
             }
-            return kvClient!![searchKey, optionBuilder.build()][1L, TimeUnit.SECONDS].kvs
+            return kvClient!![searchKey, optionBuilder.build()][propertyUtil.connectionService
+                .defaultEtcdQueryTimeout.toLong(), TimeUnit
+                .SECONDS].kvs
         } catch (e: Exception) {
             thisLogger().info("get by prefix error: ${e.message}")
             e.printStackTrace()
@@ -318,7 +322,9 @@ class EtcdClient(
 
     override fun get(key: String): List<KeyValue> {
         try {
-            return kvClient!![bytesOf(key)].get(1L, TimeUnit.SECONDS).kvs
+            return kvClient!![bytesOf(key)].get(propertyUtil.connectionService
+                .defaultEtcdQueryTimeout.toLong(), TimeUnit
+                .SECONDS).kvs
         } catch (e: Exception) {
             thisLogger().info("get key $key error: ${e.message}")
             e.printStackTrace()

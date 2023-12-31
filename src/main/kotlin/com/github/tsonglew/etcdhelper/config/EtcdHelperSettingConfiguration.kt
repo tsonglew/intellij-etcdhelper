@@ -43,6 +43,7 @@ class EtcdHelperSettingConfiguration : Configurable {
     private val defaultGroupSymbolTextField = JBTextField(propertyUtil.connectionService.defaultGroupSymbol, 10)
     private val defaultSearchLimitTextField = JBTextField("%d".format(propertyUtil.connectionService.defaultSearchLimit), 10)
     private val enableCheatsheetPopupCheckBox = JBCheckBox("Enable cheatsheet popup (if enabled, random etcdctl cheatsheet will be popped up when opening a project)", propertyUtil.connectionService.enableCheatsheetPopup)
+    private val defaultEtcdQueryTimeoutTextField = JBTextField("%d".format(propertyUtil.connectionService.defaultEtcdQueryTimeout), 10)
 
     private val component = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -54,6 +55,7 @@ class EtcdHelperSettingConfiguration : Configurable {
                         JLabel("Default search symbol:"),
                         JLabel("Default group symbol:"),
                         JLabel("Default search limit:"),
+                        JLabel("Default etcd query timeout:")
                 ).forEach {
                     it.preferredSize = Dimension(100, 30)
                     add(it)
@@ -65,6 +67,7 @@ class EtcdHelperSettingConfiguration : Configurable {
                         defaultSearchSymbolTextField,
                         defaultGroupSymbolTextField,
                         defaultSearchLimitTextField,
+                        defaultEtcdQueryTimeoutTextField
                 ).forEach { add(it) }
             })
             alignmentX = LEFT_ALIGNMENT
@@ -77,13 +80,16 @@ class EtcdHelperSettingConfiguration : Configurable {
     override fun isModified() = defaultSearchSymbolTextField.text != propertyUtil.connectionService.defaultSearchSymbol ||
             defaultGroupSymbolTextField.text != propertyUtil.connectionService.defaultGroupSymbol ||
             defaultSearchLimitTextField.text != "%d".format(propertyUtil.connectionService.defaultSearchLimit) ||
-            enableCheatsheetPopupCheckBox.isSelected != propertyUtil.connectionService.enableCheatsheetPopup
+            enableCheatsheetPopupCheckBox.isSelected != propertyUtil.connectionService
+                .enableCheatsheetPopup || defaultEtcdQueryTimeoutTextField.text != "%d".format(propertyUtil.connectionService.defaultEtcdQueryTimeout)
 
     override fun apply() {
         propertyUtil.connectionService.defaultSearchSymbol = defaultSearchSymbolTextField.text
         propertyUtil.connectionService.defaultGroupSymbol = defaultGroupSymbolTextField.text
         propertyUtil.connectionService.defaultSearchLimit = defaultSearchLimitTextField.text.toInt()
         propertyUtil.connectionService.enableCheatsheetPopup = enableCheatsheetPopupCheckBox.isSelected
+        propertyUtil.connectionService.defaultEtcdQueryTimeout =
+            defaultEtcdQueryTimeoutTextField.text.toInt()
     }
 
     override fun getDisplayName() = "Etcd Helper"

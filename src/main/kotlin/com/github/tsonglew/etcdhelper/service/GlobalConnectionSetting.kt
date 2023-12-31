@@ -42,6 +42,7 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
     var defaultGroupSymbol = "/"
     var defaultSearchLimit = 1000
     var enableCheatsheetPopup = true
+    var defaultEtcdQueryTimeout = 5
 
     companion object {
         @JvmStatic
@@ -53,7 +54,10 @@ class GlobalConnectionSetting : PersistentStateComponent<GlobalConnectionSetting
     override fun getState() = this
     override fun loadState(state: GlobalConnectionSetting) {
         XmlSerializerUtil.copyBean(state, this)
-        thisLogger().info("load state, connections: $connectionInfos,  defaultSearchSymbol: $defaultSearchSymbol, defaultGroupSymbol: $defaultGroupSymbol, defaultSearchLimit: $defaultSearchLimit, enableCheatsheetPopup: $enableCheatsheetPopup")
+        thisLogger().info("load state, connections: $connectionInfos,  defaultSearchSymbol: " +
+                "$defaultSearchSymbol, defaultGroupSymbol: $defaultGroupSymbol, " +
+                "defaultSearchLimit: $defaultSearchLimit, enableCheatsheetPopup: " +
+                "$enableCheatsheetPopup, defaultEtcdOperationTimeout: $defaultEtcdQueryTimeout")
     }
 
     override fun getConnectionInfosList() = connectionInfos
