@@ -126,19 +126,22 @@ class EtcdConnectionSettingsDialog(
 
         centerPanel = panel {
             row("Connection Name:") { cell(remarkTextField) }
-            separator("Authentication")
-            row("Enable Auth:") { cell(enableAuthCheckBox) }
-            row("Username:") { cell(usernameTextField).enabledIf(enableAuthCheckBox.selected) }
-            row("Password:") { cell(passwordTextField).enabledIf(enableAuthCheckBox.selected) }
-            separator("SSL/TLS Configuration")
-            row("Enable SSL/TLS:") { cell(tlsCheckBox) }
-            row("SSL/TLS CA Certificate:") { cell(tlsCaCertBtn).enabledIf(tlsCheckBox.selected) }
-            row("SSL/TLS Client Key:") { cell(tlsClientKeyBtn).enabledIf(tlsCheckBox.selected) }
-            row("SSL/TLS Client Certificate:") {
-                cell(tlsClientCertBtn).enabledIf(
-                    tlsCheckBox
-                        .selected
-                )
+            group("Authentication") {
+                row("Authentication") { }
+                row("Enable Auth:") { cell(enableAuthCheckBox) }
+                row("Username:") { cell(usernameTextField).enabledIf(enableAuthCheckBox.selected) }
+                row("Password:") { cell(passwordTextField).enabledIf(enableAuthCheckBox.selected) }
+            }
+            group("SSL/TLS Configuration") {
+                row("Enable SSL/TLS:") { cell(tlsCheckBox) }
+                row("SSL/TLS CA Certificate:") { cell(tlsCaCertBtn).enabledIf(tlsCheckBox.selected) }
+                row("SSL/TLS Client Key:") { cell(tlsClientKeyBtn).enabledIf(tlsCheckBox.selected) }
+                row("SSL/TLS Client Certificate:") {
+                    cell(tlsClientCertBtn).enabledIf(
+                        tlsCheckBox
+                            .selected
+                    )
+                }
             }
             row { cell(endpointPanel!!) }
         }

@@ -33,12 +33,12 @@ import com.intellij.notification.NotificationAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.vfs.LocalFileSystem
 
-class EhProjectStartupActivity : StartupActivity {
+class EhProjectStartupActivity : ProjectActivity {
 
-    override fun runActivity(project: Project) {
+    private fun runActivity(project: Project) {
         registerVirtualFileListeners()
 
         if (PropertyUtil().connectionService.enableCheatsheetPopup) {
@@ -63,5 +63,9 @@ class EhProjectStartupActivity : StartupActivity {
             ShowSettingsUtil.getInstance().showSettingsDialog(e.project, "EtcdHelper")
             notification.expire()
         }
+    }
+
+    override suspend fun execute(project: Project) {
+        runActivity(project)
     }
 }
