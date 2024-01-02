@@ -2,6 +2,11 @@
 <idea-plugin>
   <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
   <change-notes><![CDATA[
+    1.4.2<br>
+    <ul>
+      <li>upgrade build tools</li>
+      <li>fix: jetbrains ide 2023.3 compatibility</li>
+    </ul>
     1.4.1<br>
     <ul>
       <li> support user/role query </li>
