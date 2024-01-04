@@ -37,6 +37,7 @@ import com.github.tsonglew.etcdhelper.window.MainToolWindow
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
@@ -117,7 +118,7 @@ class EtcdKeyTreeDisplayPanel(
             .apply { sortedBy { it.key.toString() } }
         keyDisplayLoadingDecorator.startLoading(false)
         keyCountLabel.text = "Key counts: ${allKeys.size}"
-        ReadAction.nonBlocking {
+        ReadAction.nonBlocking<Any?> {
             try {
                 flatRootNode = DefaultMutableTreeNode(etcdConnectionInfo).apply {
                     isVisible = false
@@ -127,6 +128,7 @@ class EtcdKeyTreeDisplayPanel(
             } finally {
                 keyDisplayLoadingDecorator.stopLoading()
             }
+
         }.submit(ThreadPoolManager.executor)
     }
 
@@ -166,18 +168,20 @@ class EtcdKeyTreeDisplayPanel(
         if (flatRootNode == null) {
             return
         }
-        groupRootNode(
-            flatRootNode!!,
-            LinkedHashMap<String, KeyValue>().apply {
-                allKeys.forEach {
-                    this[it.key.toString()] = it
-                }
-            },
-            keyValueDisplayPanel.groupSymbol.ifBlank { " " }
-        )
-        treeModel = DefaultTreeModel(flatRootNode)
-        keyTree.model = treeModel
-        treeModel!!.reload()
+        ApplicationManager.getApplication().invokeLater {
+            groupRootNode(
+                flatRootNode!!,
+                LinkedHashMap<String, KeyValue>().apply {
+                    allKeys.forEach {
+                        this[it.key.toString()] = it
+                    }
+                },
+                keyValueDisplayPanel.groupSymbol.ifBlank { " " }
+            )
+            treeModel = DefaultTreeModel(flatRootNode)
+            keyTree.model = treeModel
+            treeModel!!.reload()
+        }
     }
 
     private fun groupRootNode(

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.tsonglew"
-version = "1.4.2"
+version = "1.4.3"
 
 repositories {
     mavenCentral()
@@ -42,7 +42,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("233")
+        sinceBuild.set("232")
         untilBuild.set(provider { null })
     }
 
