@@ -2,6 +2,10 @@
 <idea-plugin>
   <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
   <change-notes><![CDATA[
+    1.4.3<br>
+    <ul>
+      <li> fix usage of scheduled for removal API </li>
+    </ul>
     1.4.2<br>
     <ul>
       <li>upgrade build tools</li>

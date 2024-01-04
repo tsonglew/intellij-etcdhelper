@@ -26,11 +26,9 @@ package com.github.tsonglew.etcdhelper.view.editor
 
 import com.github.tsonglew.etcdhelper.common.ConnectionManager
 import com.github.tsonglew.etcdhelper.common.EtcdConnectionInfo
-import com.github.tsonglew.etcdhelper.common.ThreadPoolManager
 import com.github.tsonglew.etcdhelper.listener.KeyReleasedListener
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.LoadingDecorator
@@ -78,17 +76,24 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         this.loadingDecorator = loadingDecorator
 
         loadingDecorator.startLoading(false)
-        ReadAction.nonBlocking {
+        ApplicationManager.getApplication().invokeLater {
             try {
-                ApplicationManager.getApplication().invokeLater(this::initWithValue)
+                initWithValue()
             } finally {
                 loadingDecorator.stopLoading()
             }
-        }.submit(ThreadPoolManager.executor)
+        }
+//        ReadAction.nonBlocking<Any?> {
+//            try {
+//                ApplicationManager.getApplication().invokeLater(this::initWithValue)
+//            } finally {
+//                loadingDecorator.stopLoading()
+//            }
+//        }.submit(ThreadPoolManager.executor)
     }
 
     private val keyValue: KeyValue?
-        get() = connectionManager.getClient(etcdConnectionInfo)?.get(key)?.let {
+        get() = connectionManager.getClient(etcdConnectionInfo).get(key).let {
             if (it.isNotEmpty()) it[0] else null
         }
 
@@ -136,11 +141,12 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
                 add(JButton("Save", AllIcons.Actions.MenuSaveall).apply {
                     addActionListener {
                         isEnabled = false
-                        connectionManager.getClient(etcdConnectionInfo)?.put(
-                                key,
-                                valueTextArea.text,
-                                if (ttlTextField?.text?.isBlank() == true) 0 else ttlTextField?.text?.toInt()
-                                        ?: 0)
+                        connectionManager.getClient(etcdConnectionInfo).put(
+                            key,
+                            valueTextArea.text,
+                            if (ttlTextField?.text?.isBlank() == true) 0 else ttlTextField?.text?.toInt()
+                                ?: 0
+                        )
                         renderLabels()
                         isEnabled = true
                     }
@@ -210,7 +216,7 @@ class EtcdValueDisplayPanel : JPanel(BorderLayout()) {
         modRevisionLabel.text = "Mod revision: ${kv?.modRevision}; "
         versionLabel.text = "Version: ${kv?.version}; "
         kv?.lease?.apply {
-            connectionManager.getClient(etcdConnectionInfo)?.getLeaseInfo(this).also {
+            connectionManager.getClient(etcdConnectionInfo).getLeaseInfo(this).also {
                 leaseLabel.text = "Lease: %x; ".format(this)
                 ttlTextField?.text = "%d".format(it)
                 ttlTextField?.toolTipText = "%d".format(it)
