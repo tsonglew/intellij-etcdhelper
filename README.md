@@ -89,3 +89,9 @@ see [Install from disk](https://www.jetbrains.com/help/idea/managing-plugins.htm
 * JetBrains kindly provides intellij-etcdhelper with a free open-source licence
 
 <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains Logo (Main) logo.">
+
+# Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=tsonglew/intellij-etcdhelper&type=Date)](https://star-history.com/#tsonglew/intellij-etcdhelper&Date)
+
+
