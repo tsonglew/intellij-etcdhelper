@@ -90,8 +90,7 @@ see [Install from disk](https://www.jetbrains.com/help/idea/managing-plugins.htm
 
 <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains Logo (Main) logo.">
 
-# Star History
+# Stargazers over time
 
-[![Star History Chart](https://api.star-history.com/svg?repos=tsonglew/intellij-etcdhelper&type=Date)](https://star-history.com/#tsonglew/intellij-etcdhelper&Date)
-
+[![Stargazers over time](https://starchart.cc/tsonglew/intellij-etcdhelper.svg?variant=adaptive)](https://starchart.cc/tsonglew/intellij-etcdhelper)
 
