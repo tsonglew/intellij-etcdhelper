@@ -100,7 +100,7 @@ class MainToolWindow(private val project: Project) : Disposable {
                 true
             ).also {
                 it.targetComponent = this
-                it.adjustTheSameSize(true)
+//                it.adjustTheSameSize(true)
             }
         add(actionToolBar.component, BorderLayout.NORTH)
     }
